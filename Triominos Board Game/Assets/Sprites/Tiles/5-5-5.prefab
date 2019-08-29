@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1001 &3202302375551820870
+--- !u!1001 &7372133543156122446
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
@@ -10,7 +10,7 @@ PrefabInstance:
     - target: {fileID: 6663011989867318605, guid: c5e17baf63956a44182f42278bf84893,
         type: 3}
       propertyPath: m_Name
-      value: 0-1-5
+      value: 5-5-5
       objectReference: {fileID: 0}
     - target: {fileID: 6663011989867318605, guid: c5e17baf63956a44182f42278bf84893,
         type: 3}
@@ -142,6 +142,11 @@ PrefabInstance:
       propertyPath: m_textInfo.pageCount
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 8874971219259188847, guid: c5e17baf63956a44182f42278bf84893,
+        type: 3}
+      propertyPath: m_text
+      value: 5
+      objectReference: {fileID: 0}
     - target: {fileID: 5930999317898825046, guid: c5e17baf63956a44182f42278bf84893,
         type: 3}
       propertyPath: m_textInfo.characterCount
@@ -165,6 +170,11 @@ PrefabInstance:
     - target: {fileID: 5930999317898825046, guid: c5e17baf63956a44182f42278bf84893,
         type: 3}
       propertyPath: m_text
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 8376888599134591104, guid: c5e17baf63956a44182f42278bf84893,
+        type: 3}
+      propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8571007026886120033, guid: c5e17baf63956a44182f42278bf84893,
