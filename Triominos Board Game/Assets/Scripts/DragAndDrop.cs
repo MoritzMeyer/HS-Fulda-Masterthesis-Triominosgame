@@ -4,7 +4,8 @@ using UnityEngine;
 
 public class DragAndDrop : MonoBehaviour
 {
-    private bool selected;
+    [HideInInspector]
+    public bool selected;
 
     // Update is called once per frame
     void Update()
@@ -26,6 +27,7 @@ public class DragAndDrop : MonoBehaviour
         if (Input.GetMouseButtonDown(0))
         {
             this.selected = true;
+            this.gameObject.layer = 0;
         }
     }
 }

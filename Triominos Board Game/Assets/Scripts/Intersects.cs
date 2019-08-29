@@ -25,13 +25,25 @@ public class Intersects : MonoBehaviour
     public void OnCollisionEnter2D(Collision2D collision)
     {
         Debug.Log("OnCollisionEnter2D");
-        if (object.Equals(collision.gameObject.tag, OtherTag))
+        if (object.Equals(collision.gameObject.tag, OtherTag) && collision.gameObject.GetComponent<DragAndDrop>().selected)
         {
             GetComponent<Renderer>().material.color = highlightColor;
             //GetComponent<Outline>()
         }
     }
     #endregion
+
+    public void OnCollisionStay2D(Collision2D collision)
+    {
+        if (collision.gameObject.GetComponent<DragAndDrop>().selected)
+        {
+            GetComponent<Renderer>().material.color = highlightColor;
+        }
+        else
+        {
+            GetComponent<Renderer>().material.color = originColor;
+        }
+    }
 
     #region OnCollisionExit2D
     public void OnCollisionExit2D(Collision2D collision)
