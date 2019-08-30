@@ -1520,8 +1520,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 979018824}
-        m_MethodName: DrawRandomTile
+      - m_Target: {fileID: 6754225560450230271, guid: e52503bbc81064549ab3d7e4afea4482,
+          type: 3}
+        m_MethodName: DrawTile
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
