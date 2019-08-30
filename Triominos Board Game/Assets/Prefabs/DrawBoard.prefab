@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 7329432850089236135}
   - component: {fileID: 1653959720551234942}
   - component: {fileID: 5992907765224517703}
+  - component: {fileID: 579059700957010854}
   m_Layer: 0
   m_Name: DrawBoard
   m_TagString: Untagged
@@ -97,3 +98,20 @@ MonoBehaviour:
   TileMaxPositionX: 0.32
   TileMinPositionX: -0.32
   TileOffsetX: 0.08
+--- !u!114 &579059700957010854
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1928336596123497598}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6cdad856ed15d304db5ffd33ad17305b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  KeyScrollLeft: 97
+  KeyScrollRight: 100
+  KeyScrollUp: 0
+  KeyScrollDown: 0
+  ScrollAmount: 0.007
