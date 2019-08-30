@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class DragAndDrop : MonoBehaviour
 {
@@ -24,10 +25,26 @@ public class DragAndDrop : MonoBehaviour
 
     private void OnMouseOver()
     {
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButtonDown(0) && !IsMouseOverUi())
         {
             this.selected = true;
             this.gameObject.layer = 0;
         }
     }
+
+    private bool IsMouseOverUi()
+    {
+        return EventSystem.current.IsPointerOverGameObject();
+    }
+
+    //private bool IsPointerOverUIObject()
+    //{
+    //    PointerEventData eventDataCurrentPosition = new PointerEventData(EventSystem.current)
+    //    {
+    //        position = new Vector2(Input.mousePosition.x, Input.mousePosition.y)
+    //    };
+    //    List<RaycastResult> results = new List<RaycastResult>();
+    //    EventSystem.current.RaycastAll(eventDataCurrentPosition, results);
+    //    return results.Count > 0;
+    //}
 }

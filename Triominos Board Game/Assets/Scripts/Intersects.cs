@@ -24,7 +24,6 @@ public class Intersects : MonoBehaviour
     #region OnCollisionEnter2D
     public void OnCollisionEnter2D(Collision2D collision)
     {
-        Debug.Log("OnCollisionEnter2D");
         if (object.Equals(collision.gameObject.tag, OtherTag) && collision.gameObject.GetComponent<DragAndDrop>().selected)
         {
             GetComponent<Renderer>().material.color = highlightColor;

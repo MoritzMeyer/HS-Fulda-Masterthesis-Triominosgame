@@ -6,6 +6,7 @@ TagManager:
   tags:
   - BoardTile
   - PlayerTile
+  - TilePool
   layers:
   - Default
   - TransparentFX
