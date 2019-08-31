@@ -11,7 +11,7 @@ public class GameManager : MonoBehaviour
     public BoardManager boardManager;
     public GameMode GameMode;
 
-    [HideInInspector]
+    //[HideInInspector]
     public PlayerCode ActivePlayer = PlayerCode.None;
     [HideInInspector]
     public List<PlayerCode> ParticipatingPlayers;
@@ -33,7 +33,6 @@ public class GameManager : MonoBehaviour
 
         DontDestroyOnLoad(gameObject);
         boardManager = GetComponent<BoardManager>();
-        GameMode = GameMode.TwoPlayer;
         this.InitGame();
     }
 
@@ -84,16 +83,20 @@ public class GameManager : MonoBehaviour
         this.boardManager.DrawRandomTile();
     }
 
-    public void PlaceTile(GameObject tile)
+    public bool PlaceTile(GameObject tile)
     {
         int tilePoints = this.GetValueFromTileName(tile.name);
         playerPoints[ActivePlayer] += tilePoints;
+
+        this.NextPlayersTurn();
+        return true;
     }
 
     public void NextPlayersTurn()
     {
         this.TurnCount++;
         this.NumbTileDrawsInTurn = 0;
+        this.ActivePlayer = this.GetNextPlayer();
     }
 
     public PlayerCode GetStartingPlayer()
@@ -144,5 +147,22 @@ public class GameManager : MonoBehaviour
         int points = parts.Select(n => int.Parse(n)).Aggregate((a, b) => a + b);
         Debug.Log("TilePoints: " + points);
         return points;
+    }
+
+    public GameObject GetDrawBoardForActivePlayer()
+    {
+        return this.boardManager.DrawBoards[this.ActivePlayer];
+    }
+
+    private PlayerCode GetNextPlayer()
+    {
+        int actualIndex = this.ParticipatingPlayers.IndexOf(this.ActivePlayer);
+        actualIndex++;
+        if (actualIndex >= this.ParticipatingPlayers.Count())
+        {
+            actualIndex = 0;
+        }
+
+        return ParticipatingPlayers[actualIndex];
     }
 }

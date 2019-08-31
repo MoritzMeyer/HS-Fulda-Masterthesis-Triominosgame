@@ -21,6 +21,7 @@ public class DrawBoardManager : MonoBehaviour
     {
         tile.transform.parent = this.transform;
         tile.layer = this.gameObject.layer;
+        tile.GetComponent<DragAndDrop>().IsOverDrawBoard = true;
         this.ReArrangeTiles();
     }
 
@@ -33,5 +34,10 @@ public class DrawBoardManager : MonoBehaviour
             Transform child = this.transform.GetChild(i);
             child.localPosition = new Vector3(positionX, TilePositionY, TilePositionZ);
         }
+    }
+
+    public bool IsActiveDrawBoard()
+    {
+        return this.gameObject.name.Equals(GameManager.instance.GetDrawBoardForActivePlayer().gameObject.name);
     }
 }

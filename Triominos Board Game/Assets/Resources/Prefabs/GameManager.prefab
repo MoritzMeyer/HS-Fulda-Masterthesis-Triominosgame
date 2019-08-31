@@ -45,6 +45,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   boardManager: {fileID: 0}
+  GameMode: 2
+  ActivePlayer: 0
+  ParticipatingPlayers: 
 --- !u!114 &2106975419933231653
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -61,4 +64,6 @@ MonoBehaviour:
     type: 3}
   DrawBoardPlayer1: {fileID: 0}
   DrawBoardPlayer2: {fileID: 0}
+  DrawBoardPlayer3: {fileID: 0}
+  DrawBoardPlayer4: {fileID: 0}
   DrawButton: {fileID: 0}

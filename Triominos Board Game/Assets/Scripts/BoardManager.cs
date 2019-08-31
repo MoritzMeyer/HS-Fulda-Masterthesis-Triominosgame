@@ -16,8 +16,12 @@ public class BoardManager : MonoBehaviour
     public GameObject DrawBoardPlayer4;
     public Button DrawButton;
 
+    [HideInInspector]
+    public Dictionary<PlayerCode, GameObject> DrawBoards;
+    
+    public bool IsDragging { get; private set; }
     private GameObject ActualTilePool;
-    private Dictionary<PlayerCode, GameObject> DrawBoards;
+    
 
     public void InitBoard()
     {
@@ -170,5 +174,15 @@ public class BoardManager : MonoBehaviour
         }
 
         return tileNames.ToArray();
+    }
+
+    public void StartDragging()
+    {
+        this.IsDragging = true;
+    }
+
+    public void StopDragging()
+    {
+        this.IsDragging = false;
     }
 }
