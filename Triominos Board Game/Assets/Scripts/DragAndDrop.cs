@@ -34,6 +34,7 @@ public class DragAndDrop : MonoBehaviour
                 if (GameManager.instance.PlaceTile(this.gameObject))
                 {
                     this.selected = false;
+                    this.transform.position = new Vector3(this.transform.position.x, this.transform.position.y, this.transform.position.z + 1);
                     GameManager.instance.boardManager.StopDragging();
                     GameManager.instance.boardManager.DrawBoards[this.draggingPlayer].GetComponent<DrawBoardManager>().ReArrangeTiles();
                 }                
@@ -69,6 +70,7 @@ public class DragAndDrop : MonoBehaviour
             this.gameObject.layer = 0;
             this.transform.parent = null;
             this.originRotation = this.gameObject.transform.rotation;
+            this.transform.position = new Vector3(this.transform.position.x, this.transform.position.y, this.transform.position.z - 1);
         }
     }
 

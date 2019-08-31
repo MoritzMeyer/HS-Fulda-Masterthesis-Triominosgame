@@ -25,12 +25,12 @@ public class ScrollChildren : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKey(KeyScrollLeft) || this.scrollContinouslyLeft)
+        if ((Input.GetKey(KeyScrollLeft) && this.GetComponent<DrawBoardManager>().IsActiveDrawBoard()) || this.scrollContinouslyLeft)
         {
             this.ScrollLeft();
         }
 
-        if (Input.GetKey(KeyScrollRight) || this.scrollContinouslyRight)
+        if ((Input.GetKey(KeyScrollRight) && this.GetComponent<DrawBoardManager>().IsActiveDrawBoard()) || this.scrollContinouslyRight)
         {
             this.ScrollRight();
         }
