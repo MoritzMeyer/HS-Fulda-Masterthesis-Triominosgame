@@ -19,7 +19,7 @@ public class DrawBoardManager : MonoBehaviour
 
     public void AddTile(GameObject tile)
     {
-        tile.transform.parent = this.transform;
+        tile.transform.SetParent(this.transform);
         tile.layer = this.gameObject.layer;
         tile.GetComponent<DragAndDrop>().IsOverDrawBoard = true;
         this.ReArrangeTiles();

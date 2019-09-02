@@ -57,7 +57,7 @@ public class DragAndDrop : MonoBehaviour
     {
         if (Input.GetMouseButtonDown(0) && 
             !GameManager.instance.boardManager.IsDragging && 
-            !IsMouseOverUi() && 
+            !IsMouseOverUI() && 
             this.gameObject.transform.parent.gameObject.GetComponent<DrawBoardManager>().IsActiveDrawBoard())
         {
             GameManager.instance.boardManager.StartDragging();
@@ -68,7 +68,7 @@ public class DragAndDrop : MonoBehaviour
             this.originLocalePosition = this.gameObject.transform.localPosition;
             this.selected = true;
             this.gameObject.layer = 0;
-            this.transform.parent = null;
+            this.transform.SetParent(null);
             this.originRotation = this.gameObject.transform.rotation;
             this.transform.position = new Vector3(this.transform.position.x, this.transform.position.y, this.transform.position.z - 1);
         }
@@ -90,7 +90,7 @@ public class DragAndDrop : MonoBehaviour
         }
     }
 
-    private bool IsMouseOverUi()
+    private bool IsMouseOverUI()
     {
         return EventSystem.current.IsPointerOverGameObject();
     }

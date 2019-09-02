@@ -185,4 +185,27 @@ public class BoardManager : MonoBehaviour
     {
         this.IsDragging = false;
     }
+
+    public HitDirection GetHitDirection(Vector2 direction)
+    {
+        if (direction.y < -0.5f && direction.x >= -0.9f && direction.x <= 0.9f)
+        //if ((direction.x >= -0.1f && direction.x <= 0.1f) && (direction.y >= -1.1f && direction.y <= -0.9f))
+        {
+            return HitDirection.Bottom;
+        }
+
+        if (direction.x > 0.0f && direction.y >= -0.5f && direction.y <= 1.0f)
+        //if ((direction.x <= 1.0f && direction.x >= 0.8f) && (direction.y <= 0.6f && direction.y >= 0.4f))
+        {
+            return HitDirection.Right;
+        }
+
+        if (direction.x <= 0.0f && direction.y >= -0.5f && direction.y <= 1.0f)
+        //if ((direction.x >= -1.0f && direction.x <= -0.8f) && (direction.y >= 0.4f && direction.y <= 0.6f))
+        {
+            return HitDirection.Left;
+        }
+
+        return HitDirection.None;
+    }
 }
