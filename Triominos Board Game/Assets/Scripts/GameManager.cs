@@ -88,8 +88,14 @@ public class GameManager : MonoBehaviour
         int tilePoints = this.GetValueFromTileName(tile.name);
         playerPoints[ActivePlayer] += tilePoints;
 
+        this.boardManager.PlaceTile(tile);
         this.NextPlayersTurn();
         return true;
+    }
+
+    public bool TryPlaceTile(GameObject tile)
+    {
+        throw new NotImplementedException();
     }
 
     public void NextPlayersTurn()
@@ -149,11 +155,6 @@ public class GameManager : MonoBehaviour
         return points;
     }
 
-    public GameObject GetDrawBoardForActivePlayer()
-    {
-        return this.boardManager.DrawBoards[this.ActivePlayer];
-    }
-
     private PlayerCode GetNextPlayer()
     {
         int actualIndex = this.ParticipatingPlayers.IndexOf(this.ActivePlayer);
@@ -164,5 +165,13 @@ public class GameManager : MonoBehaviour
         }
 
         return ParticipatingPlayers[actualIndex];
+    }
+
+    public bool CheckFaceValues(string value1, string value2)
+    {
+        string[] parts1 = value1.Split('-');
+        string[] parts2 = value2.Split('-');
+
+        return parts1[0] == parts2[1] && parts1[1] == parts2[0];
     }
 }

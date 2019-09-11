@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Assets.Scripts
 {
-    public enum HitDirection
+    public enum TileFace
     {
         None, Left, Right, Bottom
     }

@@ -1,44 +1,53 @@
 ﻿using Assets.Scripts;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class MarkMatchingTilesOnDragging : MonoBehaviour
 {
-    public Color ColorMatching = Color.green;
-    public Color ColorNotMatching = Color.red;
+    GameObject[] previousTiles;
 
-    private void OnCollisionEnter2D(Collision2D collision)
+    private void Update()
     {
-        if (this.gameObject.GetComponent<DragAndDrop>().selected && 
-            collision.gameObject.tag.Equals("PlayerTile") && 
-            collision.gameObject.layer == 0)
+        if (previousTiles != null && previousTiles.Length > 0)
         {
-            Vector2 direction = this.GetDirection(collision.gameObject);
-            Debug.Log("Direction (locale): " + direction);
-            HitDirection hitDirection = GameManager.instance.boardManager.GetHitDirection(direction);
-            Debug.Log("HitDirection: " + hitDirection);
-        }
-    }
+            foreach (GameObject tile in previousTiles)
+            {
+                tile.GetComponent<TileManager>().ResetColor();
+            }
 
-    private void OnCollisionExit2D(Collision2D collision)
-    {
-        if (this.gameObject.GetComponent<DragAndDrop>().selected && 
-            collision.gameObject.tag.Equals("PlayerTile") && 
-            collision.gameObject.layer == 0)
+            previousTiles = null;
+        }
+
+        if (this.GetComponent<DragAndDrop>().selected)
         {
-            collision.gameObject.GetComponent<Renderer>().material.color = this.gameObject.GetComponent<Renderer>().material.color;
+            Dictionary<TileFace, GameObject> adjacentTiles = this.GetComponent<TileManager>().GetAllAdjacentTiles();
+
+            foreach(KeyValuePair<TileFace, GameObject> kv in adjacentTiles)
+            {
+                if (kv.Value != null)
+                {
+                    Debug.Log("AdjacentTile (" + kv.Value.name + ") on " + kv.Key);
+                    if (GameManager.instance.boardManager.CheckIfTileOrientationMatches(this.gameObject, kv.Value))
+                    {
+                        TileFace faceOther = kv.Value.GetComponent<TileManager>().GetSelfAdjacentSide(this.gameObject);
+                        string faceValueOther = GameManager.instance.boardManager.GetValueFromTileFace(faceOther, kv.Value.name);
+                        string faceValueThis = GameManager.instance.boardManager.GetValueFromTileFace(kv.Key, this.gameObject.name);
+
+                        if (GameManager.instance.CheckFaceValues(faceValueOther, faceValueThis))
+                        {
+                            kv.Value.GetComponent<TileManager>().SetColorMatching();
+                        }
+                        else
+                        {
+                            kv.Value.GetComponent<TileManager>().SetColorNotMatching();
+                        }
+                    }
+                }
+            }
+
+            previousTiles = adjacentTiles.Values.Where(g => g != null).ToArray();
         }
-    }
-
-    public Vector2 GetDirection(GameObject other)
-    {
-        Vector2 direction = (other.transform.position - this.transform.position).normalized;
-        //Debug.Log("Direction world: " + direction);
-        direction = this.transform.InverseTransformDirection(direction);
-        //Debug.Log("Direction local: " + direction);
-        direction = direction.normalized;
-
-        return direction;
     }
 }

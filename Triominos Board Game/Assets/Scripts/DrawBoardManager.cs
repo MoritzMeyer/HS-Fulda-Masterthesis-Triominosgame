@@ -12,8 +12,8 @@ public class DrawBoardManager : MonoBehaviour
 
     public void RemoveTile(GameObject tile)
     {
-        tile.transform.parent = null;
-        tile.layer = 0;
+        tile.transform.SetParent(null);
+        tile.layer = GameManager.instance.boardManager.PlacedTileLayer.Value;
         this.ReArrangeTiles();        
     }
 
@@ -38,6 +38,6 @@ public class DrawBoardManager : MonoBehaviour
 
     public bool IsActiveDrawBoard()
     {
-        return this.gameObject.name.Equals(GameManager.instance.GetDrawBoardForActivePlayer().gameObject.name);
+        return this.gameObject.name.Equals(GameManager.instance.boardManager.GetDrawBoardForActivePlayer().gameObject.name);
     }
 }

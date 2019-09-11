@@ -123,9 +123,9 @@ public class RayCastFromStaticToMoving : MonoBehaviour
     //    return hitDirection;
     //}
 
-    public HitDirection ReturnDirection(GameObject other, GameObject objectHit, Color rayColor)
+    public TileFace ReturnDirection(GameObject other, GameObject objectHit, Color rayColor)
     {
-        HitDirection hitDirection = HitDirection.None;
+        TileFace hitDirection = TileFace.None;
         //Vector2 direction = (other.transform.position - objectHit.transform.position).normalized;
         Vector2 direction = (other.transform.position - objectHit.transform.position).normalized;
         Vector2 direction2 = (objectHit.transform.localPosition - objectHit.transform.InverseTransformPoint(other.transform.position)).normalized;
@@ -169,9 +169,9 @@ public class RayCastFromStaticToMoving : MonoBehaviour
         Debug.DrawRay(this.transform.position, normal * 100, Color.black, 1000);
     }
 
-    public HitDirection ReturnDirection(GameObject other, Color rayColor)
+    public TileFace ReturnDirection(GameObject other, Color rayColor)
     {
-        HitDirection hitDirection = HitDirection.None;
+        TileFace hitDirection = TileFace.None;
         Vector2 direction = (other.transform.position - this.transform.position).normalized;
         direction = new Vector2(-direction.x, -direction.y);
         Debug.Log("Direction local: " + this.transform.InverseTransformDirection(direction));

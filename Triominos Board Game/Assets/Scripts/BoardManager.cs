@@ -15,6 +15,9 @@ public class BoardManager : MonoBehaviour
     public GameObject DrawBoardPlayer3;
     public GameObject DrawBoardPlayer4;
     public Button DrawButton;
+    public int? DefaultLayer;
+    public int? PlayerHudLayer;
+    public int? PlacedTileLayer;
 
     [HideInInspector]
     public Dictionary<PlayerCode, GameObject> DrawBoards;
@@ -25,6 +28,10 @@ public class BoardManager : MonoBehaviour
 
     public void InitBoard()
     {
+        this.DefaultLayer = this.DefaultLayer ?? LayerMask.NameToLayer("Default");
+        this.PlayerHudLayer = this.PlayerHudLayer ?? LayerMask.NameToLayer("Player HUD");
+        this.PlacedTileLayer = this.PlacedTileLayer ?? LayerMask.NameToLayer("PlacedTile");
+
         this.InitTilePool();
     }
 
@@ -176,6 +183,49 @@ public class BoardManager : MonoBehaviour
         return tileNames.ToArray();
     }
 
+    public string GetValueFromTileFace(TileFace face, string name)
+    {
+        string[] parts = name.Split('-');
+        if (parts.Count() != 3)
+        {
+            throw new ArgumentException($"Tile name ('{name}') does not contain three numbers.");
+        }
+
+        string faceValue = string.Empty;
+        switch(face)
+        {
+            case TileFace.Right:
+                faceValue = parts[0] + "-" + parts[1];
+                break;
+            case TileFace.Bottom:
+                faceValue = parts[1] + "-" + parts[2];
+                break;
+            case TileFace.Left:
+                faceValue = parts[2] + "-" + parts[0];
+                break;
+            default:
+                break;
+        }
+
+        return faceValue;
+    }
+
+    public bool CheckIfTileOrientationMatches(GameObject tile1, GameObject tile2)
+    {
+        float rotation1 = tile1.transform.rotation.eulerAngles.z;
+        float rotation2 = tile2.transform.rotation.eulerAngles.z;
+
+        int orientation1 = Convert.ToInt32((Math.Abs(rotation1) / 60.0f) % 2);
+        int orientation2 = Convert.ToInt32((Math.Abs(rotation2) / 60.0f) % 2);
+
+        if (orientation1 < 0 || orientation1 > 1 || orientation2 < 0 || orientation2 > 1)
+        {
+            throw new ArgumentException("Orientation value has to be 0 or 1");
+        }
+
+        return orientation1 != orientation2;
+    }
+
     public void StartDragging()
     {
         this.IsDragging = true;
@@ -185,27 +235,14 @@ public class BoardManager : MonoBehaviour
     {
         this.IsDragging = false;
     }
-
-    public HitDirection GetHitDirection(Vector2 direction)
+    public GameObject GetDrawBoardForActivePlayer()
     {
-        if (direction.y < -0.5f && direction.x >= -0.9f && direction.x <= 0.9f)
-        //if ((direction.x >= -0.1f && direction.x <= 0.1f) && (direction.y >= -1.1f && direction.y <= -0.9f))
-        {
-            return HitDirection.Bottom;
-        }
+        return this.DrawBoards[GameManager.instance.ActivePlayer];
+    }
 
-        if (direction.x > 0.0f && direction.y >= -0.5f && direction.y <= 1.0f)
-        //if ((direction.x <= 1.0f && direction.x >= 0.8f) && (direction.y <= 0.6f && direction.y >= 0.4f))
-        {
-            return HitDirection.Right;
-        }
-
-        if (direction.x <= 0.0f && direction.y >= -0.5f && direction.y <= 1.0f)
-        //if ((direction.x >= -1.0f && direction.x <= -0.8f) && (direction.y >= 0.4f && direction.y <= 0.6f))
-        {
-            return HitDirection.Left;
-        }
-
-        return HitDirection.None;
+    public void PlaceTile(GameObject tile)
+    {
+        tile.transform.position = new Vector3(tile.transform.position.x, tile.transform.position.y, tile.transform.position.z + 1);
+        this.GetDrawBoardForActivePlayer().GetComponent<DrawBoardManager>().RemoveTile(this.gameObject);
     }
 }

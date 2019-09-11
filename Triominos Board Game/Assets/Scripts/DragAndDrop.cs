@@ -13,8 +13,7 @@ public class DragAndDrop : MonoBehaviour
 
     private Vector3 originLocalePosition;
     private Quaternion originRotation;
-    private bool hadParent = true;
-    private PlayerCode draggingPlayer = PlayerCode.None;
+    private bool hadParent = true;    
 
     // Update is called once per frame
     void Update()
@@ -34,9 +33,7 @@ public class DragAndDrop : MonoBehaviour
                 if (GameManager.instance.PlaceTile(this.gameObject))
                 {
                     this.selected = false;
-                    this.transform.position = new Vector3(this.transform.position.x, this.transform.position.y, this.transform.position.z + 1);
                     GameManager.instance.boardManager.StopDragging();
-                    GameManager.instance.boardManager.DrawBoards[this.draggingPlayer].GetComponent<DrawBoardManager>().ReArrangeTiles();
                 }                
             }
 
@@ -45,7 +42,7 @@ public class DragAndDrop : MonoBehaviour
                 // the order of setting parent, position and rotation is important
                 this.selected = false;
                 this.gameObject.transform.rotation = this.originRotation;
-                this.transform.parent = GameManager.instance.GetDrawBoardForActivePlayer().transform;
+                this.transform.parent = GameManager.instance.boardManager.GetDrawBoardForActivePlayer().transform;
                 this.gameObject.layer = this.transform.parent.gameObject.layer;
                 this.gameObject.transform.localPosition = this.originLocalePosition;
                 GameManager.instance.boardManager.StopDragging();
@@ -55,19 +52,19 @@ public class DragAndDrop : MonoBehaviour
 
     private void OnMouseOver()
     {
-        if (Input.GetMouseButtonDown(0) && 
-            !GameManager.instance.boardManager.IsDragging && 
-            !IsMouseOverUI() && 
+        if (Input.GetMouseButtonDown(0) &&
+            !GameManager.instance.boardManager.IsDragging &&
+            !this.gameObject.layer.Equals(GameManager.instance.boardManager.DefaultLayer.Value) &&
+            !IsMouseOverUI() &&
             this.gameObject.transform.parent.gameObject.GetComponent<DrawBoardManager>().IsActiveDrawBoard())
         {
             GameManager.instance.boardManager.StartDragging();
             this.hadParent = (this.transform.parent != null);
-            this.draggingPlayer = GameManager.instance.ActivePlayer;
 
             // the order of removing Parent and caching position/rotation is important
             this.originLocalePosition = this.gameObject.transform.localPosition;
             this.selected = true;
-            this.gameObject.layer = 0;
+            this.gameObject.layer = GameManager.instance.boardManager.DefaultLayer.Value;
             this.transform.SetParent(null);
             this.originRotation = this.gameObject.transform.rotation;
             this.transform.position = new Vector3(this.transform.position.x, this.transform.position.y, this.transform.position.z - 1);
