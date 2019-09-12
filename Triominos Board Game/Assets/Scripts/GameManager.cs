@@ -103,7 +103,7 @@ public class GameManager : MonoBehaviour
         playerPoints[ActivePlayer] += tilePoints;
 
         this.boardManager.PlaceTile(tile);
-        this.NextPlayersTurn();
+        this.NextTurn();
         return true;
     }
 
@@ -112,7 +112,7 @@ public class GameManager : MonoBehaviour
         throw new NotImplementedException();
     }
 
-    public void NextPlayersTurn()
+    public void NextTurn()
     {
         this.TurnCount++;
         this.NumbTileDrawsInTurn = 0;

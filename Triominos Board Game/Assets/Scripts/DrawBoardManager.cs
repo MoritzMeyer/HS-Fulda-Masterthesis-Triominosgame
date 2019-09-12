@@ -10,6 +10,26 @@ public class DrawBoardManager : MonoBehaviour
     public float TileMinPositionX = -0.32f;
     public float TileOffsetX = 0.08f;
 
+    public Color highlightColor = new Color32(92, 255, 0, 255);
+    private Color originColor;
+
+    private void Awake()
+    {
+        this.originColor = this.gameObject.GetComponent<Renderer>().material.color;
+    }
+
+    private void Update()
+    {
+        if (this.IsActiveDrawBoard())
+        {
+            this.HighlightDrawBoard();
+        }
+        else
+        {
+            this.SetNormalColor();
+        }
+    }
+
     public void RemoveTile(GameObject tile)
     {
         tile.transform.SetParent(null);
@@ -32,6 +52,7 @@ public class DrawBoardManager : MonoBehaviour
         {
             float positionX = startPositionX + (i * TileOffsetX);
             Transform child = this.transform.GetChild(i);
+            //child.localPosition = new Vector3(positionX, TilePositionY, this.transform.position.z);
             child.localPosition = new Vector3(positionX, TilePositionY, TilePositionZ);
         }
     }
@@ -39,5 +60,15 @@ public class DrawBoardManager : MonoBehaviour
     public bool IsActiveDrawBoard()
     {
         return this.gameObject.name.Equals(GameManager.instance.boardManager.GetDrawBoardForActivePlayer().gameObject.name);
+    }
+
+    public void HighlightDrawBoard()
+    {
+        this.gameObject.GetComponent<Renderer>().material.color = highlightColor;
+    }
+
+    public void SetNormalColor()
+    {
+        this.gameObject.GetComponent<Renderer>().material.color = originColor;
     }
 }

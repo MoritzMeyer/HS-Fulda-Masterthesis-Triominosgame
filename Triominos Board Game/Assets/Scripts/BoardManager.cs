@@ -9,6 +9,7 @@ using Random = UnityEngine.Random;
 
 public class BoardManager : MonoBehaviour
 {
+    public float BoardPositionZ = 1.0f;
     public GameObject TilePool;
     public GameObject DrawBoardPlayer1;
     public GameObject DrawBoardPlayer2;
@@ -187,7 +188,8 @@ public class BoardManager : MonoBehaviour
 
     public void PlaceTile(GameObject tile)
     {
-        tile.transform.position = new Vector3(tile.transform.position.x, tile.transform.position.y, tile.transform.position.z + 1);
+        //tile.transform.position = new Vector3(tile.transform.position.x, tile.transform.position.y, 0);
+        tile.transform.position = new Vector3(tile.transform.position.x, tile.transform.position.y, this.BoardPositionZ);
         this.GetDrawBoardForActivePlayer().GetComponent<DrawBoardManager>().RemoveTile(this.gameObject);
     }
 
