@@ -6,7 +6,13 @@ public class CameraMovement : MonoBehaviour
 {
     [Range(0.0f, 10.0f)]
     public float speed = 10f;
+
+    [Range(1.0f, 100.0f)]
+    public float dragSpeed = 10.0f;
+
+    private Vector3 mouseOrigin;
     private readonly float basicSpeed = 100;
+    private bool isPanning = false;
 
     #region Update
     // Update is called once per frame
@@ -15,6 +21,26 @@ public class CameraMovement : MonoBehaviour
         Vector3 velocity = this.GetBaseMovement();
         velocity = velocity * Time.deltaTime * speed * basicSpeed;
         transform.Translate(velocity);
+
+        if (Input.GetMouseButtonDown(1) && !GameManager.instance.boardManager.IsDragging)
+        {
+            mouseOrigin = Input.mousePosition;
+            isPanning = true;
+
+        }
+
+        if (Input.GetMouseButtonUp(1) && !GameManager.instance.boardManager.IsDragging)
+        {
+            isPanning = false;
+        }
+
+        if (isPanning)
+        {
+            Vector3 pos = Camera.main.ScreenToViewportPoint(Input.mousePosition - mouseOrigin);
+            Vector3 move = new Vector3(pos.x * dragSpeed,pos.y * dragSpeed, 0);
+
+            transform.Translate(move, Space.Self);
+        }
     }
     #endregion
 
