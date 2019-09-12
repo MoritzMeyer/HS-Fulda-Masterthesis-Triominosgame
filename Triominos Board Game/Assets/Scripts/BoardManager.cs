@@ -24,7 +24,15 @@ public class BoardManager : MonoBehaviour
     
     public bool IsDragging { get; private set; }
     private GameObject ActualTilePool;
-    
+
+    private void Update()
+    {
+        if (this.TilePoolIsEmpty())
+        {
+            this.DrawButton.GetComponent<DrawButtonManager>().Deactivate();
+        }
+    }
+
 
     public void InitBoard()
     {
@@ -119,9 +127,9 @@ public class BoardManager : MonoBehaviour
         GameObject randomTile = ActualTilePool.transform.GetChild(randomIndex).gameObject;
         randomTile.gameObject.SetActive(true);
         targetDrawBoard.GetComponent<DrawBoardManager>().AddTile(randomTile);
-        if (TilePool.transform.childCount < 1)
+        if (this.TilePoolIsEmpty())
         {
-            DrawButton.gameObject.SetActive(false);
+            this.DrawButton.GetComponent<DrawButtonManager>().Deactivate();
         }
     }
 
@@ -244,5 +252,10 @@ public class BoardManager : MonoBehaviour
     {
         tile.transform.position = new Vector3(tile.transform.position.x, tile.transform.position.y, tile.transform.position.z + 1);
         this.GetDrawBoardForActivePlayer().GetComponent<DrawBoardManager>().RemoveTile(this.gameObject);
+    }
+
+    public bool TilePoolIsEmpty()
+    {
+        return this.TilePool.transform.childCount < 1;
     }
 }

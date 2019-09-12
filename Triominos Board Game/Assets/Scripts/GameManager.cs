@@ -4,12 +4,15 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
+using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
     public static GameManager instance = null;
     public BoardManager boardManager;
     public GameMode GameMode;
+    public Text player1Score;
+    public Text player2Score;
 
     //[HideInInspector]
     public PlayerCode ActivePlayer = PlayerCode.None;
@@ -32,8 +35,19 @@ public class GameManager : MonoBehaviour
         }
 
         DontDestroyOnLoad(gameObject);
-        boardManager = GetComponent<BoardManager>();
+        this.boardManager = GetComponent<BoardManager>();
+
+        Text[] texts = FindObjectsOfType<Text>();
+        player1Score = texts.Where(o => o.name == "ScorePlayer1").First();
+        player2Score = texts.Where(o => o.name == "ScorePlayer2").First();
+
         this.InitGame();
+    }
+
+    private void Update()
+    {
+        this.player1Score.text = PlayerCode.Player1 + ": " + this.playerPoints[PlayerCode.Player1];
+        this.player2Score.text = PlayerCode.Player2 + ": " + this.playerPoints[PlayerCode.Player2];
     }
 
     public void InitGame()
@@ -63,23 +77,23 @@ public class GameManager : MonoBehaviour
         playerPoints = new Dictionary<PlayerCode, int>();
         foreach (PlayerCode player in this.ParticipatingPlayers)
         {
-            playerPoints.Add(player, 0);
+            this.playerPoints.Add(player, 0);
         }
 
-        boardManager.InitBoard();
+        this.boardManager.InitBoard();
         this.ActivePlayer = this.GetStartingPlayer();
         Debug.Log("Aktiver Spieler: " + this.ActivePlayer);
     }
 
     public void DrawTile()
     {
-        if (this.NumbTileDrawsInTurn >= 3)
+        if (this.NumbTileDrawsInTurn >= 2)
         {
-            this.boardManager.DrawButton.GetComponent<Renderer>().material.color = Color.red;
+            this.boardManager.DrawButton.GetComponent<DrawButtonManager>().Deactivate();
         }
 
         this.NumbTileDrawsInTurn++;
-        playerPoints[ActivePlayer] -= 5;
+        this.playerPoints[ActivePlayer] -= 5;
         this.boardManager.DrawRandomTile();
     }
 
@@ -103,6 +117,11 @@ public class GameManager : MonoBehaviour
         this.TurnCount++;
         this.NumbTileDrawsInTurn = 0;
         this.ActivePlayer = this.GetNextPlayer();
+
+        if (!this.boardManager.TilePoolIsEmpty())
+        {
+            this.boardManager.DrawButton.GetComponent<DrawButtonManager>().Activate();
+        }
     }
 
     public PlayerCode GetStartingPlayer()
@@ -111,7 +130,7 @@ public class GameManager : MonoBehaviour
         Dictionary<PlayerCode, int> highestTriominoOfSameKind = new Dictionary<PlayerCode, int>();
         foreach(PlayerCode player in this.ParticipatingPlayers)
         {
-            int highestTriomino = boardManager.GethHighestTriominoOfSameKindForPlayer(player);
+            int highestTriomino = this.boardManager.GethHighestTriominoOfSameKindForPlayer(player);
             highestTriominoOfSameKind.Add(player, highestTriomino);
         }
 
@@ -126,7 +145,7 @@ public class GameManager : MonoBehaviour
         Dictionary<PlayerCode, int> highestTriominoValue = new Dictionary<PlayerCode, int>();
         foreach(PlayerCode player in this.ParticipatingPlayers)
         {
-            int highestTriominio = boardManager.GetHighestTileValueForPlayer(player);
+            int highestTriominio = this.boardManager.GetHighestTileValueForPlayer(player);
             highestTriominoValue.Add(player, highestTriominio);
         }
 
