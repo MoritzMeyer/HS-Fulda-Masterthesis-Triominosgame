@@ -19,7 +19,10 @@ public class GameManager : MonoBehaviour
     [HideInInspector]
     public List<PlayerCode> ParticipatingPlayers;
 
-    private int TurnCount = 0;
+    [HideInInspector]
+    public int TurnCount { get; private set; }
+
+    //private int TurnCount = 0;
     private Dictionary<PlayerCode, int> playerPoints;
     private int NumbTileDrawsInTurn = 0;
 
@@ -40,6 +43,8 @@ public class GameManager : MonoBehaviour
         Text[] texts = FindObjectsOfType<Text>();
         player1Score = texts.Where(o => o.name == "ScorePlayer1").First();
         player2Score = texts.Where(o => o.name == "ScorePlayer2").First();
+
+        this.TurnCount = 0;
 
         this.InitGame();
     }
@@ -94,22 +99,26 @@ public class GameManager : MonoBehaviour
 
         this.NumbTileDrawsInTurn++;
         this.playerPoints[ActivePlayer] -= 5;
-        this.boardManager.DrawRandomTile();
-    }
+        GameObject tile = this.boardManager.DrawRandomTile();
 
-    public bool PlaceTile(GameObject tile)
-    {
-        int tilePoints = tile.GetComponent<TileManager>().GetTileValue();
-        playerPoints[ActivePlayer] += tilePoints;
-
-        this.boardManager.PlaceTile(tile);
-        this.NextTurn();
-        return true;
+        if (tile != null)
+        {
+            tile.GetComponent<FadeToColor>().StartFadeToOrigin();
+        }
     }
 
     public bool TryPlaceTile(GameObject tile)
     {
-        throw new NotImplementedException();
+        if (this.boardManager.TryPlaceTile(tile))
+        {
+            int tilePoints = tile.GetComponent<TileManager>().GetTileValue();
+            playerPoints[ActivePlayer] += tilePoints;
+
+            this.NextTurn();
+            return true;
+        }
+
+        return false;
     }
 
     public void NextTurn()

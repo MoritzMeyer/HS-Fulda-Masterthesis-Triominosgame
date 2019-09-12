@@ -643,6 +643,7 @@ GameObject:
   - component: {fileID: 2648179750281453192}
   - component: {fileID: 2676629426155813125}
   - component: {fileID: 6401053546366693125}
+  - component: {fileID: 4383952049442909859}
   m_Layer: 0
   m_Name: 0-0-0
   m_TagString: PlayerTile
@@ -819,6 +820,28 @@ MonoBehaviour:
   rayCastRight: {fileID: 186301878066848943}
   rayCastLeft: {fileID: 617672975598302222}
   rayCastBottom: {fileID: 5360824477463634291}
+--- !u!114 &4383952049442909859
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6663011989867318605}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e31b1de6cf9f79a4196d353ba37039ac, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  fadingSpeed: 5
+  startingColor:
+    serializedVersion: 2
+    rgba: 4278255615
+  targetColor:
+    serializedVersion: 2
+    rgba: 4293000447
+  fadeOnChannelR: 0
+  fadeOnChannelG: 0
+  fadeOnChannelB: 1
 --- !u!1 &8210338428371873734
 GameObject:
   m_ObjectHideFlags: 0

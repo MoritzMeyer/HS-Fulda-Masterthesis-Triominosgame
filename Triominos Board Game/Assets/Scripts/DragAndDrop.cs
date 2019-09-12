@@ -28,16 +28,14 @@ public class DragAndDrop : MonoBehaviour
                 this.gameObject.transform.Rotate(new Vector3(0, 0, -60));
             }
 
-            if (Input.GetMouseButtonUp(0) && !IsOverDrawBoard)
-            {
-                if (GameManager.instance.PlaceTile(this.gameObject))
-                {
-                    this.selected = false;
-                    GameManager.instance.boardManager.StopDragging();
-                }                
-            }
-
-            if ((Input.GetKey(KeyCode.Escape) || (Input.GetMouseButtonUp(0) && IsOverDrawBoard)) && this.hadParent)
+            if ((Input.GetKey(KeyCode.Escape) ||
+                    (Input.GetMouseButtonUp(0) &&
+                        (IsOverDrawBoard ||
+                            !this.gameObject.GetComponent<TileManager>().CanPlaceTileOnGameBoard()
+                        )
+                    )
+                ) &&
+                this.hadParent)
             {
                 // the order of setting parent, position and rotation is important
                 this.selected = false;
@@ -46,6 +44,15 @@ public class DragAndDrop : MonoBehaviour
                 this.gameObject.layer = this.transform.parent.gameObject.layer;
                 this.gameObject.transform.localPosition = this.originLocalePosition;
                 GameManager.instance.boardManager.StopDragging();
+            }
+
+            if (Input.GetMouseButtonUp(0) && !IsOverDrawBoard)
+            {
+                if (GameManager.instance.TryPlaceTile(this.gameObject))
+                {
+                    this.selected = false;
+                    GameManager.instance.boardManager.StopDragging();
+                }
             }
         }
     }

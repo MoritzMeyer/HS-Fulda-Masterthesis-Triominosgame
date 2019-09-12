@@ -117,7 +117,7 @@ public class BoardManager : MonoBehaviour
         }
     }
 
-    public void DrawRandomTile(GameObject targetDrawBoard = null)
+    public GameObject DrawRandomTile(GameObject targetDrawBoard = null)
     {
         if (targetDrawBoard == null)
         {
@@ -132,6 +132,8 @@ public class BoardManager : MonoBehaviour
         {
             this.DrawButton.GetComponent<DrawButtonManager>().Deactivate();
         }
+
+        return randomTile;
     }
 
     public int GethHighestTriominoOfSameKindForPlayer(PlayerCode player)
@@ -186,9 +188,19 @@ public class BoardManager : MonoBehaviour
         return this.DrawBoards[GameManager.instance.ActivePlayer];
     }
 
-    public void PlaceTile(GameObject tile)
+    public bool TryPlaceTile(GameObject tile)
     {
-        //tile.transform.position = new Vector3(tile.transform.position.x, tile.transform.position.y, 0);
+        if (tile.GetComponent<TileManager>().CanPlaceTileOnGameBoard())
+        {
+            this.PlaceTile(tile);
+            return true;
+        }
+
+        return false;
+    }
+
+    private void PlaceTile(GameObject tile)
+    {
         tile.transform.position = new Vector3(tile.transform.position.x, tile.transform.position.y, this.BoardPositionZ);
         this.GetDrawBoardForActivePlayer().GetComponent<DrawBoardManager>().RemoveTile(this.gameObject);
     }

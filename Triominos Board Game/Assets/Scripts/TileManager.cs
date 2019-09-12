@@ -98,14 +98,17 @@ public class TileManager : MonoBehaviour
 
     public Dictionary<TileFace, GameObject> GetAllAdjacentTiles()
     {
+        TileFace[] facesToCheck = new TileFace[3] { TileFace.Left, TileFace.Right, TileFace.Bottom };
         Dictionary<TileFace, GameObject> adjacentTiles = new Dictionary<TileFace, GameObject>();
-        GameObject objectOnLeftFace = this.GetAdjacentTileInDirection(TileFace.Left);
-        GameObject objectOnRightFace = this.GetAdjacentTileInDirection(TileFace.Right);
-        GameObject objectOnBottomFace = this.GetAdjacentTileInDirection(TileFace.Bottom);
 
-        adjacentTiles.Add(TileFace.Left, objectOnLeftFace);
-        adjacentTiles.Add(TileFace.Right, objectOnRightFace);
-        adjacentTiles.Add(TileFace.Bottom, objectOnBottomFace);
+        foreach (TileFace face in facesToCheck)
+        {
+            GameObject adjacentTile = this.GetAdjacentTileInDirection(face);
+            if (adjacentTile != null)
+            {
+                adjacentTiles.Add(face, adjacentTile);
+            }
+        }
 
         return adjacentTiles;
     }
@@ -196,7 +199,7 @@ public class TileManager : MonoBehaviour
         return faceValue;
     }
 
-    public bool CanPlacedNextToOtherTile(TileFace thisFace, GameObject other)
+    public bool CanPlaceNextToOtherTile(TileFace thisFace, GameObject other)
     {
         if (!this.CheckIfOtherTileOrientationMatches(other))
         {
@@ -245,5 +248,35 @@ public class TileManager : MonoBehaviour
         }
 
         return parts;
+    }
+
+    public bool HasAdjacentTiles()
+    {
+        //Dictionary<TileFace, GameObject> tiles = this.GetAllAdjacentTiles();
+        //Dictionary<TileFace, GameObject> test = tiles.Where(kv => kv.Value != null).ToDictionary(kv => kv.Key, kv => kv.Value);
+        //bool result = test.Any();
+        //return result;
+        //return tiles.Where(kv => kv.Value != null).Any();
+        return this.GetAllAdjacentTiles().Any();
+    }
+
+    public bool CanPlaceTileOnGameBoard()
+    {
+        Dictionary<TileFace, GameObject> adjacentTiles = this.GetAllAdjacentTiles();
+
+        if (GameManager.instance.TurnCount > 0 && !this.HasAdjacentTiles())
+        {
+            return false;
+        }
+
+        foreach (KeyValuePair<TileFace, GameObject> kv in adjacentTiles)
+        {
+            if (!this.gameObject.GetComponent<TileManager>().CanPlaceNextToOtherTile(kv.Key, kv.Value))
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

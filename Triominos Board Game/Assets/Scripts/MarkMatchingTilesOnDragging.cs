@@ -26,20 +26,17 @@ public class MarkMatchingTilesOnDragging : MonoBehaviour
 
             foreach(KeyValuePair<TileFace, GameObject> kv in adjacentTiles)
             {
-                if (kv.Value != null)
-                {
-                    Debug.Log("AdjacentTile (" + kv.Value.name + ") on " + kv.Key);
+                Debug.Log("AdjacentTile (" + kv.Value.name + ") on " + kv.Key);
 
-                    if (this.gameObject.GetComponent<TileManager>().CheckIfOtherTileOrientationMatches(kv.Value))
+                if (this.gameObject.GetComponent<TileManager>().CheckIfOtherTileOrientationMatches(kv.Value))
+                {
+                    if (this.gameObject.GetComponent<TileManager>().CanPlaceNextToOtherTile(kv.Key, kv.Value))
                     {
-                        if (this.gameObject.GetComponent<TileManager>().CanPlacedNextToOtherTile(kv.Key, kv.Value))
-                        {
-                            kv.Value.GetComponent<TileManager>().SetColorMatching();
-                        }
-                        else
-                        {
-                            kv.Value.GetComponent<TileManager>().SetColorNotMatching();
-                        }
+                        kv.Value.GetComponent<TileManager>().SetColorMatching();
+                    }
+                    else
+                    {
+                        kv.Value.GetComponent<TileManager>().SetColorNotMatching();
                     }
                 }
             }
