@@ -1,6 +1,8 @@
 ﻿using Assets.Scripts;
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class TileManager : MonoBehaviour
@@ -22,7 +24,7 @@ public class TileManager : MonoBehaviour
         originColor = this.GetComponent<Renderer>().material.color;
     }
 
-    public TileFace GetSelfAdjacentSide(GameObject other) 
+    public TileFace GetAdjacentFaceToOtherTile(GameObject other) 
     {
         Vector2 direction = this.GetDirection(other);
         Debug.Log("Direction (locale): " + direction);
@@ -149,5 +151,99 @@ public class TileManager : MonoBehaviour
 
         direction = direction.normalized;
         return direction;
+    }
+
+    public bool CheckIfOtherTileOrientationMatches(GameObject other)
+    {
+        float rotation1 = this.transform.rotation.eulerAngles.z;
+        float rotation2 = other.transform.rotation.eulerAngles.z;
+
+        int orientation1 = Convert.ToInt32((Math.Abs(rotation1) / 60.0f) % 2);
+        int orientation2 = Convert.ToInt32((Math.Abs(rotation2) / 60.0f) % 2);
+
+        if (orientation1 < 0 || orientation1 > 1 || orientation2 < 0 || orientation2 > 1)
+        {
+            throw new ArgumentException("Orientation value has to be 0 or 1");
+        }
+
+        return orientation1 != orientation2;
+    }
+
+    private string GetValueFromTileFace(TileFace face)
+    {
+        string[] parts = this.gameObject.name.Split('-');
+        if (parts.Length != 3)
+        {
+            throw new ArgumentException($"Tile name ('{name}') does not contain three numbers.");
+        }
+
+        string faceValue = string.Empty;
+        switch (face)
+        {
+            case TileFace.Right:
+                faceValue = parts[0] + "-" + parts[1];
+                break;
+            case TileFace.Bottom:
+                faceValue = parts[1] + "-" + parts[2];
+                break;
+            case TileFace.Left:
+                faceValue = parts[2] + "-" + parts[0];
+                break;
+            default:
+                break;
+        }
+
+        return faceValue;
+    }
+
+    public bool CanPlacedNextToOtherTile(TileFace thisFace, GameObject other)
+    {
+        if (!this.CheckIfOtherTileOrientationMatches(other))
+        {
+            return false;
+        }
+
+        TileFace faceOther = other.GetComponent<TileManager>().GetAdjacentFaceToOtherTile(this.gameObject);
+        string faceValueOther = other.gameObject.GetComponent<TileManager>().GetValueFromTileFace(faceOther);
+        string faceValueThis = this.GetValueFromTileFace(thisFace);
+
+        if (!GameManager.instance.CheckFaceValues(faceValueOther, faceValueThis))
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    public int GetTileValue()
+    {
+        string[] parts = this.GetNameParts();
+
+        int points = parts.Select(n => int.Parse(n)).Aggregate((a, b) => a + b);
+        Debug.Log("TilePoints: " + points);
+        return points;
+    }
+
+    public bool IsSameKindTriomino()
+    {
+        string[] parts = this.GetNameParts();
+
+        if (parts[0].Equals(parts[1]) && parts[1].Equals(parts[2]))
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    private string[] GetNameParts()
+    {
+        string[] parts = this.gameObject.name.Split('-');
+        if (parts.Length != 3)
+        {
+            throw new ArgumentException("Der Name eins Spielsteines muss die Form '1-2-3' haben.");
+        }
+
+        return parts;
     }
 }

@@ -29,13 +29,10 @@ public class MarkMatchingTilesOnDragging : MonoBehaviour
                 if (kv.Value != null)
                 {
                     Debug.Log("AdjacentTile (" + kv.Value.name + ") on " + kv.Key);
-                    if (GameManager.instance.boardManager.CheckIfTileOrientationMatches(this.gameObject, kv.Value))
-                    {
-                        TileFace faceOther = kv.Value.GetComponent<TileManager>().GetSelfAdjacentSide(this.gameObject);
-                        string faceValueOther = GameManager.instance.boardManager.GetValueFromTileFace(faceOther, kv.Value.name);
-                        string faceValueThis = GameManager.instance.boardManager.GetValueFromTileFace(kv.Key, this.gameObject.name);
 
-                        if (GameManager.instance.CheckFaceValues(faceValueOther, faceValueThis))
+                    if (this.gameObject.GetComponent<TileManager>().CheckIfOtherTileOrientationMatches(kv.Value))
+                    {
+                        if (this.gameObject.GetComponent<TileManager>().CanPlacedNextToOtherTile(kv.Key, kv.Value))
                         {
                             kv.Value.GetComponent<TileManager>().SetColorMatching();
                         }

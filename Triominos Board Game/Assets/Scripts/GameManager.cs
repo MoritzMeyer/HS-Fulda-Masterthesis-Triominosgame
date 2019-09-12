@@ -99,7 +99,7 @@ public class GameManager : MonoBehaviour
 
     public bool PlaceTile(GameObject tile)
     {
-        int tilePoints = this.GetValueFromTileName(tile.name);
+        int tilePoints = tile.GetComponent<TileManager>().GetTileValue();
         playerPoints[ActivePlayer] += tilePoints;
 
         this.boardManager.PlaceTile(tile);
@@ -159,19 +159,6 @@ public class GameManager : MonoBehaviour
         }
 
         return playerWithHighestTriominoValue;
-    }
-
-    public int GetValueFromTileName(string name)
-    {
-        string[] parts = name.Split('-');
-        if (parts.Length != 3)
-        {
-            throw new ArgumentException("Der Name eins Spielsteines muss die Form '1-2-3' haben.");
-        }
-
-        int points = parts.Select(n => int.Parse(n)).Aggregate((a, b) => a + b);
-        Debug.Log("TilePoints: " + points);
-        return points;
     }
 
     private PlayerCode GetNextPlayer()

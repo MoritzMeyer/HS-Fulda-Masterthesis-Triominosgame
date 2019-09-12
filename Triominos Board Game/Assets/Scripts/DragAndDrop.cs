@@ -25,7 +25,7 @@ public class DragAndDrop : MonoBehaviour
 
             if (Input.GetMouseButtonDown(1))
             {
-                this.gameObject.transform.Rotate(new Vector3(0, 0, 60));
+                this.gameObject.transform.Rotate(new Vector3(0, 0, -60));
             }
 
             if (Input.GetMouseButtonUp(0) && !IsOverDrawBoard)
@@ -42,7 +42,7 @@ public class DragAndDrop : MonoBehaviour
                 // the order of setting parent, position and rotation is important
                 this.selected = false;
                 this.gameObject.transform.rotation = this.originRotation;
-                this.transform.parent = GameManager.instance.boardManager.GetDrawBoardForActivePlayer().transform;
+                this.transform.SetParent(GameManager.instance.boardManager.GetDrawBoardForActivePlayer().transform);
                 this.gameObject.layer = this.transform.parent.gameObject.layer;
                 this.gameObject.transform.localPosition = this.originLocalePosition;
                 GameManager.instance.boardManager.StopDragging();
