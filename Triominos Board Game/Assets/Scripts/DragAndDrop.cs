@@ -80,7 +80,7 @@ public class DragAndDrop : MonoBehaviour
 
     void OnCollisionEnter2D(Collision2D collision)
     {
-        if (collision.gameObject.tag.Equals("DrawBoard"))
+        if (collision.gameObject.tag.Equals(GameObjectTags.DRAWBOARD))
         {
             this.IsOverDrawBoard = true;
         }
@@ -88,7 +88,7 @@ public class DragAndDrop : MonoBehaviour
 
     private void OnCollisionExit2D(Collision2D collision)
     {
-        if (collision.gameObject.tag.Equals("DrawBoard"))
+        if (collision.gameObject.tag.Equals(GameObjectTags.DRAWBOARD))
         {
             this.IsOverDrawBoard = false;
         }

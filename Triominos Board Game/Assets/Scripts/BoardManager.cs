@@ -106,8 +106,8 @@ public class BoardManager : MonoBehaviour
 
     public void ResetPoolAndTiles()
     {
-        IEnumerable<GameObject> objects = GameObject.FindGameObjectsWithTag("TilePool");
-        objects = objects.Concat(GameObject.FindGameObjectsWithTag("PlayerTile"));
+        IEnumerable<GameObject> objects = GameObject.FindGameObjectsWithTag(GameObjectTags.TILEPOOL);
+        objects = objects.Concat(GameObject.FindGameObjectsWithTag(GameObjectTags.PLAYERTILE));
         if (objects.Count() > 0)
         {
             foreach (GameObject tilePool in objects)
@@ -142,7 +142,7 @@ public class BoardManager : MonoBehaviour
 
         foreach (Transform child in this.DrawBoards[player].transform)
         {
-            if (child.gameObject.CompareTag("PlayerTile") && child.gameObject.GetComponent<TileManager>().IsSameKindTriomino())
+            if (child.gameObject.CompareTag(GameObjectTags.PLAYERTILE) && child.gameObject.GetComponent<TileManager>().IsSameKindTriomino())
             {
                 int tileNumber = (int)(child.gameObject.GetComponent<TileManager>().GetTileValue() / 3);
                 if (tileNumber > highestSameKindTriomino)
@@ -161,7 +161,7 @@ public class BoardManager : MonoBehaviour
 
         foreach (Transform child in this.DrawBoards[player].transform)
         {
-            if (child.gameObject.CompareTag("PlayerTile"))
+            if (child.gameObject.CompareTag(GameObjectTags.PLAYERTILE))
             {
                 int tileValue = child.gameObject.GetComponent<TileManager>().GetTileValue();
                 if (tileValue > highestTileValue)
