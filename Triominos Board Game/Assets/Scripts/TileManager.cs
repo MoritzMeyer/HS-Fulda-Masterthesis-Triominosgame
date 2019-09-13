@@ -20,7 +20,7 @@ public class TileManager : MonoBehaviour
 
     private void Awake()
     {
-        raycastFilter = GameManager.instance.boardManager.PlacedTileLayer.Value;
+        raycastFilter = LayerMask.GetMask(new string[] {LayerMask.LayerToName(GameManager.instance.boardManager.PlacedTileLayer.Value) });
         originColor = this.GetComponent<Renderer>().material.color;
     }
 
@@ -250,21 +250,11 @@ public class TileManager : MonoBehaviour
         return parts;
     }
 
-    public bool HasAdjacentTiles()
-    {
-        //Dictionary<TileFace, GameObject> tiles = this.GetAllAdjacentTiles();
-        //Dictionary<TileFace, GameObject> test = tiles.Where(kv => kv.Value != null).ToDictionary(kv => kv.Key, kv => kv.Value);
-        //bool result = test.Any();
-        //return result;
-        //return tiles.Where(kv => kv.Value != null).Any();
-        return this.GetAllAdjacentTiles().Any();
-    }
-
     public bool CanPlaceTileOnGameBoard()
     {
         Dictionary<TileFace, GameObject> adjacentTiles = this.GetAllAdjacentTiles();
 
-        if (GameManager.instance.TurnCount > 0 && !this.HasAdjacentTiles())
+        if (GameManager.instance.TurnCount > 0 && !adjacentTiles.Any())
         {
             return false;
         }

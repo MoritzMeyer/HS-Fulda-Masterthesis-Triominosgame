@@ -13,7 +13,7 @@ public class FadeToColor : MonoBehaviour
     public bool fadeOnChannelG = false;
     public bool fadeOnChannelB = true;
 
-    private SpriteRenderer renderer;
+    private new SpriteRenderer renderer;
     private Color originColor;
     private int fadeAmountR;
     private int fadeAmountG;

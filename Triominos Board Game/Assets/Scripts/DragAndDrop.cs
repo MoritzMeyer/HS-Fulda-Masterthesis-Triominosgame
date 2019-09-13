@@ -45,8 +45,7 @@ public class DragAndDrop : MonoBehaviour
                 this.gameObject.transform.localPosition = this.originLocalePosition;
                 GameManager.instance.boardManager.StopDragging();
             }
-
-            if (Input.GetMouseButtonUp(0) && !IsOverDrawBoard)
+            else if (Input.GetMouseButtonUp(0) && !IsOverDrawBoard)
             {
                 if (GameManager.instance.TryPlaceTile(this.gameObject))
                 {

@@ -25,6 +25,8 @@ public class BoardManager : MonoBehaviour
     
     public bool IsDragging { get; private set; }
     private GameObject ActualTilePool;
+    private Dictionary<int, Dictionary<TileFace, Vector2>> NewTilePositionsByOtherOrientationAndTileFace;
+    private Dictionary<TileFace, Dictionary<TileFace, float>> NewTileOrientationByOtherFaceAndThisFace;
 
     private void Update()
     {
@@ -44,11 +46,14 @@ public class BoardManager : MonoBehaviour
         this.InitTilePool();
     }
 
-    public void InitTilePool()
+    private void InitTilePool()
     {
         // remove existing Tiles
         this.ResetPoolAndTiles();
         ActualTilePool = Instantiate(TilePool) as GameObject;
+
+        this.NewTilePositionsByOtherOrientationAndTileFace = this.InitNewTilePositionsByOtherOrientationAndTileFace();
+        this.NewTileOrientationByOtherFaceAndThisFace = this.InitNewTileOrientationByOtherFaceAndThisFace();
 
         DrawBoardPlayer1 = GameObject.Find("DrawBoardPlayer1");
         DrawBoardPlayer2 = GameObject.Find("DrawBoardPlayer2");
@@ -76,6 +81,92 @@ public class BoardManager : MonoBehaviour
         }
 
         this.DrawStartTiles();
+    }
+
+    private Dictionary<int, Dictionary<TileFace, Vector2>> InitNewTilePositionsByOtherOrientationAndTileFace()
+    {
+        return new Dictionary<int, Dictionary<TileFace, Vector2>>()
+        {
+            {
+                0, new Dictionary<TileFace, Vector2>()
+                {
+                    { TileFace.Right, new Vector2(61.5f, 35f) },
+                    { TileFace.Left, new Vector2(-61.5f, 35f) },
+                    { TileFace.Bottom, new Vector2(0f, -71f) },
+                }
+            },
+            {
+                60, new Dictionary<TileFace, Vector2>()
+                {
+                    { TileFace.Right, new Vector2(0f, 71f) },
+                    { TileFace.Left, new Vector2(-61.5f, -35f) },
+                    { TileFace.Bottom, new Vector2(61.5f, -35f) },
+                }
+            },
+            {
+                120, new Dictionary<TileFace, Vector2>()
+                {
+                    { TileFace.Right, new Vector2(-61.5f, 35f) },
+                    { TileFace.Left, new Vector2(0f, -71f) },
+                    { TileFace.Bottom, new Vector2(61.5f, 35f) },
+                }
+            },
+            {
+                180, new Dictionary<TileFace, Vector2>()
+                {
+                    { TileFace.Right, new Vector2(-61.5f, -35f) },
+                    { TileFace.Left, new Vector2(61.5f, -35f) },
+                    { TileFace.Bottom, new Vector2(0f, 71f) },
+                }
+            },
+            {
+                -120, new Dictionary<TileFace, Vector2>()
+                {
+                    { TileFace.Right, new Vector2(0f, -71f) },
+                    { TileFace.Left, new Vector2(61.5f, 35f) },
+                    { TileFace.Bottom, new Vector2(-61.5f, 35f) },
+                }
+            },
+            {
+                -60, new Dictionary<TileFace, Vector2>()
+                {
+                    { TileFace.Right, new Vector2(61.5f, -35f) },
+                    { TileFace.Left, new Vector2(0f, 71f) },
+                    { TileFace.Bottom, new Vector2(-61.5f, -35f) },
+                }
+            }
+        };
+    }
+
+    private Dictionary<TileFace, Dictionary<TileFace, float>> InitNewTileOrientationByOtherFaceAndThisFace()
+    {
+        return new Dictionary<TileFace, Dictionary<TileFace, float>>()
+        {
+            {
+                TileFace.Right, new Dictionary<TileFace, float>()
+                {
+                    { TileFace.Right, 180f },
+                    { TileFace.Bottom, -60f },
+                    { TileFace.Left, 60f }
+                }
+            },
+            {
+                TileFace.Bottom, new Dictionary<TileFace, float>()
+                {
+                    { TileFace.Right, 60f },
+                    { TileFace.Bottom, 180f },
+                    { TileFace.Left, -60f }
+                }
+            },
+            {
+                TileFace.Left, new Dictionary<TileFace, float>()
+                {
+                    { TileFace.Right, -60f },
+                    { TileFace.Bottom, +60f },
+                    { TileFace.Left, 180f }
+                }
+            }
+        };
     }
 
     public void DrawStartTiles()
@@ -192,21 +283,70 @@ public class BoardManager : MonoBehaviour
     {
         if (tile.GetComponent<TileManager>().CanPlaceTileOnGameBoard())
         {
-            this.PlaceTile(tile);
+            if (GameManager.instance.TurnCount == 0)
+            {
+                this.PlaceTileInCenter(tile);
+                return true;
+            }
+
+            KeyValuePair<TileFace, GameObject> adjacentTile = tile.GetComponent<TileManager>().GetAllAdjacentTiles().First();
+            this.PlaceTileNextToOther(tile, adjacentTile.Key, adjacentTile.Value);
+            this.GetDrawBoardForActivePlayer().GetComponent<DrawBoardManager>().RemoveTile(tile);
+
             return true;
         }
 
         return false;
     }
 
-    private void PlaceTile(GameObject tile)
+    private void PlaceTileOnActualPosition(GameObject tile)
     {
         tile.transform.position = new Vector3(tile.transform.position.x, tile.transform.position.y, this.BoardPositionZ);
-        this.GetDrawBoardForActivePlayer().GetComponent<DrawBoardManager>().RemoveTile(this.gameObject);
+        this.GetDrawBoardForActivePlayer().GetComponent<DrawBoardManager>().RemoveTile(tile);
+    }
+
+    private void PlaceTileNextToOther(GameObject thisTile, TileFace thisFace, GameObject otherTile)
+    {
+        TileFace otherFace = otherTile.GetComponent<TileManager>().GetAdjacentFaceToOtherTile(thisTile);
+        Vector3 thisTilePosition = this.GetNewTilePositionFromPlacedTile(otherFace, otherTile);
+        Quaternion thisTileRotation = this.GetNewTileOrientationByOtherFaceAndThisFace(otherTile, thisTile, otherFace, thisFace);
+
+        thisTile.transform.SetPositionAndRotation(thisTilePosition, thisTileRotation);
+    }
+
+    private void PlaceTileInCenter(GameObject tile)
+    {
+        tile.transform.position = new Vector3(0, 0, this.BoardPositionZ);
+        this.GetDrawBoardForActivePlayer().GetComponent<DrawBoardManager>().RemoveTile(tile);
     }
 
     public bool TilePoolIsEmpty()
     {
         return this.TilePool.transform.childCount < 1;
+    }
+
+    private Vector3 GetNewTilePositionFromPlacedTile(TileFace placedTileFace, GameObject placedTile)
+    {
+        int orientation = Convert.ToInt32(Math.Round(placedTile.transform.rotation.eulerAngles.z));
+
+        if (orientation > 180)
+        {
+            orientation -= 360;
+        }
+
+        Vector2 positionToAdd = this.NewTilePositionsByOtherOrientationAndTileFace[orientation][placedTileFace];
+
+        Vector3 newPosition = new Vector3(placedTile.transform.position.x, placedTile.transform.position.y, this.BoardPositionZ);
+        newPosition += new Vector3(positionToAdd.x, positionToAdd.y, 0);
+
+        return newPosition;
+    }
+
+    private Quaternion GetNewTileOrientationByOtherFaceAndThisFace(GameObject otherTile, GameObject thisTile, TileFace otherFace, TileFace thisFace)
+    {
+        float newZRotation = otherTile.transform.rotation.eulerAngles.z;
+        newZRotation += this.NewTileOrientationByOtherFaceAndThisFace[otherFace][thisFace];
+
+        return Quaternion.Euler(thisTile.transform.rotation.eulerAngles.x, thisTile.transform.rotation.eulerAngles.y, newZRotation);
     }
 }
