@@ -60,7 +60,7 @@ public class DragAndDrop : MonoBehaviour
     {
         if (Input.GetMouseButtonDown(0) &&
             !GameManager.instance.boardManager.IsDragging &&
-            !this.gameObject.layer.Equals(GameManager.instance.boardManager.DefaultLayer.Value) &&
+            !this.gameObject.layer.Equals(LayerMask.NameToLayer(LayerManager.DEFAULTLAYER)) &&
             !IsMouseOverUI() &&
             this.gameObject.transform.parent.gameObject.GetComponent<DrawBoardManager>().IsActiveDrawBoard())
         {
@@ -70,7 +70,7 @@ public class DragAndDrop : MonoBehaviour
             // the order of removing Parent and caching position/rotation is important
             this.originLocalePosition = this.gameObject.transform.localPosition;
             this.selected = true;
-            this.gameObject.layer = GameManager.instance.boardManager.DefaultLayer.Value;
+            this.gameObject.layer = LayerMask.NameToLayer(LayerManager.DEFAULTLAYER);
             this.transform.SetParent(null);
             this.originRotation = this.gameObject.transform.rotation;
             this.transform.position = new Vector3(this.transform.position.x, this.transform.position.y, this.transform.position.z - 1);
@@ -79,7 +79,7 @@ public class DragAndDrop : MonoBehaviour
 
     void OnCollisionEnter2D(Collision2D collision)
     {
-        if (collision.gameObject.tag.Equals(GameObjectTags.DRAWBOARD))
+        if (collision.gameObject.tag.Equals(TagManager.DRAWBOARD))
         {
             this.IsOverDrawBoard = true;
         }
@@ -87,7 +87,7 @@ public class DragAndDrop : MonoBehaviour
 
     private void OnCollisionExit2D(Collision2D collision)
     {
-        if (collision.gameObject.tag.Equals(GameObjectTags.DRAWBOARD))
+        if (collision.gameObject.tag.Equals(TagManager.DRAWBOARD))
         {
             this.IsOverDrawBoard = false;
         }

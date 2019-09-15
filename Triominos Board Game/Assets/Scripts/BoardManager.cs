@@ -16,9 +16,6 @@ public class BoardManager : MonoBehaviour
     public GameObject DrawBoardPlayer3;
     public GameObject DrawBoardPlayer4;
     public Button DrawButton;
-    public int? DefaultLayer;
-    public int? PlayerHudLayer;
-    public int? PlacedTileLayer;
 
     [HideInInspector]
     public Dictionary<PlayerCode, GameObject> DrawBoards;
@@ -39,11 +36,81 @@ public class BoardManager : MonoBehaviour
 
     public void InitBoard()
     {
-        this.DefaultLayer = this.DefaultLayer ?? LayerMask.NameToLayer("Default");
-        this.PlayerHudLayer = this.PlayerHudLayer ?? LayerMask.NameToLayer("Player HUD");
-        this.PlacedTileLayer = this.PlacedTileLayer ?? LayerMask.NameToLayer("PlacedTile");
+        //this.InitTilePool();
+        this.InitTestScene();
+    }
 
-        this.InitTilePool();
+    private void InitTestScene()
+    {
+        this.ResetPoolAndTiles();
+        ActualTilePool = Instantiate(TilePool) as GameObject;
+
+        this.NewTilePositionsByOtherOrientationAndTileFace = this.InitNewTilePositionsByOtherOrientationAndTileFace();
+        this.NewTileOrientationByOtherFaceAndThisFace = this.InitNewTileOrientationByOtherFaceAndThisFace();
+
+        DrawBoardPlayer1 = GameObject.Find("DrawBoardPlayer1");
+        DrawBoardPlayer2 = GameObject.Find("DrawBoardPlayer2");
+        DrawButton = GameObject.Find("DrawButton").GetComponent<Button>();
+
+        DrawBoards = new Dictionary<PlayerCode, GameObject>()
+        {
+            { PlayerCode.Player1, DrawBoardPlayer1 },
+            { PlayerCode.Player2, DrawBoardPlayer2 }
+        };
+
+        switch (GameManager.instance.GameMode)
+        {
+            case GameMode.PlayerVsAi:
+            case GameMode.TwoPlayer:
+                break;
+            case GameMode.ThreePlayer:
+                DrawBoards.Add(PlayerCode.Player3, DrawBoardPlayer3);
+                break;
+            case GameMode.FourPlayer:
+                DrawBoards.Add(PlayerCode.Player4, DrawBoardPlayer4);
+                break;
+            default:
+                throw new ArgumentException($"Unbekannter gameMode '{GameManager.instance.GameMode}'");
+        }
+
+        this.InitBridgeScene();
+    }
+
+    private void InitBridgeScene()
+    {
+        GameObject tile014 = this.DrawSpecificTile("0-1-4", DrawBoards[PlayerCode.Player1]);
+        GameObject tile045 = this.DrawSpecificTile("0-4-5", DrawBoards[PlayerCode.Player1]);
+        GameObject tile445 = this.DrawSpecificTile("4-4-5", DrawBoards[PlayerCode.Player1]);
+        GameObject tile344 = this.DrawSpecificTile("3-4-4", DrawBoards[PlayerCode.Player1]);
+        GameObject tile334 = this.DrawSpecificTile("3-3-4", DrawBoards[PlayerCode.Player1]);
+        GameObject tile333 = this.DrawSpecificTile("3-3-3", DrawBoards[PlayerCode.Player1]);
+        GameObject tile233 = this.DrawSpecificTile("2-3-3", DrawBoards[PlayerCode.Player1]);
+        GameObject tile123 = this.DrawSpecificTile("1-2-3", DrawBoards[PlayerCode.Player1]);
+        GameObject tile113 = this.DrawSpecificTile("1-1-3", DrawBoards[PlayerCode.Player1]);
+        GameObject tile133 = this.DrawSpecificTile("1-3-3", DrawBoards[PlayerCode.Player1]);
+
+        tile014.transform.SetParent(null);
+        tile014.transform.Rotate(new Vector3(0, 0, -120));
+        tile014.transform.position = new Vector3(0, 0, this.BoardPositionZ);
+        this.PlaceTileOnActualPosition(tile014, DrawBoards[PlayerCode.Player1]);
+
+        DrawBoardManager drawBoardManager = DrawBoards[PlayerCode.Player1].GetComponent<DrawBoardManager>();
+
+        drawBoardManager.RemoveTile(tile045);
+        drawBoardManager.RemoveTile(tile445);
+        drawBoardManager.RemoveTile(tile344);
+        drawBoardManager.RemoveTile(tile334);
+        drawBoardManager.RemoveTile(tile333);
+        drawBoardManager.RemoveTile(tile233);
+        drawBoardManager.RemoveTile(tile123);
+
+        this.PlaceTileNextToOther(tile045, TileFace.Right, tile014, TileFace.Left);
+        this.PlaceTileNextToOther(tile445, TileFace.Left, tile045, TileFace.Bottom);
+        this.PlaceTileNextToOther(tile344, TileFace.Bottom, tile445, TileFace.Right);
+        this.PlaceTileNextToOther(tile334, TileFace.Bottom, tile344, TileFace.Left);
+        this.PlaceTileNextToOther(tile333, TileFace.Bottom, tile334, TileFace.Right);
+        this.PlaceTileNextToOther(tile233, TileFace.Bottom, tile333, TileFace.Left);
+        this.PlaceTileNextToOther(tile123, TileFace.Bottom, tile233, TileFace.Left);
     }
 
     private void InitTilePool()
@@ -197,8 +264,8 @@ public class BoardManager : MonoBehaviour
 
     public void ResetPoolAndTiles()
     {
-        IEnumerable<GameObject> objects = GameObject.FindGameObjectsWithTag(GameObjectTags.TILEPOOL);
-        objects = objects.Concat(GameObject.FindGameObjectsWithTag(GameObjectTags.PLAYERTILE));
+        IEnumerable<GameObject> objects = GameObject.FindGameObjectsWithTag(TagManager.TILEPOOL);
+        objects = objects.Concat(GameObject.FindGameObjectsWithTag(TagManager.PLAYERTILE));
         if (objects.Count() > 0)
         {
             foreach (GameObject tilePool in objects)
@@ -227,13 +294,26 @@ public class BoardManager : MonoBehaviour
         return randomTile;
     }
 
+    private GameObject DrawSpecificTile(string name, GameObject targetDrawBoard = null)
+    {
+        GameObject tile = ActualTilePool.transform.Find(name).gameObject;
+        tile.SetActive(true);
+
+        if (targetDrawBoard != null)
+        {
+            targetDrawBoard.GetComponent<DrawBoardManager>().AddTile(tile);
+        }
+
+        return tile;
+    }
+
     public int GethHighestTriominoOfSameKindForPlayer(PlayerCode player)
     {
         int highestSameKindTriomino = -1;
 
         foreach (Transform child in this.DrawBoards[player].transform)
         {
-            if (child.gameObject.CompareTag(GameObjectTags.PLAYERTILE) && child.gameObject.GetComponent<TileManager>().IsSameKindTriomino())
+            if (child.gameObject.CompareTag(TagManager.PLAYERTILE) && child.gameObject.GetComponent<TileManager>().IsSameKindTriomino())
             {
                 int tileNumber = (int)(child.gameObject.GetComponent<TileManager>().GetTileValue() / 3);
                 if (tileNumber > highestSameKindTriomino)
@@ -252,7 +332,7 @@ public class BoardManager : MonoBehaviour
 
         foreach (Transform child in this.DrawBoards[player].transform)
         {
-            if (child.gameObject.CompareTag(GameObjectTags.PLAYERTILE))
+            if (child.gameObject.CompareTag(TagManager.PLAYERTILE))
             {
                 int tileValue = child.gameObject.GetComponent<TileManager>().GetTileValue();
                 if (tileValue > highestTileValue)
@@ -299,15 +379,22 @@ public class BoardManager : MonoBehaviour
         return false;
     }
 
-    private void PlaceTileOnActualPosition(GameObject tile)
+    private void PlaceTileOnActualPosition(GameObject tile, GameObject drawBoardManager = null)
     {
         tile.transform.position = new Vector3(tile.transform.position.x, tile.transform.position.y, this.BoardPositionZ);
-        this.GetDrawBoardForActivePlayer().GetComponent<DrawBoardManager>().RemoveTile(tile);
+        if (drawBoardManager != null)
+        {
+            drawBoardManager.GetComponent<DrawBoardManager>().RemoveTile(tile);
+        }        
     }
 
-    private void PlaceTileNextToOther(GameObject thisTile, TileFace thisFace, GameObject otherTile)
+    private void PlaceTileNextToOther(GameObject thisTile, TileFace thisFace, GameObject otherTile, TileFace otherFace = TileFace.None)
     {
-        TileFace otherFace = otherTile.GetComponent<TileManager>().GetAdjacentFaceToOtherTile(thisTile);
+        if (otherFace.Equals(TileFace.None))
+        {
+            otherFace = otherTile.GetComponent<TileManager>().GetAdjacentFaceToOtherTile(thisTile);
+        }
+
         Vector3 thisTilePosition = this.GetNewTilePositionFromPlacedTile(otherFace, otherTile);
         Quaternion thisTileRotation = this.GetNewTileOrientationByOtherFaceAndThisFace(otherTile, thisTile, otherFace, thisFace);
 

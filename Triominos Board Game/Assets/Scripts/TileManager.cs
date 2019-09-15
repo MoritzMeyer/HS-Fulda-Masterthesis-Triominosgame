@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using TMPro;
 using UnityEngine;
 
 public class TileManager : MonoBehaviour
@@ -10,7 +11,7 @@ public class TileManager : MonoBehaviour
     public Color originColor;
     public Color matching = Color.green;
     public Color notMatching = Color.red;
-    public float rayCastDistance = 100.0f;
+    public float rayCastDistance = 60.0f;
     public GameObject rayCastStart;
     public GameObject rayCastRight;
     public GameObject rayCastLeft;
@@ -18,9 +19,12 @@ public class TileManager : MonoBehaviour
 
     private LayerMask raycastFilter;
 
-    private void Awake()
+    private float circleCastDistance = 40f;
+    private float cirlceCastRadius = 40f;
+
+    void Awake()
     {
-        raycastFilter = LayerMask.GetMask(new string[] {LayerMask.LayerToName(GameManager.instance.boardManager.PlacedTileLayer.Value) });
+        raycastFilter = LayerMask.GetMask(new string[] { LayerManager.PLACEDTILELAYER });
         originColor = this.GetComponent<Renderer>().material.color;
     }
 
@@ -250,7 +254,7 @@ public class TileManager : MonoBehaviour
         return parts;
     }
 
-    public bool CanPlaceTileOnGameBoard()
+    public bool CanPlaceTileOnGameBoard(Action<bool, GameObject> modifyAdjacentTile = null)
     {
         Dictionary<TileFace, GameObject> adjacentTiles = this.GetAllAdjacentTiles();
 
@@ -262,8 +266,62 @@ public class TileManager : MonoBehaviour
         foreach (KeyValuePair<TileFace, GameObject> kv in adjacentTiles)
         {
             if (!this.gameObject.GetComponent<TileManager>().CanPlaceNextToOtherTile(kv.Key, kv.Value))
+            {                 
+                modifyAdjacentTile?.Invoke(false, kv.Value);
+
+                if (modifyAdjacentTile == null)
+                {
+                    return false;
+                }
+            }
+            else
             {
-                return false;
+                modifyAdjacentTile?.Invoke(true, kv.Value);
+            }
+        }
+
+        if (adjacentTiles.Count == 1 && !this.CheckIfNumberOppositeOfFaceMatches(adjacentTiles.First().Key, modifyAdjacentTile))
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    public bool CheckIfNumberOppositeOfFaceMatches(TileFace matchingFace, Action<bool, GameObject> modifyAdjacentTile = null)
+    {
+        GameObject opositeNumber = this.gameObject.transform.Find("Number3").gameObject;
+        switch (matchingFace)
+        {
+            case TileFace.Left:
+                opositeNumber = this.gameObject.transform.Find("Number2").gameObject;
+                break;
+            case TileFace.Bottom:
+                opositeNumber = this.gameObject.transform.Find("Number1").gameObject;
+                break;
+        }
+
+        Vector2 origin = new Vector2(opositeNumber.transform.position.x, opositeNumber.transform.position.y);
+        Vector3 direction = (opositeNumber.transform.position - this.gameObject.GetComponent<TileManager>().rayCastStart.transform.position).normalized;
+
+        Debug.DrawRay(new Vector3(origin.x, origin.y, 0), direction * circleCastDistance, Color.white);
+
+        RaycastHit2D[] numbersInRange = Physics2D.CircleCastAll(origin, cirlceCastRadius, new Vector2(direction.x, direction.y), circleCastDistance);
+        numbersInRange = numbersInRange.Where(n => n.collider != null && n.collider.gameObject.CompareTag(TagManager.TILENUMBER)).ToArray();
+
+        if (numbersInRange.Length > 0)
+        {
+            foreach (RaycastHit2D number in numbersInRange)
+            {
+                if (opositeNumber.gameObject.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text != number.collider.gameObject.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text)
+                {
+                    modifyAdjacentTile?.Invoke(false, number.collider.transform.parent.gameObject);
+                    return false;
+                }
+                else
+                {
+                    modifyAdjacentTile?.Invoke(true, number.collider.transform.parent.gameObject);
+                }
             }
         }
 

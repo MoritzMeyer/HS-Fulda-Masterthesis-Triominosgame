@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Assets.Scripts
 {
-    public static class GameObjectTags
+    public static class TagManager
     {
         public const string UNTAGGED = "Untagged";
         public const string RESPAWN = "Respawn";
@@ -19,5 +19,6 @@ namespace Assets.Scripts
         public const string TILEPOOL = "TilePool";
         public const string DRAWBOARD = "DrawBoard";
         public const string RAYCASTSTART = "RayCastStart";
+        public const string TILENUMBER = "TileNumber";
     }
 }

@@ -9,6 +9,7 @@ TagManager:
   - TilePool
   - DrawBoard
   - RayCastStart
+  - TileNumber
   layers:
   - Default
   - TransparentFX

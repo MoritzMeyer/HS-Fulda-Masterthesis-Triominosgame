@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using Assets.Scripts;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -33,7 +34,8 @@ public class DrawBoardManager : MonoBehaviour
     public void RemoveTile(GameObject tile)
     {
         tile.transform.SetParent(null);
-        tile.layer = GameManager.instance.boardManager.PlacedTileLayer.Value;
+        tile.GetComponent<DragAndDrop>().IsOverDrawBoard = false;
+        tile.layer = LayerMask.NameToLayer(LayerManager.PLACEDTILELAYER);
         this.ReArrangeTiles();        
     }
 

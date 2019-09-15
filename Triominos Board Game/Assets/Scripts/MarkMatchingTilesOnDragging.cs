@@ -2,15 +2,19 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class MarkMatchingTilesOnDragging : MonoBehaviour
 {
-    GameObject[] previousTiles;
+    private List<GameObject> previousTiles;
+    public float distance = 40f;
+    public float radius = 60f;
 
     private void Update()
     {
-        if (previousTiles != null && previousTiles.Length > 0)
+        if (previousTiles != null && previousTiles.Count > 0)
         {
             foreach (GameObject tile in previousTiles)
             {
@@ -20,28 +24,22 @@ public class MarkMatchingTilesOnDragging : MonoBehaviour
             previousTiles = null;
         }
 
+        previousTiles = new List<GameObject>();
         if (this.GetComponent<DragAndDrop>().selected)
         {
-            Dictionary<TileFace, GameObject> adjacentTiles = this.GetComponent<TileManager>().GetAllAdjacentTiles();
-
-            foreach(KeyValuePair<TileFace, GameObject> kv in adjacentTiles)
+            this.GetComponent<TileManager>().CanPlaceTileOnGameBoard((tileMatches, tile) =>
             {
-                Debug.Log("AdjacentTile (" + kv.Value.name + ") on " + kv.Key);
-
-                if (this.gameObject.GetComponent<TileManager>().CheckIfOtherTileOrientationMatches(kv.Value))
+                if (tileMatches)
                 {
-                    if (this.gameObject.GetComponent<TileManager>().CanPlaceNextToOtherTile(kv.Key, kv.Value))
-                    {
-                        kv.Value.GetComponent<TileManager>().SetColorMatching();
-                    }
-                    else
-                    {
-                        kv.Value.GetComponent<TileManager>().SetColorNotMatching();
-                    }
+                    tile.GetComponent<TileManager>().SetColorMatching();
                 }
-            }
+                else
+                {
+                    tile.GetComponent<TileManager>().SetColorNotMatching();
+                }
 
-            previousTiles = adjacentTiles.Values.Where(g => g != null).ToArray();
+                this.previousTiles.Add(tile);
+            });
         }
     }
 }
