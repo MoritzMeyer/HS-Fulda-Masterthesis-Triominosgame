@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Assets.Scripts;
+using GraphKI.GameManagement;
 
 public class RayCastFromStaticToMoving : MonoBehaviour
 {

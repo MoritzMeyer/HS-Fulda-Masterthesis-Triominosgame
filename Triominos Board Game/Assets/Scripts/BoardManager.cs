@@ -6,6 +6,8 @@ using UnityEngine.UI;
 using Assets.Scripts;
 using System;
 using Random = UnityEngine.Random;
+using GraphKI.Extensions;
+using GraphKI.GameManagement;
 
 public class BoardManager : MonoBehaviour
 {
@@ -19,7 +21,11 @@ public class BoardManager : MonoBehaviour
 
     [HideInInspector]
     public Dictionary<PlayerCode, GameObject> DrawBoards;
-    
+
+    [HideInInspector]
+    public GameBoard gameBoard;
+
+
     public bool IsDragging { get; private set; }
     private GameObject ActualTilePool;
     private Dictionary<int, Dictionary<TileFace, Vector2>> NewTilePositionsByOtherOrientationAndTileFace;
@@ -36,7 +42,8 @@ public class BoardManager : MonoBehaviour
 
     public void InitBoard()
     {
-        //this.InitTilePool();
+        this.gameBoard = new GameBoard();
+        //this.InitGameBoard();
         this.InitTestScene();
     }
 
@@ -90,7 +97,6 @@ public class BoardManager : MonoBehaviour
         GameObject tile133 = this.DrawSpecificTile("1-3-3", DrawBoards[PlayerCode.Player1]);
 
         tile014.transform.SetParent(null);
-        tile014.transform.Rotate(new Vector3(0, 0, -120));
         tile014.transform.position = new Vector3(0, 0, this.BoardPositionZ);
         this.PlaceTileOnActualPosition(tile014, DrawBoards[PlayerCode.Player1]);
 
@@ -111,13 +117,23 @@ public class BoardManager : MonoBehaviour
         this.PlaceTileNextToOther(tile333, TileFace.Bottom, tile334, TileFace.Right);
         this.PlaceTileNextToOther(tile233, TileFace.Bottom, tile333, TileFace.Left);
         this.PlaceTileNextToOther(tile123, TileFace.Bottom, tile233, TileFace.Left);
+
+        this.gameBoard.TryAddTile("0-1-4");
+        this.gameBoard.TryAddTile("0-4-5", "0-1-4", TileFace.Right, TileFace.Left);
+        this.gameBoard.TryAddTile("4-4-5", "0-4-5", TileFace.Left, TileFace.Bottom);
+        this.gameBoard.TryAddTile("3-4-4", "4-4-5", TileFace.Bottom, TileFace.Right);
+        this.gameBoard.TryAddTile("3-3-4", "3-4-4", TileFace.Bottom, TileFace.Left);
+        this.gameBoard.TryAddTile("3-3-3", "3-3-4", TileFace.Bottom, TileFace.Right);
+        this.gameBoard.TryAddTile("2-3-3", "3-3-3", TileFace.Bottom, TileFace.Left);
+        this.gameBoard.TryAddTile("1-2-3", "2-3-3", TileFace.Bottom, TileFace.Left);
     }
 
-    private void InitTilePool()
+    private void InitGameBoard()
     {
         // remove existing Tiles
         this.ResetPoolAndTiles();
         ActualTilePool = Instantiate(TilePool) as GameObject;
+        this.InitTilePool();
 
         this.NewTilePositionsByOtherOrientationAndTileFace = this.InitNewTilePositionsByOtherOrientationAndTileFace();
         this.NewTileOrientationByOtherFaceAndThisFace = this.InitNewTileOrientationByOtherFaceAndThisFace();
@@ -148,6 +164,24 @@ public class BoardManager : MonoBehaviour
         }
 
         this.DrawStartTiles();
+    }
+    public Stack<string> InitTilePool()
+    {
+        List<string> tilePool = new List<string>();
+
+        for (int i = 0; i < 6; i++)
+        {
+            for (int j = i; j < 6; j++)
+            {
+                for (int k = j; k < 6; k++)
+                {
+                    tilePool.Add(i + "-" + j + "-" + k);
+                }
+            }
+        }
+
+        tilePool.Shuffle();
+        return new Stack<string>(tilePool);
     }
 
     private Dictionary<int, Dictionary<TileFace, Vector2>> InitNewTilePositionsByOtherOrientationAndTileFace()
@@ -359,25 +393,40 @@ public class BoardManager : MonoBehaviour
         return this.DrawBoards[GameManager.instance.ActivePlayer];
     }
 
+    #region TryPlaceTile
+    /// <summary>
+    /// Places a tile on the GameBoard only if this tile can be placed.
+    /// </summary>
+    /// <param name="tile">The tile to be placed.</param>
+    /// <returns>True if it was placed, false if not.</returns>
     public bool TryPlaceTile(GameObject tile)
     {
+        // Check if tile can be placed
         if (tile.GetComponent<TileManager>().CanPlaceTileOnGameBoard())
         {
-            if (GameManager.instance.TurnCount == 0)
+            // if it's the first turn, tile hast to be placed in center with orientation straight
+            if (GameManager.instance.TurnCount == 0 && this.gameBoard.TryAddTile(tile.gameObject.name))
             {
                 this.PlaceTileInCenter(tile);
                 return true;
             }
 
+            // if it's not the first turn, the tile hast to be placed adjacent to another tile, according to the others tile
+            // orientation and the faces with which both tiles should be placed adjacent to each other.
             KeyValuePair<TileFace, GameObject> adjacentTile = tile.GetComponent<TileManager>().GetAllAdjacentTiles().First();
-            this.PlaceTileNextToOther(tile, adjacentTile.Key, adjacentTile.Value);
-            this.GetDrawBoardForActivePlayer().GetComponent<DrawBoardManager>().RemoveTile(tile);
+            TileFace otherFace = adjacentTile.Value.GetComponent<TileManager>().GetAdjacentFaceToOtherTile(tile);
 
-            return true;
+            if (this.gameBoard.TryAddTile(tile.name, adjacentTile.Value.name, adjacentTile.Key, otherFace))
+            {
+                this.PlaceTileNextToOther(tile, adjacentTile.Key, adjacentTile.Value);
+                this.GetDrawBoardForActivePlayer().GetComponent<DrawBoardManager>().RemoveTile(tile);
+                return true;
+            }
         }
 
         return false;
     }
+    #endregion
 
     private void PlaceTileOnActualPosition(GameObject tile, GameObject drawBoardManager = null)
     {
@@ -403,7 +452,8 @@ public class BoardManager : MonoBehaviour
 
     private void PlaceTileInCenter(GameObject tile)
     {
-        tile.transform.position = new Vector3(0, 0, this.BoardPositionZ);
+        //tile.transform.position = new Vector3(0, 0, this.BoardPositionZ);
+        tile.transform.SetPositionAndRotation(new Vector3(0, 0, this.BoardPositionZ), Quaternion.Euler(new Vector3(0, 0, 0)));
         this.GetDrawBoardForActivePlayer().GetComponent<DrawBoardManager>().RemoveTile(tile);
     }
 

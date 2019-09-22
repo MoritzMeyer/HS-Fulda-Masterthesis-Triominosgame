@@ -1,4 +1,5 @@
 ﻿using Assets.Scripts;
+using GraphKI.GameManagement;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -265,7 +266,8 @@ public class TileManager : MonoBehaviour
 
         foreach (KeyValuePair<TileFace, GameObject> kv in adjacentTiles)
         {
-            if (!this.gameObject.GetComponent<TileManager>().CanPlaceNextToOtherTile(kv.Key, kv.Value))
+            TileFace otherFace = kv.Value.GetComponent<TileManager>().GetAdjacentFaceToOtherTile(this.gameObject);
+            if (!GameManager.instance.boardManager.gameBoard.CanPlaceTileOnGameBoard(this.gameObject.name, kv.Value.gameObject.name, kv.Key, otherFace, out TriominoTile placableTile))
             {                 
                 modifyAdjacentTile?.Invoke(false, kv.Value);
 
@@ -280,6 +282,7 @@ public class TileManager : MonoBehaviour
             }
         }
 
+        // Examine if single tile corner is adjacent to another tiles corner (Bridge) and color this other tile accordingly.
         if (adjacentTiles.Count == 1 && !this.CheckIfNumberOppositeOfFaceMatches(adjacentTiles.First().Key, modifyAdjacentTile))
         {
             return false;
