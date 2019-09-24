@@ -4,14 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Assets.Scripts
+namespace GraphKI.GameManagement
 {
     public enum GameMode
     {
-        None = 0,
-        PlayerVsAi = 1,
-        TwoPlayer = 2,
-        ThreePlayer = 3,
-        FourPlayer = 4
+        None, TwoPlayer, ThreePlayer, FourPlayer
     }
 }

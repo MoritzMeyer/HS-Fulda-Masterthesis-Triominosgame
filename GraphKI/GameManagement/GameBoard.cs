@@ -1,9 +1,8 @@
-﻿using System;
+﻿using GraphKI.Extensions;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace GraphKI.GameManagement
 {
@@ -11,24 +10,24 @@ namespace GraphKI.GameManagement
     {
         #region fields
         /// <summary>
+        /// Number of Tiles placed on the gameboard.
+        /// </summary>
+        public int NumbTilesOnBoard { get; private set; }
+
+        /// <summary>
         /// Array with the actual tile values on the grid according to the tiles position on the grid.
         /// </summary>
         private int?[,] tileValueGrid;
-        
+
         /// <summary>
         /// Array with tiles on the GameBoard
         /// </summary>
         private TriominoTile[,] tileGrid;
-
-        /// <summary>
-        /// Number of Tiles placed on the gameboard.
-        /// </summary>
-        public int NumbTilesOnBoard { get; private set; }
         #endregion
 
         #region ctor
         /// <summary>
-        /// Constructs a new object of this class.
+        /// Intantiates a new object of this class.
         /// </summary>
         public GameBoard()
         {
@@ -54,7 +53,7 @@ namespace GraphKI.GameManagement
         /// </summary>
         /// <param name="position">Coordinates of Tile.</param>
         /// <returns>The Tile</returns>
-        public TriominoTile GetTileFromGrid(Point position)
+        internal TriominoTile GetTileFromGrid(Point position)
         {
             if (position.Y < 0 || position.X < 0)
             {
@@ -62,22 +61,6 @@ namespace GraphKI.GameManagement
             }
 
             return this.tileGrid[position.Y, position.X];
-        }
-        #endregion
-
-        #region SetTileOnGrid
-        /// <summary>
-        ///  Sets a tile on the grid with coordinates from tile object.
-        /// </summary>
-        /// <param name="tile">The tile to be set on the grid including the coordinates.</param>
-        private void SetTileOnGrid(TriominoTile tile)
-        {
-            if (tile.TileGridPosition.Y < 0 || tile.TileGridPosition.X < 0)
-            {
-                throw new IndexOutOfRangeException("Only positive coordinates are allowed");
-            }
-
-            this.tileGrid[tile.TileGridPosition.Y, tile.TileGridPosition.X] = tile;
         }
         #endregion
 
@@ -131,39 +114,6 @@ namespace GraphKI.GameManagement
         }
         #endregion
 
-        #region GetTileCoordsByName
-        /// <summary>
-        /// Determines the coords of a specific tile in the tileGrid by its name.
-        /// </summary>
-        /// <param name="name">tile name.</param>
-        /// <returns>The coordinates of the tile if it can be found.</returns>
-        private Point GetTileCoordsByName(string name)
-        {
-            int otherNameGridPositionX = -1;
-            int otherNameGridPositionY = -1;
-
-            for (int i = 0; i < this.tileGrid.GetLength(0); i++)
-            {
-                for (int j = 0; j < this.tileGrid.GetLength(1); j++)
-                {
-                    if (this.tileGrid[i, j] != null && this.tileGrid[i, j].Name.Equals(name))
-                    {
-                        if (otherNameGridPositionX != -1 || otherNameGridPositionY != -1)
-                        {
-                            throw new InvalidOperationException("Tile with 'name' could be found multiple times in grid.");
-                        }
-
-                        otherNameGridPositionY = i;
-                        otherNameGridPositionX = j;
-                    }
-                }
-            }
-
-            Point tileCoords = new Point(otherNameGridPositionX, otherNameGridPositionY);
-            return tileCoords;
-        }
-        #endregion
-
         #region GetTileGridPositionFromOtherTilePositionAndFace
         /// <summary>
         /// Determines a place in the tileGrid for a tile according to anothers (other) tile 
@@ -172,7 +122,7 @@ namespace GraphKI.GameManagement
         /// <param name="otherTileTileGridCoords">The others tile coordinates of the tileGrid.</param>
         /// <param name="otherFace">The others tile face, on which the new tile should be placed.</param>
         /// <returns>The coordniates of the tile Grid, next to the other tile. If there is a tile on the determined coordinates, -1|-1 is returned.</returns>
-        public Point GetTileGridPositionFromOtherTilePositionAndFace(Point otherTileTileGridCoords, TileFace otherFace)
+        internal Point GetTileGridPositionFromOtherTilePositionAndFace(Point otherTileTileGridCoords, TileFace otherFace)
         {
             Point thisTileGridPosition = new Point(-1, -1);
 
@@ -209,38 +159,6 @@ namespace GraphKI.GameManagement
                 thisTileGridPosition = new Point(otherTileTileGridCoords.X, otherTileTileGridCoords.Y - 1);
             }
 
-            //switch (this.GetTileFromGrid(otherTileTileGridCoords).Orientation)
-            //{
-            //    case ArrayTileOrientation.BottomUp:
-            //        switch(otherFace)
-            //        {
-            //            case TileFace.Left:
-            //                thisTileGridPosition = new Point(otherTileTileGridCoords.X - 1, otherTileTileGridCoords.Y);
-            //                break;
-            //            case TileFace.Right:
-            //                thisTileGridPosition = new Point(otherTileTileGridCoords.X + 1, otherTileTileGridCoords.Y);
-            //                break;
-            //            case TileFace.Bottom:
-            //                thisTileGridPosition = new Point(otherTileTileGridCoords.X, otherTileTileGridCoords.Y + 1);
-            //                break;
-            //        }
-            //        break;
-            //    case ArrayTileOrientation.TopDown:
-            //        switch (otherFace)
-            //        {
-            //            case TileFace.Left:
-            //                thisTileGridPosition = new Point(otherTileTileGridCoords.X + 1, otherTileTileGridCoords.Y);
-            //                break;
-            //            case TileFace.Right:
-            //                thisTileGridPosition = new Point(otherTileTileGridCoords.X - 1, otherTileTileGridCoords.Y);
-            //                break;
-            //            case TileFace.Bottom:
-            //                thisTileGridPosition = new Point(otherTileTileGridCoords.X, otherTileTileGridCoords.Y - 1);
-            //                break;
-            //        }
-            //        break;
-            //}
-
             if (thisTileGridPosition.Y >= 0 && thisTileGridPosition.X >= 0 && this.GetTileFromGrid(thisTileGridPosition) != null)
             {
                 thisTileGridPosition.X = -1;
@@ -260,7 +178,7 @@ namespace GraphKI.GameManagement
         /// <param name="otherFace">Other tiles face.</param>
         /// <param name="tileFace">New tiles face.</param>
         /// <returns>the orientation of the new tile.</returns>
-        public TileOrientation GetTileOrienationFromOtherTileOrientationAndFaces(TileOrientation otherOrientation, TileFace otherFace, TileFace tileFace)
+        internal TileOrientation GetTileOrienationFromOtherTileOrientationAndFaces(TileOrientation otherOrientation, TileFace otherFace, TileFace tileFace)
         {
             if ((otherOrientation == TileOrientation.Straight && otherFace == TileFace.Left && tileFace == TileFace.Left) ||
                 (otherOrientation == TileOrientation.Straight && otherFace == TileFace.Right && tileFace == TileFace.Right) ||
@@ -351,7 +269,7 @@ namespace GraphKI.GameManagement
         /// <returns></returns>
         public bool TryAddTile(string tileName, string otherName = null, TileFace? tileFace = null, TileFace? otherFace = null)
         {
-            TriominoTile.EnsureName(tileName);
+            tileName.EnsureTriominoTileName();
 
             if (!this.CanPlaceTileOnGameBoard(tileName, otherName, tileFace, otherFace, out TriominoTile placeableTile))
             {
@@ -382,6 +300,55 @@ namespace GraphKI.GameManagement
             this.NumbTilesOnBoard++;
 
             return true;
+        }
+        #endregion
+
+        #region SetTileOnGrid
+        /// <summary>
+        ///  Sets a tile on the grid with coordinates from tile object.
+        /// </summary>
+        /// <param name="tile">The tile to be set on the grid including the coordinates.</param>
+        private void SetTileOnGrid(TriominoTile tile)
+        {
+            if (tile.TileGridPosition.Y < 0 || tile.TileGridPosition.X < 0)
+            {
+                throw new IndexOutOfRangeException("Only positive coordinates are allowed");
+            }
+
+            this.tileGrid[tile.TileGridPosition.Y, tile.TileGridPosition.X] = tile;
+        }
+        #endregion
+
+        #region GetTileCoordsByName
+        /// <summary>
+        /// Determines the coords of a specific tile in the tileGrid by its name.
+        /// </summary>
+        /// <param name="name">tile name.</param>
+        /// <returns>The coordinates of the tile if it can be found.</returns>
+        private Point GetTileCoordsByName(string name)
+        {
+            int otherNameGridPositionX = -1;
+            int otherNameGridPositionY = -1;
+
+            for (int i = 0; i < this.tileGrid.GetLength(0); i++)
+            {
+                for (int j = 0; j < this.tileGrid.GetLength(1); j++)
+                {
+                    if (this.tileGrid[i, j] != null && this.tileGrid[i, j].Name.Equals(name))
+                    {
+                        if (otherNameGridPositionX != -1 || otherNameGridPositionY != -1)
+                        {
+                            throw new InvalidOperationException("Tile with 'name' could be found multiple times in grid.");
+                        }
+
+                        otherNameGridPositionY = i;
+                        otherNameGridPositionX = j;
+                    }
+                }
+            }
+
+            Point tileCoords = new Point(otherNameGridPositionX, otherNameGridPositionY);
+            return tileCoords;
         }
         #endregion
 

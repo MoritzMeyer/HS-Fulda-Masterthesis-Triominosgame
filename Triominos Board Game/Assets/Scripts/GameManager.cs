@@ -5,9 +5,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 using UnityEngine.UI;
+using GraphKI.GameManagement;
 
 public class GameManager : MonoBehaviour
 {
+    #region fields
     public static GameManager instance = null;
     public BoardManager boardManager;
     public GameMode GameMode;
@@ -25,7 +27,9 @@ public class GameManager : MonoBehaviour
     //private int TurnCount = 0;
     private Dictionary<PlayerCode, int> playerPoints;
     private int NumbTileDrawsInTurn = 0;
+    #endregion
 
+    #region Awake
     public void Awake()
     {
         if (instance == null)
@@ -48,13 +52,17 @@ public class GameManager : MonoBehaviour
 
         this.InitGame();
     }
+    #endregion
 
+    #region Update
     private void Update()
     {
         this.player1Score.text = PlayerCode.Player1 + ": " + this.playerPoints[PlayerCode.Player1];
         this.player2Score.text = PlayerCode.Player2 + ": " + this.playerPoints[PlayerCode.Player2];
     }
+    #endregion
 
+    #region InitGame
     public void InitGame()
     {
         ParticipatingPlayers = new List<PlayerCode>()
@@ -63,9 +71,14 @@ public class GameManager : MonoBehaviour
             PlayerCode.Player2
         };
 
+        playerPoints = new Dictionary<PlayerCode, int>();
+        foreach (PlayerCode player in this.ParticipatingPlayers)
+        {
+            this.playerPoints.Add(player, 0);
+        }
+
         switch (GameMode)
         {
-            case GameMode.PlayerVsAi:
             case GameMode.TwoPlayer:
                 break;
             case GameMode.ThreePlayer:
@@ -79,17 +92,13 @@ public class GameManager : MonoBehaviour
                 throw new ArgumentException($"Unbekannter gameMode '{GameMode}'");
         }
 
-        playerPoints = new Dictionary<PlayerCode, int>();
-        foreach (PlayerCode player in this.ParticipatingPlayers)
-        {
-            this.playerPoints.Add(player, 0);
-        }
-
         this.boardManager.InitBoard();
         this.ActivePlayer = this.GetStartingPlayer();
         Debug.Log("Aktiver Spieler: " + this.ActivePlayer);
     }
+    #endregion
 
+    #region DrawTile
     public void DrawTile()
     {
         if (this.NumbTileDrawsInTurn >= 2)
@@ -106,7 +115,9 @@ public class GameManager : MonoBehaviour
             tile.GetComponent<FadeToColor>().StartFadeToOrigin();
         }
     }
+    #endregion
 
+    #region TryPlaceTile
     public bool TryPlaceTile(GameObject tile)
     {
         if (this.boardManager.TryPlaceTile(tile))
@@ -120,7 +131,9 @@ public class GameManager : MonoBehaviour
 
         return false;
     }
+    #endregion
 
+    #region NextTurn
     public void NextTurn()
     {
         this.TurnCount++;
@@ -132,7 +145,9 @@ public class GameManager : MonoBehaviour
             this.boardManager.DrawButton.GetComponent<DrawButtonManager>().Activate();
         }
     }
+    #endregion
 
+    #region GetStartingPlayer
     public PlayerCode GetStartingPlayer()
     {
         // Zunächst für jeden Spieler den TrippleTriomino mit dem höchsten Wert holen
@@ -169,7 +184,9 @@ public class GameManager : MonoBehaviour
 
         return playerWithHighestTriominoValue;
     }
+    #endregion
 
+    #region  GetNextPlayer
     private PlayerCode GetNextPlayer()
     {
         int actualIndex = this.ParticipatingPlayers.IndexOf(this.ActivePlayer);
@@ -181,7 +198,9 @@ public class GameManager : MonoBehaviour
 
         return ParticipatingPlayers[actualIndex];
     }
+    #endregion
 
+    #region CheckFaceValues
     public bool CheckFaceValues(string value1, string value2)
     {
         string[] parts1 = value1.Split('-');
@@ -189,4 +208,5 @@ public class GameManager : MonoBehaviour
 
         return parts1[0] == parts2[1] && parts1[1] == parts2[0];
     }
+    #endregion
 }

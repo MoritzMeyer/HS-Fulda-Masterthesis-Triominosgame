@@ -8,10 +8,10 @@
     ".NETCoreApp,Version=v2.1": {
       "GraphKITest/1.0.0": {
         "dependencies": {
-          "GraphKI": "1.0.0",
           "MSTest.TestAdapter": "1.3.2",
           "MSTest.TestFramework": "1.3.2",
-          "Microsoft.NET.Test.Sdk": "15.9.0"
+          "Microsoft.NET.Test.Sdk": "15.9.0",
+          "GraphKI": "1.0.0.0"
         },
         "runtime": {
           "GraphKITest.dll": {}
@@ -1014,28 +1014,11 @@
           }
         }
       },
-      "GraphKI/1.0.0": {
-        "dependencies": {
-          "UnityEngine.CoreModule": "0.0.0.0",
-          "UnityEngine.SharedInternalsModule": "0.0.0.0"
-        },
+      "GraphKI/1.0.0.0": {
         "runtime": {
-          "GraphKI.dll": {}
-        }
-      },
-      "UnityEngine.CoreModule.Reference/0.0.0.0": {
-        "runtime": {
-          "UnityEngine.CoreModule.dll": {
-            "assemblyVersion": "0.0.0.0",
-            "fileVersion": "0.0.0.0"
-          }
-        }
-      },
-      "UnityEngine.SharedInternalsModule.Reference/0.0.0.0": {
-        "runtime": {
-          "UnityEngine.SharedInternalsModule.dll": {
-            "assemblyVersion": "0.0.0.0",
-            "fileVersion": "0.0.0.0"
+          "GraphKI.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
           }
         }
       }
@@ -1537,17 +1520,7 @@
       "path": "system.xml.xpath.xmldocument/4.0.1",
       "hashPath": "system.xml.xpath.xmldocument.4.0.1.nupkg.sha512"
     },
-    "GraphKI/1.0.0": {
-      "type": "project",
-      "serviceable": false,
-      "sha512": ""
-    },
-    "UnityEngine.CoreModule.Reference/0.0.0.0": {
-      "type": "reference",
-      "serviceable": false,
-      "sha512": ""
-    },
-    "UnityEngine.SharedInternalsModule.Reference/0.0.0.0": {
+    "GraphKI/1.0.0.0": {
       "type": "reference",
       "serviceable": false,
       "sha512": ""

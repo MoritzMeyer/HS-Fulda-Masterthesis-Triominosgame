@@ -13,7 +13,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\GraphKI\GraphKI.csproj" />
+    <Reference Include="GraphKI">
+      <HintPath>..\GraphKI\bin\Debug\GraphKI.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 </Project>

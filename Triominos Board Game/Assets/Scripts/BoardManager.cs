@@ -67,7 +67,6 @@ public class BoardManager : MonoBehaviour
 
         switch (GameManager.instance.GameMode)
         {
-            case GameMode.PlayerVsAi:
             case GameMode.TwoPlayer:
                 break;
             case GameMode.ThreePlayer:
@@ -150,7 +149,6 @@ public class BoardManager : MonoBehaviour
 
         switch (GameManager.instance.GameMode)
         {
-            case GameMode.PlayerVsAi:
             case GameMode.TwoPlayer:
                 break;
             case GameMode.ThreePlayer:
@@ -275,7 +273,6 @@ public class BoardManager : MonoBehaviour
         int numberStartTiles = 0;
         switch(GameManager.instance.GameMode)
         {
-            case GameMode.PlayerVsAi:
             case GameMode.TwoPlayer:
                 numberStartTiles = 9;
                 break;
