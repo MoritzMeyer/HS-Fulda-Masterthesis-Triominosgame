@@ -43,7 +43,12 @@ namespace GraphKI.GameManagement
         /// <summary>
         /// Dictionary with Drawboards for each player.
         /// </summary>
-        internal Dictionary<PlayerCode, DrawBoard> DrawBoards { get; set; }
+        public Dictionary<PlayerCode, DrawBoard> DrawBoards { get; set; }
+
+        /// <summary>
+        /// Dictionary with bool values for each Player, which indicates if this player is played by ai.
+        /// </summary>
+        public Dictionary<PlayerCode, bool> AIPlayers { get; set; }
 
         /// <summary>
         /// All remaining (drawable) tiles, which are not distributed to a player yet.
@@ -67,8 +72,9 @@ namespace GraphKI.GameManagement
         /// <summary>
         /// Intantiates a new Object of this class.
         /// </summary>
-        /// <param name="gameMode"></param>
-        public GameManager(GameMode gameMode)
+        /// <param name="gameMode">gamemode</param>
+        /// <param name="isPlayer2AI">Determines, if player2 is played by computer.</param>
+        public GameManager(GameMode gameMode, bool isPlayer2AI = false)
         {
             this.TurnCount = 0;
             this.MaxTileDrawCount = 3;
@@ -79,6 +85,7 @@ namespace GraphKI.GameManagement
             this.TilePool = this.InitTilePool();
             this.DrawStartTiles(gameMode);
             this.ActivePlayer = this.GetStartingPlayer();
+            this.AIPlayers = this.InitAIPlayers(gameMode, isPlayer2AI);
         }
         #endregion
 
@@ -138,7 +145,7 @@ namespace GraphKI.GameManagement
 
             if (!this.HasPlaced && 
                 this.GetActivePlayersDrawBoard().TryRemoveTile(tileName) && 
-                this.GameBoard.TryAddTile(tileName, otherName, tileFace, otherFace))
+                this.GameBoard.TryAddTile(this.ActivePlayer, tileName, otherName, tileFace, otherFace))
             {               
                 this.PlayerPoints[this.ActivePlayer] += tileName.GetTriominoTileValue();
                 this.HasPlaced = true;
@@ -349,6 +356,36 @@ namespace GraphKI.GameManagement
             List<string> unorderedTilePool = new List<string>(tilePool);
             unorderedTilePool.Shuffle();
             return new Stack<string>(unorderedTilePool);
+        }
+        #endregion
+
+        #region InitAIPlayers
+        /// <summary>
+        /// Initializes Dictionary which indicates if a player is ai-Player or not.
+        /// </summary>
+        /// <param name="gameMode">the gamemode.</param>
+        /// <param name="isPlayer2AI">indicates if player2 is ai.</param>
+        /// <returns>the Dictionary</returns>
+        private Dictionary<PlayerCode, bool> InitAIPlayers(GameMode gameMode, bool isPlayer2AI)
+        {
+            Dictionary<PlayerCode, bool> aiPlayers = new Dictionary<PlayerCode, bool>()
+            {
+                { PlayerCode.Player1, false },
+                { PlayerCode.Player2, true }
+            };
+
+            switch(gameMode)
+            {
+                case GameMode.ThreePlayer:
+                    aiPlayers.Add(PlayerCode.Player3, false);
+                    break;
+                case GameMode.FourPlayer:
+                    aiPlayers.Add(PlayerCode.Player3, false);
+                    aiPlayers.Add(PlayerCode.Player4, false);
+                    break;
+            }
+
+            return aiPlayers;
         }
         #endregion
 

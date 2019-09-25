@@ -124,28 +124,32 @@ namespace GraphKITest
         [TestMethod]
         public void GameBoard_TryAddTile_has_to_work()
         {
+            int tilesAdded = 0;
             GameBoard gameBoard = new GameBoard();
+            gameBoard.TilePlaced += (object sender, TriominoTileEventArgs e) => { tilesAdded++; };
 
-            Assert.IsTrue(gameBoard.TryAddTile("0-1-4"));
-            Assert.IsTrue(gameBoard.TryAddTile("0-4-5", "0-1-4", TileFace.Right, TileFace.Left));
-            Assert.IsTrue(gameBoard.TryAddTile("4-4-5", "0-4-5", TileFace.Left, TileFace.Bottom));
-            Assert.IsTrue(gameBoard.TryAddTile("3-4-4", "4-4-5", TileFace.Bottom, TileFace.Right));
-            Assert.IsTrue(gameBoard.TryAddTile("3-3-4", "3-4-4", TileFace.Bottom, TileFace.Left));
-            Assert.IsTrue(gameBoard.TryAddTile("3-3-3", "3-3-4", TileFace.Left, TileFace.Right));
-            Assert.IsTrue(gameBoard.TryAddTile("2-3-3", "3-3-3", TileFace.Bottom, TileFace.Right));
-            Assert.IsTrue(gameBoard.TryAddTile("1-2-3", "2-3-3", TileFace.Bottom, TileFace.Left));
-            Assert.IsTrue(gameBoard.TryAddTile("1-1-3", "1-2-3", TileFace.Bottom, TileFace.Left));
-            Assert.IsTrue(gameBoard.TryAddTile("1-3-4", "1-1-3", TileFace.Right, TileFace.Left));
+            Assert.IsTrue(gameBoard.TryAddTile(PlayerCode.None, "0-1-4"));
+            Assert.IsTrue(gameBoard.TryAddTile(PlayerCode.None, "0-4-5", "0-1-4", TileFace.Right, TileFace.Left));
+            Assert.IsTrue(gameBoard.TryAddTile(PlayerCode.None, "4-4-5", "0-4-5", TileFace.Left, TileFace.Bottom));
+            Assert.IsTrue(gameBoard.TryAddTile(PlayerCode.None, "3-4-4", "4-4-5", TileFace.Bottom, TileFace.Right));
+            Assert.IsTrue(gameBoard.TryAddTile(PlayerCode.None, "3-3-4", "3-4-4", TileFace.Bottom, TileFace.Left));
+            Assert.IsTrue(gameBoard.TryAddTile(PlayerCode.None, "3-3-3", "3-3-4", TileFace.Left, TileFace.Right));
+            Assert.IsTrue(gameBoard.TryAddTile(PlayerCode.None, "2-3-3", "3-3-3", TileFace.Bottom, TileFace.Right));
+            Assert.IsTrue(gameBoard.TryAddTile(PlayerCode.None, "1-2-3", "2-3-3", TileFace.Bottom, TileFace.Left));
+            Assert.IsTrue(gameBoard.TryAddTile(PlayerCode.None, "1-1-3", "1-2-3", TileFace.Bottom, TileFace.Left));
+            Assert.IsTrue(gameBoard.TryAddTile(PlayerCode.None, "1-3-4", "1-1-3", TileFace.Right, TileFace.Left));
 
-            Assert.IsTrue(gameBoard.TryAddTile("1-1-1", "1-1-3", TileFace.Bottom, TileFace.Right));
-            Assert.IsTrue(gameBoard.TryAddTile("0-1-1", "1-1-1", TileFace.Bottom, TileFace.Right));
-            Assert.IsTrue(gameBoard.TryAddTile("0-0-1", "0-1-1", TileFace.Bottom, TileFace.Left));
-            Assert.IsTrue(gameBoard.TryAddTile("0-1-2", "0-0-1", TileFace.Right, TileFace.Left));
-            Assert.IsTrue(gameBoard.TryAddTile("1-2-2", "0-1-2",TileFace.Left, TileFace.Bottom));
-            Assert.IsTrue(gameBoard.TryAddTile("1-1-2", "1-1-1", TileFace.Right, TileFace.Left));
+            Assert.IsTrue(gameBoard.TryAddTile(PlayerCode.None, "1-1-1", "1-1-3", TileFace.Bottom, TileFace.Right));
+            Assert.IsTrue(gameBoard.TryAddTile(PlayerCode.None, "0-1-1", "1-1-1", TileFace.Bottom, TileFace.Right));
+            Assert.IsTrue(gameBoard.TryAddTile(PlayerCode.None, "0-0-1", "0-1-1", TileFace.Bottom, TileFace.Left));
+            Assert.IsTrue(gameBoard.TryAddTile(PlayerCode.None, "0-1-2", "0-0-1", TileFace.Right, TileFace.Left));
+            Assert.IsTrue(gameBoard.TryAddTile(PlayerCode.None, "1-2-2", "0-1-2",TileFace.Left, TileFace.Bottom));
+            Assert.IsTrue(gameBoard.TryAddTile(PlayerCode.None, "1-1-2", "1-1-1", TileFace.Right, TileFace.Left));
 
-            Assert.IsFalse(gameBoard.TryAddTile("1-3-3", "1-1-3", TileFace.Right, TileFace.Left));
-            Assert.IsFalse(gameBoard.TryAddTile("0-4-4", "0-1-4", TileFace.Right, TileFace.Left));
+            Assert.IsFalse(gameBoard.TryAddTile(PlayerCode.None, "1-3-3", "1-1-3", TileFace.Right, TileFace.Left));
+            Assert.IsFalse(gameBoard.TryAddTile(PlayerCode.None, "0-4-4", "0-1-4", TileFace.Right, TileFace.Left));
+
+            Assert.AreEqual(15, tilesAdded);
         }
         #endregion
 
@@ -159,14 +163,14 @@ namespace GraphKITest
             GameBoard gameBoard = new GameBoard();
 
             // Check all Sides of a Tile placed BottomUp
-            Assert.IsTrue(gameBoard.TryAddTile("0-1-1"));
+            Assert.IsTrue(gameBoard.TryAddTile(PlayerCode.None, "0-1-1"));
             Assert.AreEqual(new Point(23, 24), gameBoard.GetTileGridPositionFromOtherTilePositionAndFace(new Point(23, 23), TileFace.Bottom));
             Assert.AreEqual(new Point(24, 23), gameBoard.GetTileGridPositionFromOtherTilePositionAndFace(new Point(23, 23), TileFace.Right));
             Assert.AreEqual(new Point(22, 23), gameBoard.GetTileGridPositionFromOtherTilePositionAndFace(new Point(23, 23), TileFace.Left));
 
             // Check all Sides of a Tile placed TopDown
-            Assert.IsTrue(gameBoard.TryAddTile("0-0-1", "0-1-1", TileFace.Left, TileFace.Right));
-            Assert.IsTrue(gameBoard.TryAddTile("0-1-2", "0-1-1", TileFace.Right, TileFace.Left));
+            Assert.IsTrue(gameBoard.TryAddTile(PlayerCode.None, "0-0-1", "0-1-1", TileFace.Left, TileFace.Right));
+            Assert.IsTrue(gameBoard.TryAddTile(PlayerCode.None, "0-1-2", "0-1-1", TileFace.Right, TileFace.Left));
             Assert.AreEqual(new Point(25, 23), gameBoard.GetTileGridPositionFromOtherTilePositionAndFace(new Point(24, 23), TileFace.Bottom));
             Assert.AreEqual(new Point(21, 23), gameBoard.GetTileGridPositionFromOtherTilePositionAndFace(new Point(22, 23), TileFace.Bottom));
             Assert.AreEqual(new Point(22, 22), gameBoard.GetTileGridPositionFromOtherTilePositionAndFace(new Point(22, 23), TileFace.Left));

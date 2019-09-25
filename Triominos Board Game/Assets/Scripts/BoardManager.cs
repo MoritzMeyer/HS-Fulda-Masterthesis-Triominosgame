@@ -18,6 +18,8 @@ public class BoardManager : MonoBehaviour
     public GameObject DrawBoardPlayer4;
     public Button DrawButton;
 
+    private GameObject PlacedTiles;
+
     [HideInInspector]
     public Dictionary<PlayerCode, GameObject> DrawBoardManagers;
 
@@ -123,6 +125,7 @@ public class BoardManager : MonoBehaviour
     /// </summary>
     private void InitGameBoard()
     {
+        this.PlacedTiles = new GameObject();
         this.NewTilePositionsByOtherOrientationAndTileFace = this.InitNewTilePositionsByOtherOrientationAndTileFace();
         this.NewTileOrientationByOtherFaceAndThisFace = this.InitNewTileOrientationByOtherFaceAndThisFace();
 
@@ -154,6 +157,8 @@ public class BoardManager : MonoBehaviour
             default:
                 throw new ArgumentException($"Unbekannter gameMode '{UnityGameManager.instance.GameMode}'");
         }
+
+        UnityGameManager.instance.GameManager.GameBoard.TilePlaced += this.OnTilePlaced; 
     }
     #endregion
 
@@ -333,6 +338,29 @@ public class BoardManager : MonoBehaviour
     }
     #endregion
 
+    #region TryPlacedTileFromDrawBoard
+    /// <summary>
+    /// Places a tile from a Drawboard. 
+    /// !!!! This tile was placed within GraphKI.GameManagement.GameBoard before !!!!
+    /// </summary>
+    /// <param name="player">The Player for whom this tile is placed.</param>
+    /// <param name="tileName">The name of the tile to be placed.</param>
+    /// <param name="otherTileName">The name of the tile to which the new tile should be placed adjacent to.</param>
+    /// <param name="tileFace">The tiles face wich should be adjacent to other tile after placing.</param>
+    /// <param name="otherFace">the other tiles face which should be adjacent to tile after placing.</param>
+    public void TryPlaceTileFromDrawBoard(PlayerCode player, string tileName, string otherTileName = null, TileFace? tileFace = null, TileFace? otherFace = null)
+    {
+        GameObject tile = GameObject.Find(tileName);
+        if (otherTileName == null || !tileFace.HasValue || !otherFace.HasValue)
+        {
+            this.PlaceTileInCenter(tile);
+        }
+
+        GameObject otherTile = this.PlacedTiles.transform.Find(otherTileName).gameObject;
+        this.PlaceTileNextToOther(tile, tileFace.Value, otherTile, otherFace.Value);
+    }
+    #endregion
+
     #region PlaceTileOnActualPosition
     /// <summary>
     /// Places a tile on its actual position
@@ -341,7 +369,8 @@ public class BoardManager : MonoBehaviour
     /// <param name="drawBoardManager">If existent the drawboardmanager who holds this tile before placement.</param>
     private void PlaceTileOnActualPosition(GameObject tile, GameObject drawBoardManager = null)
     {
-        tile.transform.position = new Vector3(tile.transform.position.x, tile.transform.position.y, this.BoardPositionZ);     
+        tile.transform.position = new Vector3(tile.transform.position.x, tile.transform.position.y, this.BoardPositionZ);
+        tile.transform.SetParent(this.PlacedTiles.transform);
     }
     #endregion
 
@@ -365,6 +394,7 @@ public class BoardManager : MonoBehaviour
         Quaternion thisTileRotation = this.GetNewTileOrientationByOtherFaceAndThisFace(otherTile, thisTile, otherFace, thisFace);
 
         thisTile.transform.SetPositionAndRotation(thisTilePosition, thisTileRotation);
+        thisTile.transform.SetParent(this.PlacedTiles.transform);
     }
     #endregion
 
@@ -377,6 +407,7 @@ public class BoardManager : MonoBehaviour
     {
         //tile.transform.position = new Vector3(0, 0, this.BoardPositionZ);
         tile.transform.SetPositionAndRotation(new Vector3(0, 0, this.BoardPositionZ), Quaternion.Euler(new Vector3(0, 0, 0)));
+        tile.transform.SetParent(this.PlacedTiles.transform);
     }
     #endregion
 
@@ -420,6 +451,21 @@ public class BoardManager : MonoBehaviour
         newZRotation += this.NewTileOrientationByOtherFaceAndThisFace[otherFace][thisFace];
 
         return Quaternion.Euler(thisTile.transform.rotation.eulerAngles.x, thisTile.transform.rotation.eulerAngles.y, newZRotation);
+    }
+    #endregion
+
+    #region OnTilePlaced
+    /// <summary>
+    /// EventHandler for TilePlaced events.
+    /// </summary>
+    /// <param name="sender">sender</param>
+    /// <param name="e">event args</param>
+    private void OnTilePlaced(object sender, TriominoTileEventArgs e)
+    {
+        if (UnityGameManager.instance.GameManager.AIPlayers[UnityGameManager.instance.GameManager.ActivePlayer])
+        {
+            this.TryPlaceTileFromDrawBoard(e.Player.Value, e.TileName, e.OtherTileName, e.TileFace, e.OtherTileFAce);
+        }
     }
     #endregion
 }

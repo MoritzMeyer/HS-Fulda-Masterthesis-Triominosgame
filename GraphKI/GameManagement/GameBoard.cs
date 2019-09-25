@@ -15,6 +15,11 @@ namespace GraphKI.GameManagement
         public int NumbTilesOnBoard { get; private set; }
 
         /// <summary>
+        /// Event which is thrown, when a new tile was placed on the gameboard.
+        /// </summary>
+        public event EventHandler<TriominoTileEventArgs> TilePlaced;
+
+        /// <summary>
         /// Array with the actual tile values on the grid according to the tiles position on the grid.
         /// </summary>
         private int?[,] tileValueGrid;
@@ -267,7 +272,7 @@ namespace GraphKI.GameManagement
         /// <param name="tileFace">The new tiles face wich points to the other tile.</param>
         /// <param name="otherFace">The other tiles face which points to the new tile.</param>
         /// <returns></returns>
-        public bool TryAddTile(string tileName, string otherName = null, TileFace? tileFace = null, TileFace? otherFace = null)
+        public bool TryAddTile(PlayerCode player, string tileName, string otherName = null, TileFace? tileFace = null, TileFace? otherFace = null)
         {
             tileName.EnsureTriominoTileName();
 
@@ -277,7 +282,15 @@ namespace GraphKI.GameManagement
             }
 
             this.AddTile(placeableTile);
+            this.OnTilePlaced(new TriominoTileEventArgs()
+            {
+                TileName = tileName,
+                OtherTileName = otherName,
+                TileFace = tileFace,
+                OtherTileFAce = otherFace,
+                Player = player
 
+            });
             return true;
         }
         #endregion
@@ -446,6 +459,17 @@ namespace GraphKI.GameManagement
                     this.tileValueGrid[tileGridPosition.Y, tileGridPosition.X + 2] = int.Parse(nameParts[2]);
                     break;
             }
+        }
+        #endregion
+
+        #region OnTilePlaced
+        /// <summary>
+        /// throws a new tilePlaced event.
+        /// </summary>
+        /// <param name="e"></param>
+        protected virtual void OnTilePlaced(TriominoTileEventArgs e)
+        {
+            this.TilePlaced?.Invoke(this, e);
         }
         #endregion
     }

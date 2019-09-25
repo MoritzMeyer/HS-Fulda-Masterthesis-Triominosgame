@@ -52,7 +52,8 @@ public class UnityGameManager : MonoBehaviour
     #region InitGame
     public void InitGame()
     {
-        this.GameManager = new GameManager(GameMode);
+        //this.GameManager = new GameManager(GameMode, true);
+        this.GameManager = new GameManager(GameMode, false);
         this.GameManager.NextTurnEvent += (sender, e) => { this.NextTurn(); };
         this.boardManager.InitBoard();
         Debug.Log("Aktiver Spieler: " + this.GameManager.ActivePlayer);

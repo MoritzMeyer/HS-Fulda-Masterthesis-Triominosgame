@@ -17,7 +17,7 @@ public class DrawBoardManager : MonoBehaviour
     public float TileMinPositionX = -0.32f;
     public float TileOffsetX = 0.08f;
 
-    private List<GameObject> tilesOnDrawBoard;
+    public List<GameObject> tilesOnDrawBoard;
 
     public Color highlightColor = new Color32(92, 255, 0, 255);
     private Color originColor;
