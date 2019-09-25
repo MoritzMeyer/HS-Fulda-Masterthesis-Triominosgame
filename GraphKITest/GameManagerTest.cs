@@ -18,12 +18,18 @@ namespace GraphKITest
         [TestMethod]
         public void DrawTile_functionality_has_to_work()
         {
+            int nextTurnCount = 0;
             GameManager gameManager = new GameManager(GameMode.ThreePlayer);
             Assert.AreEqual(3, gameManager.DrawBoards.Count());
             gameManager = new GameManager(GameMode.FourPlayer);
             Assert.AreEqual(4, gameManager.DrawBoards.Count());
             gameManager = new GameManager(GameMode.TwoPlayer);
             Assert.AreEqual(2, gameManager.DrawBoards.Count());
+
+            gameManager.NextTurnEvent += (sender, e) =>
+            {
+                nextTurnCount++;
+            };
 
             Assert.AreEqual(0, gameManager.TurnCount);
             Assert.IsTrue(gameManager.TryDrawTile(out string randomTile));
@@ -43,6 +49,7 @@ namespace GraphKITest
 
             PlayerCode activePlayer = gameManager.ActivePlayer;
             Assert.IsTrue(gameManager.TryNextTurn());
+            Assert.AreEqual(gameManager.TurnCount, nextTurnCount);
             Assert.AreNotEqual(activePlayer, gameManager.ActivePlayer);
             Assert.AreEqual(-25, gameManager.PlayerPoints[activePlayer]);
             Assert.AreEqual(0, gameManager.PlayerPoints[gameManager.ActivePlayer]);
@@ -59,15 +66,19 @@ namespace GraphKITest
         [TestMethod]
         public void PlaceTile_functionality_has_to_work()
         {
+            int nextTurnCount = 0;
             GameManager gameManager = new GameManager(GameMode.TwoPlayer);
+            gameManager.NextTurnEvent += (sender, e) => { nextTurnCount++; };
+
             List<string> allTiles = new List<string>(gameManager.InitTilePool());
 
             string tile = new List<string>(gameManager.TilePool).First();
-            Assert.ThrowsException<InvalidOperationException>(() => { gameManager.TryPlaceOnGameBoard(tile, null, null, null); }, "Only the active player can place tiles on the gameboard.");
+            Assert.ThrowsException<InvalidOperationException>(() => { gameManager.TryPlaceOnGameBoard(tile); }, "Only the active player can place tiles on the gameboard.");
 
             string tileFromActiveDrawboard = allTiles.Where(t => gameManager.GetActivePlayersDrawBoard().HasTile(t)).ElementAt(0);
-            Assert.IsTrue(gameManager.TryPlaceOnGameBoard(tileFromActiveDrawboard, null, null, null));
+            Assert.IsTrue(gameManager.TryPlaceOnGameBoard(tileFromActiveDrawboard));
             Assert.AreEqual(1, gameManager.TurnCount);
+            Assert.AreEqual(gameManager.TurnCount, nextTurnCount);
             Assert.IsFalse(gameManager.HasPlaced);
 
             PlayerCode firstPlayer = (gameManager.ActivePlayer == PlayerCode.Player1) ? PlayerCode.Player2 : PlayerCode.Player1;

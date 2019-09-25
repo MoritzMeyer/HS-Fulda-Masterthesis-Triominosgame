@@ -36,6 +36,11 @@ namespace GraphKI.GameManagement
         public Dictionary<PlayerCode, int> PlayerPoints { get; set; }
 
         /// <summary>
+        /// Event, which indicates a new Turn.
+        /// </summary>
+        public event EventHandler NextTurnEvent;
+
+        /// <summary>
         /// Dictionary with Drawboards for each player.
         /// </summary>
         internal Dictionary<PlayerCode, DrawBoard> DrawBoards { get; set; }
@@ -124,7 +129,7 @@ namespace GraphKI.GameManagement
         /// </summary>
         /// <param name="tile">The tile.</param>
         /// <returns>True if it could be added, false if not.</returns>
-        public bool TryPlaceOnGameBoard(string tileName, string otherName, TileFace? tileFace, TileFace? otherFace)
+        public bool TryPlaceOnGameBoard(string tileName, string otherName = null, TileFace? tileFace = null, TileFace? otherFace = null)
         {
             if (!this.GetActivePlayersDrawBoard().HasTile(tileName))
             {
@@ -186,7 +191,7 @@ namespace GraphKI.GameManagement
         /// <returns></returns>
         public bool CanDrawTile()
         {
-            return this.DrawCount < this.MaxTileDrawCount;
+            return this.DrawCount < this.MaxTileDrawCount && this.TilePool.Count > 0;
         }
         #endregion
 
@@ -214,6 +219,16 @@ namespace GraphKI.GameManagement
         }
         #endregion
 
+        #region NextTurnForDebug
+        /// <summary>
+        /// Invokes NextTurn without verifications.
+        /// </summary>
+        public void NextTurnForDebug()
+        {
+            this.NextTurn();
+        }
+        #endregion
+
         #region NextTurn
         /// <summary>
         /// Initializes the next turn.
@@ -224,6 +239,7 @@ namespace GraphKI.GameManagement
             this.TurnCount++;
             this.DrawCount = 0;
             this.HasPlaced = false;
+            this.OnNextTurn(EventArgs.Empty);
         }
         #endregion
 
@@ -405,6 +421,17 @@ namespace GraphKI.GameManagement
             return highestTriominoValuePerPlayer
                 .Aggregate((a, b) => (a.Value > b.Value) ? a : b)
                 .Key;
+        }
+        #endregion
+
+        #region OnNextTurn
+        /// <summary>
+        /// Throws the NextTurn-Event.
+        /// </summary>
+        /// <param name="e">Argument for the event.</param>
+        protected virtual void OnNextTurn(EventArgs e)
+        {
+            this.NextTurnEvent?.Invoke(this, e);
         }
         #endregion
     }

@@ -22,14 +22,14 @@ public class CameraMovement : MonoBehaviour
         velocity = velocity * Time.deltaTime * speed * basicSpeed;
         transform.Translate(velocity);
 
-        if (Input.GetMouseButtonDown(1) && !GameManager.instance.boardManager.IsDragging)
+        if (Input.GetMouseButtonDown(1) && !UnityGameManager.instance.boardManager.IsDragging)
         {
             mouseOrigin = Input.mousePosition;
             isPanning = true;
 
         }
 
-        if (Input.GetMouseButtonUp(1) && !GameManager.instance.boardManager.IsDragging)
+        if (Input.GetMouseButtonUp(1) && !UnityGameManager.instance.boardManager.IsDragging)
         {
             isPanning = false;
         }

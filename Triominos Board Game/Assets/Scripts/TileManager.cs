@@ -215,7 +215,7 @@ public class TileManager : MonoBehaviour
         string faceValueOther = other.gameObject.GetComponent<TileManager>().GetValueFromTileFace(faceOther);
         string faceValueThis = this.GetValueFromTileFace(thisFace);
 
-        if (!GameManager.instance.CheckFaceValues(faceValueOther, faceValueThis))
+        if (!UnityGameManager.instance.CheckFaceValues(faceValueOther, faceValueThis))
         {
             return false;
         }
@@ -259,7 +259,7 @@ public class TileManager : MonoBehaviour
     {
         Dictionary<TileFace, GameObject> adjacentTiles = this.GetAllAdjacentTiles();
 
-        if (GameManager.instance.TurnCount > 0 && !adjacentTiles.Any())
+        if (UnityGameManager.instance.GameManager.TurnCount > 0 && !adjacentTiles.Any())
         {
             return false;
         }
@@ -267,7 +267,7 @@ public class TileManager : MonoBehaviour
         foreach (KeyValuePair<TileFace, GameObject> kv in adjacentTiles)
         {
             TileFace otherFace = kv.Value.GetComponent<TileManager>().GetAdjacentFaceToOtherTile(this.gameObject);
-            if (!GameManager.instance.boardManager.gameBoard.CanPlaceTileOnGameBoard(this.gameObject.name, kv.Value.gameObject.name, kv.Key, otherFace, out TriominoTile placableTile))
+            if (!UnityGameManager.instance.GameManager.GameBoard.CanPlaceTileOnGameBoard(this.gameObject.name, kv.Value.gameObject.name, kv.Key, otherFace, out TriominoTile placableTile))
             {                 
                 modifyAdjacentTile?.Invoke(false, kv.Value);
 
@@ -330,4 +330,50 @@ public class TileManager : MonoBehaviour
 
         return true;
     }
+
+    #region SetNumber1
+    /// <summary>
+    /// Sets Text for Number 1
+    /// </summary>
+    /// <param name="content">The text to be set.</param>
+    public void SetNumber1(string content)
+    {
+        this.SetNumber("Number1", content);
+    }
+    #endregion
+
+    #region SetNumber2
+    /// <summary>
+    /// Sets Text for Number 2
+    /// </summary>
+    /// <param name="content">The text to be set.</param>
+    public void SetNumber2(string content)
+    {
+        this.SetNumber("Number2", content);
+    }
+    #endregion
+
+    #region SetNumber3
+    /// <summary>
+    /// Sets Text for Number 3
+    /// </summary>
+    /// <param name="content">The text to be set.</param>
+    public void SetNumber3(string content)
+    {
+        this.SetNumber("Number3", content);
+    }
+    #endregion
+
+    #region SetNumber
+    /// <summary>
+    /// Sets the text for a given Number gameObject.
+    /// </summary>
+    /// <param name="numberName">The name of the numbers gameobject.</param>
+    /// <param name="content">The text to be set.</param>
+    private void SetNumber(string numberName, string content)
+    {
+        GameObject number = this.gameObject.transform.Find(numberName).gameObject;
+        number.gameObject.transform.GetChild(0).GetComponent<TextMeshProUGUI>().SetText(content);
+    }
+    #endregion
 }

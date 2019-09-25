@@ -40,17 +40,17 @@ public class DragAndDrop : MonoBehaviour
                 // the order of setting parent, position and rotation is important
                 this.selected = false;
                 this.gameObject.transform.rotation = this.originRotation;
-                this.transform.SetParent(GameManager.instance.boardManager.GetDrawBoardForActivePlayer().transform);
+                this.transform.SetParent(UnityGameManager.instance.boardManager.GetDrawBoardManagerForActivePlayer().transform);
                 this.gameObject.layer = this.transform.parent.gameObject.layer;
                 this.gameObject.transform.localPosition = this.originLocalePosition;
-                GameManager.instance.boardManager.StopDragging();
+                UnityGameManager.instance.boardManager.StopDragging();
             }
             else if (Input.GetMouseButtonUp(0) && !IsOverDrawBoard)
             {
-                if (GameManager.instance.TryPlaceTile(this.gameObject))
+                if (UnityGameManager.instance.TryPlaceTile(this.gameObject))
                 {
                     this.selected = false;
-                    GameManager.instance.boardManager.StopDragging();
+                    UnityGameManager.instance.boardManager.StopDragging();
                 }
             }
         }
@@ -59,12 +59,12 @@ public class DragAndDrop : MonoBehaviour
     private void OnMouseOver()
     {
         if (Input.GetMouseButtonDown(0) &&
-            !GameManager.instance.boardManager.IsDragging &&
+            !UnityGameManager.instance.boardManager.IsDragging &&
             !this.gameObject.layer.Equals(LayerMask.NameToLayer(LayerManager.DEFAULTLAYER)) &&
             !IsMouseOverUI() &&
             this.gameObject.transform.parent.gameObject.GetComponent<DrawBoardManager>().IsActiveDrawBoard())
         {
-            GameManager.instance.boardManager.StartDragging();
+            UnityGameManager.instance.boardManager.StartDragging();
             this.hadParent = (this.transform.parent != null);
 
             // the order of removing Parent and caching position/rotation is important

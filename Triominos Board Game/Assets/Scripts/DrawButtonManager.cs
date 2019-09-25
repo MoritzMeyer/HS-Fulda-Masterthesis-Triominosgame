@@ -45,7 +45,7 @@ public class DrawButtonManager : MonoBehaviour
     {
         if (this.isActive)
         {
-            GameManager.instance.DrawTile();
+            UnityGameManager.instance.DrawTile();
         }
     }
 }

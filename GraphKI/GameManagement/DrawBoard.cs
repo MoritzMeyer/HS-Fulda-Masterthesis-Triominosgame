@@ -16,6 +16,16 @@ namespace GraphKI.GameManagement
         public PlayerCode Player { get; private set; }
 
         /// <summary>
+        /// Event, which is thrown, when a Tile was added.
+        /// </summary>
+        public event EventHandler<TriominoTileEventArgs> TileAdded;
+
+        /// <summary>
+        /// Event, which is thrown, when a Tile was removed.
+        /// </summary>
+        public event EventHandler<TriominoTileEventArgs> TileRemoved;
+
+        /// <summary>
         /// The tiles on this drawboard.
         /// </summary>
         internal HashSet<string> Tiles { get; set; }
@@ -58,7 +68,13 @@ namespace GraphKI.GameManagement
                 return false;
             }
 
-            return this.Tiles.Remove(tile);
+            if (!this.Tiles.Remove(tile))
+            {
+                return false;
+            }
+
+            this.OnTileRemoved(new TriominoTileEventArgs() { TileName = tile });
+            return true;
         }
         #endregion
 
@@ -76,7 +92,13 @@ namespace GraphKI.GameManagement
                 return false;
             }
 
-            return this.Tiles.Add(tile);
+            if (!this.Tiles.Add(tile))
+            {
+                return false;
+            }
+
+            this.OnTileAdded(new TriominoTileEventArgs() { TileName = tile });
+            return true;
         }
         #endregion
 
@@ -116,6 +138,40 @@ namespace GraphKI.GameManagement
             string highestTriomino = this.Tiles.Aggregate((a, b) => (a.GetTriominoTileValue() > b.GetTriominoTileValue()) ? a : b);
 
             return highestTriomino.GetTriominoTileValue();
+        }
+        #endregion
+
+        #region GetTilesOnDrawBoard
+        /// <summary>
+        /// Returns a list as copy of all tiles on the drawboard.
+        /// </summary>
+        /// <returns>List with all tiles on drawboard.</returns>
+        public List<string> GetTilesOnDrawBoard()
+        {
+            List<string> list = new List<string>(this.Tiles);
+            return list;
+        }
+        #endregion
+
+        #region OnTileAdded
+        /// <summary>
+        /// Throws Event 'TileAdded'
+        /// </summary>
+        /// <param name="e">Event Arguments</param>
+        protected virtual void OnTileAdded(TriominoTileEventArgs e)
+        {
+            TileAdded?.Invoke(this, e);
+        }
+        #endregion
+
+        #region OnTileRemoved
+        /// <summary>
+        /// Throws Event 'TileRemoved'
+        /// </summary>
+        /// <param name="e">Event Arguments</param>
+        protected virtual void OnTileRemoved(TriominoTileEventArgs e)
+        {
+            TileRemoved?.Invoke(this, e);
         }
         #endregion
     }

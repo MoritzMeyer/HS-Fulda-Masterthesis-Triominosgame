@@ -82,5 +82,19 @@ namespace GraphKI.Extensions
             return values.Aggregate((a, b) => a + b);
         }
         #endregion
+
+        #region GetTriominoTileNumbersFromName
+        /// <summary>
+        /// Determines all three single Numberchars from a TriominoTile-Name
+        /// </summary>
+        /// <param name="name">Name of the TriominoTile</param>
+        /// <returns>Array with all thre numbers as string.</returns>
+        public static string[] GetTriominoTileNumbersFromName(this string name)
+        {
+            EnsureTriominoTileName(name);
+
+            return name.Split('-');
+        }
+        #endregion
     }
 }
