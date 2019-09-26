@@ -28,6 +28,11 @@ namespace GraphKI.GameManagement
         /// Array with tiles on the GameBoard
         /// </summary>
         private TriominoTile[,] tileGrid;
+
+        /// <summary>
+        /// Dictionary with all actual free faces on the gameboard.
+        /// </summary>
+        public Dictionary<string, List<TileFace>> tilesWithFreeFaces;
         #endregion
 
         #region ctor
@@ -49,6 +54,7 @@ namespace GraphKI.GameManagement
             this.tileValueGrid = new int?[57, 57];
             this.tileGrid = new TriominoTile[56, 56];
             this.NumbTilesOnBoard = 0;
+            this.tilesWithFreeFaces = new Dictionary<string, List<TileFace>>();
         }
         #endregion
 
@@ -271,7 +277,7 @@ namespace GraphKI.GameManagement
         /// <param name="otherName">The other tile besides which the new tile should be placed.</param>
         /// <param name="tileFace">The new tiles face wich points to the other tile.</param>
         /// <param name="otherFace">The other tiles face which points to the new tile.</param>
-        /// <returns></returns>
+        /// <returns>True if tile could be added, false if not</returns>
         public bool TryAddTile(PlayerCode player, string tileName, string otherName = null, TileFace? tileFace = null, TileFace? otherFace = null)
         {
             tileName.EnsureTriominoTileName();
@@ -282,6 +288,7 @@ namespace GraphKI.GameManagement
             }
 
             this.AddTile(placeableTile);
+            this.AddFreeFaces(tileName, otherName, tileFace, otherFace);
             this.OnTilePlaced(new TriominoTileEventArgs()
             {
                 TileName = tileName,
@@ -470,6 +477,45 @@ namespace GraphKI.GameManagement
         protected virtual void OnTilePlaced(TriominoTileEventArgs e)
         {
             this.TilePlaced?.Invoke(this, e);
+        }
+        #endregion
+
+        #region AddFreeFaces
+        /// <summary>
+        /// Adds free faces of new tile and removes the now occupied face of othertile from the freeFaces Dictionary.
+        /// </summary>
+        /// <param name="tile">name of new tile</param>
+        /// <param name="otherTile">name of other tile</param>
+        /// <param name="tileFace">face of new Tile</param>
+        /// <param name="otherFace">face of other tile</param>
+        private void AddFreeFaces(string tile, string otherTile = null, TileFace? tileFace = null, TileFace? otherFace = null)
+        {
+            if (otherTile == null || tileFace == null || otherFace == null)
+            {
+                this.tilesWithFreeFaces.Add(tile, new List<TileFace>() { TileFace.Left, TileFace.Right, TileFace.Bottom });
+                return;
+            }
+
+            this.tilesWithFreeFaces[otherTile].Remove(otherFace.Value);
+
+            List<TileFace> oppositeSites = new List<TileFace>();
+            switch(tileFace.Value)
+            {
+                case TileFace.Left:
+                    oppositeSites.Add(TileFace.Right);
+                    oppositeSites.Add(TileFace.Bottom);
+                    break;
+                case TileFace.Right:
+                    oppositeSites.Add(TileFace.Bottom);
+                    oppositeSites.Add(TileFace.Left);
+                    break;
+                case TileFace.Bottom:
+                    oppositeSites.Add(TileFace.Right);
+                    oppositeSites.Add(TileFace.Left);
+                    break;
+            }
+
+            this.tilesWithFreeFaces.Add(tile, oppositeSites);
         }
         #endregion
     }

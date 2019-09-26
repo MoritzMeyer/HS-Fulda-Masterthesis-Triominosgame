@@ -141,6 +141,28 @@ namespace GraphKI.GameManagement
         }
         #endregion
 
+        #region GetTriominoWithHighestValue
+        /// <summary>
+        /// Determines the triomino tile with highest value on drawbaord.
+        /// </summary>
+        /// <returns>name of the tile with highest value</returns>
+        public string GetTriominoWithHighestValue()
+        {
+            List<string> tilesOnDrawBoard = new List<string>(this.Tiles);
+            string triominoWithHighestValue = tilesOnDrawBoard.First();
+            
+            foreach(string tile in tilesOnDrawBoard)
+            {
+                if (tile.GetTriominoTileValue() > triominoWithHighestValue.GetTriominoTileValue())
+                {
+                    triominoWithHighestValue = tile;
+                }
+            }
+
+            return triominoWithHighestValue;
+        }
+        #endregion
+
         #region GetTilesOnDrawBoard
         /// <summary>
         /// Returns a list as copy of all tiles on the drawboard.

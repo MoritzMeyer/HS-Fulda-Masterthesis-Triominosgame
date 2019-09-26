@@ -26,6 +26,7 @@ public class BoardManager : MonoBehaviour
     public bool IsDragging { get; private set; }
     private Dictionary<int, Dictionary<TileFace, Vector2>> NewTilePositionsByOtherOrientationAndTileFace;
     private Dictionary<TileFace, Dictionary<TileFace, float>> NewTileOrientationByOtherFaceAndThisFace;
+    private bool isReady;
 
     private void Update()
     {
@@ -34,7 +35,6 @@ public class BoardManager : MonoBehaviour
             this.DrawButton.GetComponent<DrawButtonManager>().Deactivate();
         }
     }
-
 
     public void InitBoard()
     {
@@ -125,7 +125,7 @@ public class BoardManager : MonoBehaviour
     /// </summary>
     private void InitGameBoard()
     {
-        this.PlacedTiles = new GameObject();
+        this.ResetTiles();
         this.NewTilePositionsByOtherOrientationAndTileFace = this.InitNewTilePositionsByOtherOrientationAndTileFace();
         this.NewTileOrientationByOtherFaceAndThisFace = this.InitNewTileOrientationByOtherFaceAndThisFace();
 
@@ -158,7 +158,27 @@ public class BoardManager : MonoBehaviour
                 throw new ArgumentException($"Unbekannter gameMode '{UnityGameManager.instance.GameMode}'");
         }
 
-        UnityGameManager.instance.GameManager.GameBoard.TilePlaced += this.OnTilePlaced; 
+        UnityGameManager.instance.GameManager.GameBoard.TilePlaced += this.OnTilePlaced;
+        this.isReady = true;
+    }
+    #endregion
+
+    #region ResetTiles
+    /// <summary>
+    /// Removes all existing tiles within the scene
+    /// </summary>
+    private void ResetTiles()
+    {
+        GameObject[] tiles = GameObject.FindGameObjectsWithTag(TagManager.PLAYERTILE);
+        foreach (GameObject tile in tiles)
+        {
+            Destroy(tile);
+        }
+
+        this.PlacedTiles = new GameObject
+        {
+            name = "PlacedTiles"
+        };
     }
     #endregion
 
@@ -312,6 +332,7 @@ public class BoardManager : MonoBehaviour
     /// <returns>True if it was placed, false if not.</returns>
     public bool TryPlaceTile(GameObject tile)
     {
+        this.isReady = false;
         // Check if tile can be placed
         if (tile.GetComponent<TileManager>().CanPlaceTileOnGameBoard())
         {
@@ -319,6 +340,7 @@ public class BoardManager : MonoBehaviour
             if (UnityGameManager.instance.GameManager.TurnCount == 0 && UnityGameManager.instance.GameManager.TryPlaceOnGameBoard(tile.gameObject.name))
             {
                 this.PlaceTileInCenter(tile);
+                this.isReady = true;
                 return true;
             }
 
@@ -330,10 +352,12 @@ public class BoardManager : MonoBehaviour
             if (UnityGameManager.instance.GameManager.TryPlaceOnGameBoard(tile.name, adjacentTile.Value.name, adjacentTile.Key, otherFace))
             {
                 this.PlaceTileNextToOther(tile, adjacentTile.Key, adjacentTile.Value);
+                this.isReady = true;
                 return true;
             }
         }
 
+        this.isReady = true;
         return false;
     }
     #endregion
@@ -351,13 +375,16 @@ public class BoardManager : MonoBehaviour
     public void TryPlaceTileFromDrawBoard(PlayerCode player, string tileName, string otherTileName = null, TileFace? tileFace = null, TileFace? otherFace = null)
     {
         GameObject tile = GameObject.Find(tileName);
-        if (otherTileName == null || !tileFace.HasValue || !otherFace.HasValue)
+        if (otherTileName == null || otherTileName == string.Empty|| !tileFace.HasValue || !otherFace.HasValue)
         {
             this.PlaceTileInCenter(tile);
+            return;
         }
 
         GameObject otherTile = this.PlacedTiles.transform.Find(otherTileName).gameObject;
+        //GameObject otherTile = GameObject.Find(otherTileName);
         this.PlaceTileNextToOther(tile, tileFace.Value, otherTile, otherFace.Value);
+        tile.GetComponent<FadeToColor>().StartFadeToOrigin();
     }
     #endregion
 
@@ -462,10 +489,20 @@ public class BoardManager : MonoBehaviour
     /// <param name="e">event args</param>
     private void OnTilePlaced(object sender, TriominoTileEventArgs e)
     {
-        if (UnityGameManager.instance.GameManager.AIPlayers[UnityGameManager.instance.GameManager.ActivePlayer])
-        {
-            this.TryPlaceTileFromDrawBoard(e.Player.Value, e.TileName, e.OtherTileName, e.TileFace, e.OtherTileFAce);
+        if (UnityGameManager.instance.GameManager.IsAiPlayer(UnityGameManager.instance.GameManager.ActivePlayer))
+        {            
+            StartCoroutine(WaitUntilReady(e));
         }
     }
     #endregion
+
+    IEnumerator WaitUntilReady(TriominoTileEventArgs e)
+    {
+        //for(int i = 0; i < 10; i++)
+        while(!this.isReady)
+        {
+            yield return new WaitForSeconds(0.25f);
+        }
+        this.TryPlaceTileFromDrawBoard(e.Player.Value, e.TileName, e.OtherTileName, e.TileFace, e.OtherTileFAce);
+    }
 }

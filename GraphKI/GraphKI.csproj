@@ -42,6 +42,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AIManagement\IAIPlayer.cs" />
+    <Compile Include="AIManagement\SimpleAIPlayer.cs" />
     <Compile Include="Extensions\IListExtensions.cs" />
     <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="GameManagement\ArrayTileOrientation.cs" />

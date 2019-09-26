@@ -1,4 +1,5 @@
-﻿using System;
+﻿using GraphKI.GameManagement;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -94,6 +95,52 @@ namespace GraphKI.Extensions
             EnsureTriominoTileName(name);
 
             return name.Split('-');
+        }
+        #endregion
+
+        #region GetValuesForFace
+        /// <summary>
+        /// Determines a TriominoTile-Faces value for one tile name.
+        /// </summary>
+        /// <param name="name">the tiles name.</param>
+        /// <param name="face">the face whose value is requested.</param>
+        /// <returns>the faces value.</returns>
+        public static string[] GetValuesForFace(this string name, TileFace face)
+        {
+            name.EnsureTriominoTileName();
+            string[] parts = name.GetTriominoTileNumbersFromName();
+            switch(face)
+            {
+                case TileFace.Right:
+                    return new List<string>() { parts[0], parts[1] }.ToArray();
+                    break;
+                case TileFace.Bottom:
+                    return new List<string>() { parts[1], parts[2] }.ToArray();
+                    break;
+                case TileFace.Left:
+                    return new List<string>() { parts[2], parts[0] }.ToArray();
+                    break;
+                default:
+                    throw new ArgumentException("Face couldn't be recognized.");
+            }
+        }
+        #endregion
+
+        #region CheckIfFacesMatches
+        /// <summary>
+        /// Verifies if two faces of two tiles are macthing.
+        /// </summary>
+        /// <param name="tileName">name of first tile.</param>
+        /// <param name="otherTileName">name of second tile.</param>
+        /// <param name="tileFace">face of first tile.</param>
+        /// <param name="otherTileFace">face of second tile.</param>
+        /// <returns></returns>
+        public static bool CheckIfFacesMatches(this string tileName, string otherTileName, TileFace tileFace, TileFace otherTileFace)
+        {
+            string[] tileFaceParts = tileName.GetValuesForFace(tileFace);
+            string[] otherFaceParts = otherTileName.GetValuesForFace(otherTileFace);
+
+            return tileFaceParts[0].Equals(otherFaceParts[1]) && tileFaceParts[1].Equals(otherFaceParts[0]);
         }
         #endregion
     }

@@ -149,7 +149,7 @@ namespace GraphKITest
             Assert.IsFalse(gameBoard.TryAddTile(PlayerCode.None, "1-3-3", "1-1-3", TileFace.Right, TileFace.Left));
             Assert.IsFalse(gameBoard.TryAddTile(PlayerCode.None, "0-4-4", "0-1-4", TileFace.Right, TileFace.Left));
 
-            Assert.AreEqual(15, tilesAdded);
+            Assert.AreEqual(16, tilesAdded);
         }
         #endregion
 
@@ -175,6 +175,30 @@ namespace GraphKITest
             Assert.AreEqual(new Point(21, 23), gameBoard.GetTileGridPositionFromOtherTilePositionAndFace(new Point(22, 23), TileFace.Bottom));
             Assert.AreEqual(new Point(22, 22), gameBoard.GetTileGridPositionFromOtherTilePositionAndFace(new Point(22, 23), TileFace.Left));
 
+        }
+        #endregion
+
+        #region TilesWithFreeFaces_functionality_has_to_work
+        /// <summary>
+        /// Verifies all methods and functionality about the TilesWithFreeFaces process.
+        /// </summary>
+        [TestMethod]
+        public void TilesWithFreeFaces_functionality_has_to_work()
+        {
+            GameBoard gameBoard = new GameBoard();
+            Assert.IsTrue(gameBoard.TryAddTile(PlayerCode.None, "1-2-3"));
+            Assert.IsTrue(gameBoard.tilesWithFreeFaces["1-2-3"].Contains(TileFace.Right));
+            Assert.IsTrue(gameBoard.tilesWithFreeFaces["1-2-3"].Contains(TileFace.Bottom));
+            Assert.IsTrue(gameBoard.tilesWithFreeFaces["1-2-3"].Contains(TileFace.Left));
+
+            Assert.IsTrue(gameBoard.TryAddTile(PlayerCode.None, "2-3-3", "1-2-3", TileFace.Left, TileFace.Bottom));
+            Assert.IsTrue(gameBoard.tilesWithFreeFaces["1-2-3"].Contains(TileFace.Right));
+            Assert.IsTrue(gameBoard.tilesWithFreeFaces["1-2-3"].Contains(TileFace.Left));
+            Assert.IsTrue(gameBoard.tilesWithFreeFaces["2-3-3"].Contains(TileFace.Right));
+            Assert.IsTrue(gameBoard.tilesWithFreeFaces["2-3-3"].Contains(TileFace.Bottom));
+
+            Assert.IsFalse(gameBoard.tilesWithFreeFaces["1-2-3"].Contains(TileFace.Bottom));
+            Assert.IsFalse(gameBoard.tilesWithFreeFaces["2-3-3"].Contains(TileFace.Left));
         }
         #endregion
     }

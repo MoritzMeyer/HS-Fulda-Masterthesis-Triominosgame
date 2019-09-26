@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using GraphKI.Extensions;
+using GraphKI.GameManagement;
 
 namespace GraphKITest
 {
@@ -80,6 +81,49 @@ namespace GraphKITest
 
             Assert.AreEqual(6, name1.GetTriominoTileValue());
             Assert.ThrowsException<ArgumentException>(() => { name2.IsTripleTriomino(); }, "The name '3-2-1' is invalid for a TriominoTile. Tile names must be of following format: '0-0-0'");
+        }
+        #endregion
+
+        #region GetValuesForFace_has_to_work
+        /// <summary>
+        /// Verifies output for GetValueForFace.
+        /// </summary>
+        [TestMethod]
+        public void GetValuesForFace_has_to_work()
+        {
+            string tileName = "1-2-3";
+            Assert.AreEqual("1", tileName.GetValuesForFace(TileFace.Right)[0]);
+            Assert.AreEqual("2", tileName.GetValuesForFace(TileFace.Right)[1]);
+
+            Assert.AreEqual("2", tileName.GetValuesForFace(TileFace.Bottom)[0]);
+            Assert.AreEqual("3", tileName.GetValuesForFace(TileFace.Bottom)[1]);
+
+            Assert.AreEqual("3", tileName.GetValuesForFace(TileFace.Left)[0]);
+            Assert.AreEqual("1", tileName.GetValuesForFace(TileFace.Left)[1]);
+        }
+        #endregion
+
+        #region CheckIfFacesMatches_has_to_work
+        /// <summary>
+        /// Verifies output for CheckIfFacesMatches
+        /// </summary>
+        [TestMethod]
+        public void CheckIfFacesMatches_has_to_work()
+        {
+            string tileName = "1-2-3";
+            string otherTileName = "2-3-3";
+
+            Assert.IsTrue(tileName.CheckIfFacesMatches(otherTileName, TileFace.Bottom, TileFace.Left));
+            Assert.IsFalse(tileName.CheckIfFacesMatches(otherTileName, TileFace.Bottom, TileFace.Right));
+            Assert.IsFalse(tileName.CheckIfFacesMatches(otherTileName, TileFace.Bottom, TileFace.Bottom));
+
+            Assert.IsFalse(tileName.CheckIfFacesMatches(otherTileName, TileFace.Left, TileFace.Left));
+            Assert.IsFalse(tileName.CheckIfFacesMatches(otherTileName, TileFace.Left, TileFace.Right));
+            Assert.IsFalse(tileName.CheckIfFacesMatches(otherTileName, TileFace.Left, TileFace.Bottom));
+
+            Assert.IsFalse(tileName.CheckIfFacesMatches(otherTileName, TileFace.Right, TileFace.Left));
+            Assert.IsFalse(tileName.CheckIfFacesMatches(otherTileName, TileFace.Right, TileFace.Right));
+            Assert.IsFalse(tileName.CheckIfFacesMatches(otherTileName, TileFace.Right, TileFace.Bottom));
         }
         #endregion
     }

@@ -80,6 +80,7 @@ public class DrawBoardManager : MonoBehaviour
         tile.GetComponent<DragAndDrop>().IsOverDrawBoard = true;
         this.ReArrangeTiles();
         this.tilesOnDrawBoard.Add(tile);
+        tile.GetComponent<FadeToColor>().StartFadeToOrigin();
     }
     #endregion
 

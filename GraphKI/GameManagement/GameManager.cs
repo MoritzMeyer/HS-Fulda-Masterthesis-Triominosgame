@@ -1,4 +1,5 @@
-﻿using GraphKI.Extensions;
+﻿using GraphKI.AIManagement;
+using GraphKI.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -36,19 +37,24 @@ namespace GraphKI.GameManagement
         public Dictionary<PlayerCode, int> PlayerPoints { get; set; }
 
         /// <summary>
-        /// Event, which indicates a new Turn.
-        /// </summary>
-        public event EventHandler NextTurnEvent;
-
-        /// <summary>
         /// Dictionary with Drawboards for each player.
         /// </summary>
         public Dictionary<PlayerCode, DrawBoard> DrawBoards { get; set; }
 
         /// <summary>
-        /// Dictionary with bool values for each Player, which indicates if this player is played by ai.
+        /// List with all Players played by ai.
         /// </summary>
-        public Dictionary<PlayerCode, bool> AIPlayers { get; set; }
+        public List<IAIPlayer> AIPlayers { get; set; }
+
+        /// <summary>
+        /// Event, which indicates a new Turn.
+        /// </summary>
+        public event EventHandler NextTurnEvent;
+
+        /// <summary>
+        /// Event, which indicates the start of the game.
+        /// </summary>
+        public event EventHandler GameStartEvent;
 
         /// <summary>
         /// All remaining (drawable) tiles, which are not distributed to a player yet.
@@ -70,7 +76,7 @@ namespace GraphKI.GameManagement
 
         #region ctor
         /// <summary>
-        /// Intantiates a new Object of this class.
+        /// Instantiates a new Object of this class.
         /// </summary>
         /// <param name="gameMode">gamemode</param>
         /// <param name="isPlayer2AI">Determines, if player2 is played by computer.</param>
@@ -88,6 +94,16 @@ namespace GraphKI.GameManagement
             this.AIPlayers = this.InitAIPlayers(gameMode, isPlayer2AI);
         }
         #endregion
+
+        public void UnityIsInitialized()
+        {
+            this.StartGame();
+        }
+
+        public void StartGame()
+        {
+            this.OnGameStart(EventArgs.Empty);
+        }
 
         #region TryDrawTile
         /// <summary>
@@ -250,6 +266,23 @@ namespace GraphKI.GameManagement
         }
         #endregion
 
+        #region IsAiPlayer
+        /// <summary>
+        /// Determines if  a specific player is played by ai.
+        /// </summary>
+        /// <param name="player"></param>
+        /// <returns></returns>
+        public bool IsAiPlayer(PlayerCode player)
+        {
+            if (!this.AIPlayers.Any() || !this.AIPlayers.Where(ai => ai.Player.Equals(player)).Any())
+            {
+                return false;
+            }
+
+            return true;
+        }
+        #endregion
+
         #region GetNextPlayer
         /// <summary>
         /// Determines the active player for next turn.
@@ -366,26 +399,37 @@ namespace GraphKI.GameManagement
         /// <param name="gameMode">the gamemode.</param>
         /// <param name="isPlayer2AI">indicates if player2 is ai.</param>
         /// <returns>the Dictionary</returns>
-        private Dictionary<PlayerCode, bool> InitAIPlayers(GameMode gameMode, bool isPlayer2AI)
+        private List<IAIPlayer> InitAIPlayers(GameMode gameMode, bool isPlayer2AI)
         {
-            Dictionary<PlayerCode, bool> aiPlayers = new Dictionary<PlayerCode, bool>()
-            {
-                { PlayerCode.Player1, false },
-                { PlayerCode.Player2, true }
-            };
+            List<IAIPlayer> aiPlayers = new List<IAIPlayer>();
 
-            switch(gameMode)
+            if (isPlayer2AI)
             {
-                case GameMode.ThreePlayer:
-                    aiPlayers.Add(PlayerCode.Player3, false);
-                    break;
-                case GameMode.FourPlayer:
-                    aiPlayers.Add(PlayerCode.Player3, false);
-                    aiPlayers.Add(PlayerCode.Player4, false);
-                    break;
+                return new List<IAIPlayer>()
+                {
+                    new SimpleAIPlayer(this, PlayerCode.Player2)
+                };
             }
 
-            return aiPlayers;
+            return new List<IAIPlayer>();
+            //Dictionary<PlayerCode, bool> aiPlayers = new Dictionary<PlayerCode, bool>()
+            //{
+            //    { PlayerCode.Player1, false },
+            //    { PlayerCode.Player2, true }
+            //};
+
+            //switch(gameMode)
+            //{
+            //    case GameMode.ThreePlayer:
+            //        aiPlayers.Add(PlayerCode.Player3, false);
+            //        break;
+            //    case GameMode.FourPlayer:
+            //        aiPlayers.Add(PlayerCode.Player3, false);
+            //        aiPlayers.Add(PlayerCode.Player4, false);
+            //        break;
+            //}
+
+            //return aiPlayers;
         }
         #endregion
 
@@ -465,10 +509,21 @@ namespace GraphKI.GameManagement
         /// <summary>
         /// Throws the NextTurn-Event.
         /// </summary>
-        /// <param name="e">Argument for the event.</param>
+        /// <param name="e">Argument for this event.</param>
         protected virtual void OnNextTurn(EventArgs e)
         {
             this.NextTurnEvent?.Invoke(this, e);
+        }
+        #endregion
+
+        #region OnGameStart
+        /// <summary>
+        /// Throws the GameStart-Event.
+        /// </summary>
+        /// <param name="e">Arguments for this event.</param>
+        protected virtual void OnGameStart(EventArgs e)
+        {
+            this.GameStartEvent?.Invoke(this, e);
         }
         #endregion
     }

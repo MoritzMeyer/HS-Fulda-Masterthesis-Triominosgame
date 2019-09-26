@@ -19,7 +19,7 @@ public class UnityGameManager : MonoBehaviour
     #endregion
 
     #region Awake
-    public void Awake()
+    public void Start()
     {
         if (instance == null)
         {
@@ -57,6 +57,7 @@ public class UnityGameManager : MonoBehaviour
         this.GameManager.NextTurnEvent += (sender, e) => { this.NextTurn(); };
         this.boardManager.InitBoard();
         Debug.Log("Aktiver Spieler: " + this.GameManager.ActivePlayer);
+        this.GameManager.UnityIsInitialized();
     }
     #endregion
 
