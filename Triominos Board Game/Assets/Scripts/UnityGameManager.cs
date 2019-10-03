@@ -16,6 +16,7 @@ public class UnityGameManager : MonoBehaviour
     public Text player1Score;
     public Text player2Score;
     public GameManager GameManager;
+    public bool PlayWithAI;
     #endregion
 
     #region Awake
@@ -52,8 +53,7 @@ public class UnityGameManager : MonoBehaviour
     #region InitGame
     public void InitGame()
     {
-        //this.GameManager = new GameManager(GameMode, true);
-        this.GameManager = new GameManager(GameMode, false);
+        this.GameManager = new GameManager(GameMode, this.PlayWithAI);
         this.GameManager.NextTurnEvent += (sender, e) => { this.NextTurn(); };
         this.boardManager.InitBoard();
         Debug.Log("Aktiver Spieler: " + this.GameManager.ActivePlayer);

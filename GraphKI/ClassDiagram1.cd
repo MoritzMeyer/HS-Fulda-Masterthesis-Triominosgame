@@ -1,0 +1,47 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="GraphKI.GameManagement.GameManager">
+    <Position X="5.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAEEHABFCAhECBiAAACAKgAAEAACEAAAEIMKIAAAg=</HashCode>
+      <FileName>GameManagement\GameManager.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="GameBoard" />
+    </ShowAsAssociation>
+    <ShowAsCollectionAssociation>
+      <Property Name="DrawBoards" />
+      <Property Name="AIPlayers" />
+    </ShowAsCollectionAssociation>
+  </Class>
+  <Class Name="GraphKI.GameManagement.GameBoard">
+    <Position X="1.75" Y="1" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>DIAwAABCEABAAAAACEFAAQAQAAAAAQAAggAACAAAAAA=</HashCode>
+      <FileName>GameManagement\GameBoard.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="GraphKI.GameManagement.DrawBoard">
+    <Position X="10.5" Y="4.5" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAQgAAAAAgAAAACAAAAQAAAOAIAAIAQAQAAQAAAAA=</HashCode>
+      <FileName>GameManagement\DrawBoard.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="GraphKI.AIManagement.SimpleAIPlayer">
+    <Position X="12.75" Y="1" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAEAAQAAAAAAAAAAAAAAAAAAAAACAAACQDAAAA=</HashCode>
+      <FileName>AIManagement\SimpleAIPlayer.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Orientation="Left" Position="0.56" />
+  </Class>
+  <Interface Name="GraphKI.AIManagement.IAIPlayer">
+    <Position X="10.25" Y="1" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQBAAAA=</HashCode>
+      <FileName>AIManagement\IAIPlayer.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

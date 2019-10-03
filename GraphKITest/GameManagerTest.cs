@@ -87,5 +87,26 @@ namespace GraphKITest
             Assert.AreEqual(0, gameManager.PlayerPoints[gameManager.ActivePlayer]);
         }
         #endregion
+
+        #region DrawSpecificTile_has_to_work
+        /// <summary>
+        /// Verifies the Method DrawSpecificTile for its output
+        /// </summary>
+        [TestMethod]
+        public void DrawSpecificTile_has_to_work()
+        {
+            GameManager gameManager = new GameManager(GameMode.TwoPlayer);
+
+            Assert.IsTrue(gameManager.DrawSpecificTile("0-0-0", gameManager.DrawBoards[PlayerCode.Player1]));
+            Assert.IsTrue(gameManager.DrawSpecificTile("1-2-3", gameManager.DrawBoards[PlayerCode.Player1]));
+            Assert.IsTrue(gameManager.DrawSpecificTile("4-4-5", gameManager.DrawBoards[PlayerCode.Player1]));
+
+            Assert.IsTrue(gameManager.DrawBoards[PlayerCode.Player1].HasTile("0-0-0"));
+            Assert.IsTrue(gameManager.DrawBoards[PlayerCode.Player1].HasTile("1-2-3"));
+            Assert.IsTrue(gameManager.DrawBoards[PlayerCode.Player1].HasTile("4-4-5"));
+
+            Assert.IsFalse(gameManager.DrawSpecificTile("0-0-0", gameManager.DrawBoards[PlayerCode.Player1]));
+        }
+        #endregion
     }
 }

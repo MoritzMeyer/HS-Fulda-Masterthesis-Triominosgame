@@ -47,6 +47,11 @@ namespace GraphKI.GameManagement
         public List<IAIPlayer> AIPlayers { get; set; }
 
         /// <summary>
+        /// GameMode for this game.
+        /// </summary>
+        public GameMode GameMode;
+
+        /// <summary>
         /// Event, which indicates a new Turn.
         /// </summary>
         public event EventHandler NextTurnEvent;
@@ -72,6 +77,8 @@ namespace GraphKI.GameManagement
         /// Determines if actual player has placed a tile.
         /// </summary>
         internal bool HasPlaced;
+
+        private GameMode TestScene;
         #endregion
 
         #region ctor
@@ -82,6 +89,16 @@ namespace GraphKI.GameManagement
         /// <param name="isPlayer2AI">Determines, if player2 is played by computer.</param>
         public GameManager(GameMode gameMode, bool isPlayer2AI = false)
         {
+            int testScene = 0;
+            this.TestScene = GameMode.None;
+
+            if (gameMode == GameMode.TestScene1)
+            {
+                this.TestScene = gameMode;
+                testScene = 1;
+                gameMode = GameMode.TwoPlayer;
+            }
+
             this.TurnCount = 0;
             this.MaxTileDrawCount = 3;
             this.HasPlaced = false;
@@ -89,21 +106,47 @@ namespace GraphKI.GameManagement
             this.InitDrawBoards(gameMode);
             this.InitPlayerPoints(gameMode);
             this.TilePool = this.InitTilePool();
-            this.DrawStartTiles(gameMode);
+
+            if (testScene != 0)
+            {
+                this.DrawTilesForTestscene(testScene);
+            }
+            else
+            {
+                this.DrawStartTiles(gameMode);
+            }
+
             this.ActivePlayer = this.GetStartingPlayer();
             this.AIPlayers = this.InitAIPlayers(gameMode, isPlayer2AI);
+            this.GameMode = gameMode;
         }
         #endregion
 
+        #region UnityIsInitialized
+        /// <summary>
+        /// When this game is used with unity and a ai player the last
+        /// has to wait for its first turn until unity is initialized
+        /// So this function throws the game start event, on which the ai player can listen
+        /// </summary>
         public void UnityIsInitialized()
         {
             this.StartGame();
         }
+        #endregion
 
+        #region StartGame
+        /// <summary>
+        /// Starts the game and throws the gameisstartet event
+        /// </summary>
         public void StartGame()
         {
+            if (this.TestScene != GameMode.None)
+            {
+                this.InitTestScene();
+            }
             this.OnGameStart(EventArgs.Empty);
         }
+        #endregion
 
         #region TryDrawTile
         /// <summary>
@@ -142,6 +185,38 @@ namespace GraphKI.GameManagement
             }
 
             
+            return true;
+        }
+        #endregion
+
+        #region DrawSpecificTile
+        /// <summary>
+        /// Draws a specific Tile from DrawBoard (for testing purposes)
+        /// </summary>
+        /// <param name="demandedTile">The tile which should be drawn.</param>
+        /// <param name="drawBoard">The drawBoard for which the tile should be drawn.</param>
+        /// <returns>True, when the tile could be drawn, false if not.</returns>
+        public bool DrawSpecificTile(string demandedTile, DrawBoard drawBoard)
+        { 
+            if (!this.TilePool.Contains(demandedTile))
+            {
+                return false;
+            }
+
+            List<string> tiles = new List<string>(this.TilePool);
+            if (!tiles.Remove(demandedTile))
+            {
+                return false;
+            }
+
+            if (!drawBoard.TryAddTile(demandedTile))
+            {
+                tiles.Add(demandedTile);
+                this.TilePool = new Stack<string>(tiles);
+                return false;
+            }
+
+            this.TilePool = new Stack<string>(tiles);
             return true;
         }
         #endregion
@@ -526,5 +601,65 @@ namespace GraphKI.GameManagement
             this.GameStartEvent?.Invoke(this, e);
         }
         #endregion
+
+        private void DrawTilesForTestscene(int sceneNumber)
+        {
+            switch(sceneNumber)
+            {
+                case 1:
+                    this.DrawTilesForTestScene1();
+                    break;
+            }
+        }
+
+        private void DrawTilesForTestScene1()
+        {
+            string tile0 = "0-1-4"; //1
+            string tile1 = "0-4-5"; //2
+            string tile2 = "4-4-5"; //1
+            string tile3 = "3-4-4"; //2
+            string tile4 = "3-3-4"; //1
+            string tile5 = "3-3-3"; //2
+            string tile6 = "2-3-3"; //1
+            string tile7 = "1-2-3"; //2
+            string tile8 = "1-1-3"; //1
+            string tile9 = "1-3-3"; //2
+
+            this.DrawSpecificTile(tile0, this.DrawBoards[PlayerCode.Player1]);
+            this.DrawSpecificTile(tile1, this.DrawBoards[PlayerCode.Player2]);
+            this.DrawSpecificTile(tile2, this.DrawBoards[PlayerCode.Player1]);
+            this.DrawSpecificTile(tile3, this.DrawBoards[PlayerCode.Player2]);
+            this.DrawSpecificTile(tile4, this.DrawBoards[PlayerCode.Player1]);
+            this.DrawSpecificTile(tile5, this.DrawBoards[PlayerCode.Player2]);
+            this.DrawSpecificTile(tile6, this.DrawBoards[PlayerCode.Player1]);
+            this.DrawSpecificTile(tile7, this.DrawBoards[PlayerCode.Player2]);
+            this.DrawSpecificTile(tile8, this.DrawBoards[PlayerCode.Player1]);
+            this.DrawSpecificTile(tile9, this.DrawBoards[PlayerCode.Player2]);
+        }
+
+        private void InitTestScene()
+        {
+            switch(this.TestScene)
+            {
+                case GameMode.TestScene1:
+                    this.InitTestScene1();
+                    break;
+                default:
+                    return;
+            }
+        }
+
+        private void InitTestScene1()
+        {
+            this.ActivePlayer = PlayerCode.Player1;
+            this.TryPlaceOnGameBoard("0-1-4");
+            this.TryPlaceOnGameBoard("0-4-5", "0-1-4", TileFace.Right, TileFace.Left);
+            this.TryPlaceOnGameBoard("4-4-5", "0-4-5", TileFace.Left, TileFace.Bottom);
+            this.TryPlaceOnGameBoard("3-4-4", "4-4-5", TileFace.Bottom, TileFace.Right);
+            this.TryPlaceOnGameBoard("3-3-4", "3-4-4", TileFace.Bottom, TileFace.Left);
+            this.TryPlaceOnGameBoard("3-3-3", "3-3-4", TileFace.Bottom, TileFace.Right);
+            this.TryPlaceOnGameBoard("2-3-3", "3-3-3", TileFace.Bottom, TileFace.Left);
+            this.TryPlaceOnGameBoard("1-2-3", "2-3-3", TileFace.Bottom, TileFace.Left);
+        }
     }
 }

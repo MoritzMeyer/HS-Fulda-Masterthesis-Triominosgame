@@ -19,6 +19,7 @@ public class BoardManager : MonoBehaviour
     public Button DrawButton;
 
     private GameObject PlacedTiles;
+    private Queue<TriominoTileEventArgs> TilesToPlace;
 
     [HideInInspector]
     public Dictionary<PlayerCode, GameObject> DrawBoardManagers;
@@ -34,90 +35,18 @@ public class BoardManager : MonoBehaviour
         {
             this.DrawButton.GetComponent<DrawButtonManager>().Deactivate();
         }
+
+        if (this.TilesToPlace.Count > 0 && this.isReady)
+        {
+            TriominoTileEventArgs e = this.TilesToPlace.Dequeue();
+            this.TryPlaceTileFromDrawBoard(e.Player.Value, e.TileName, e.OtherTileName, e.TileFace, e.OtherTileFAce);
+        }
     }
 
     public void InitBoard()
     {
         this.InitGameBoard();
-        //this.InitTestScene();
     }
-
-    //private void InitTestScene()
-    //{
-    //    this.NewTilePositionsByOtherOrientationAndTileFace = this.InitNewTilePositionsByOtherOrientationAndTileFace();
-    //    this.NewTileOrientationByOtherFaceAndThisFace = this.InitNewTileOrientationByOtherFaceAndThisFace();
-
-    //    DrawBoardPlayer1 = GameObject.Find("DrawBoardPlayer1");
-    //    DrawBoardPlayer2 = GameObject.Find("DrawBoardPlayer2");
-    //    DrawButton = GameObject.Find("DrawButton").GetComponent<Button>();
-
-    //    DrawBoards = new Dictionary<PlayerCode, GameObject>()
-    //    {
-    //        { PlayerCode.Player1, DrawBoardPlayer1 },
-    //        { PlayerCode.Player2, DrawBoardPlayer2 }
-    //    };
-
-    //    switch (UnityGameManager.instance.GameMode)
-    //    {
-    //        case GameMode.TwoPlayer:
-    //            break;
-    //        case GameMode.ThreePlayer:
-    //            DrawBoards.Add(PlayerCode.Player3, DrawBoardPlayer3);
-    //            break;
-    //        case GameMode.FourPlayer:
-    //            DrawBoards.Add(PlayerCode.Player4, DrawBoardPlayer4);
-    //            break;
-    //        default:
-    //            throw new ArgumentException($"Unbekannter gameMode '{UnityGameManager.instance.GameMode}'");
-    //    }
-
-    //    this.InitBridgeScene();
-    //}
-
-    //private void InitBridgeScene()
-    //{
-    //    GameObject tile014 = this.DrawSpecificTile("0-1-4", DrawBoards[PlayerCode.Player1]);
-    //    GameObject tile045 = this.DrawSpecificTile("0-4-5", DrawBoards[PlayerCode.Player1]);
-    //    GameObject tile445 = this.DrawSpecificTile("4-4-5", DrawBoards[PlayerCode.Player1]);
-    //    GameObject tile344 = this.DrawSpecificTile("3-4-4", DrawBoards[PlayerCode.Player1]);
-    //    GameObject tile334 = this.DrawSpecificTile("3-3-4", DrawBoards[PlayerCode.Player1]);
-    //    GameObject tile333 = this.DrawSpecificTile("3-3-3", DrawBoards[PlayerCode.Player1]);
-    //    GameObject tile233 = this.DrawSpecificTile("2-3-3", DrawBoards[PlayerCode.Player1]);
-    //    GameObject tile123 = this.DrawSpecificTile("1-2-3", DrawBoards[PlayerCode.Player1]);
-    //    GameObject tile113 = this.DrawSpecificTile("1-1-3", DrawBoards[PlayerCode.Player1]);
-    //    GameObject tile133 = this.DrawSpecificTile("1-3-3", DrawBoards[PlayerCode.Player1]);
-
-    //    tile014.transform.SetParent(null);
-    //    tile014.transform.position = new Vector3(0, 0, this.BoardPositionZ);
-    //    this.PlaceTileOnActualPosition(tile014, DrawBoards[PlayerCode.Player1]);
-
-    //    DrawBoardManager drawBoardManager = DrawBoards[PlayerCode.Player1].GetComponent<DrawBoardManager>();
-
-    //    drawBoardManager.RemoveTile(tile045);
-    //    drawBoardManager.RemoveTile(tile445);
-    //    drawBoardManager.RemoveTile(tile344);
-    //    drawBoardManager.RemoveTile(tile334);
-    //    drawBoardManager.RemoveTile(tile333);
-    //    drawBoardManager.RemoveTile(tile233);
-    //    drawBoardManager.RemoveTile(tile123);
-
-    //    this.PlaceTileNextToOther(tile045, TileFace.Right, tile014, TileFace.Left);
-    //    this.PlaceTileNextToOther(tile445, TileFace.Left, tile045, TileFace.Bottom);
-    //    this.PlaceTileNextToOther(tile344, TileFace.Bottom, tile445, TileFace.Right);
-    //    this.PlaceTileNextToOther(tile334, TileFace.Bottom, tile344, TileFace.Left);
-    //    this.PlaceTileNextToOther(tile333, TileFace.Bottom, tile334, TileFace.Right);
-    //    this.PlaceTileNextToOther(tile233, TileFace.Bottom, tile333, TileFace.Left);
-    //    this.PlaceTileNextToOther(tile123, TileFace.Bottom, tile233, TileFace.Left);
-
-    //    UnityGameManager.instance.GameManager.GameBoard.TryAddTile("0-1-4");
-    //    UnityGameManager.instance.GameManager.GameBoard.TryAddTile("0-4-5", "0-1-4", TileFace.Right, TileFace.Left);
-    //    UnityGameManager.instance.GameManager.GameBoard.TryAddTile("4-4-5", "0-4-5", TileFace.Left, TileFace.Bottom);
-    //    UnityGameManager.instance.GameManager.GameBoard.TryAddTile("3-4-4", "4-4-5", TileFace.Bottom, TileFace.Right);
-    //    UnityGameManager.instance.GameManager.GameBoard.TryAddTile("3-3-4", "3-4-4", TileFace.Bottom, TileFace.Left);
-    //    UnityGameManager.instance.GameManager.GameBoard.TryAddTile("3-3-3", "3-3-4", TileFace.Bottom, TileFace.Right);
-    //    UnityGameManager.instance.GameManager.GameBoard.TryAddTile("2-3-3", "3-3-3", TileFace.Bottom, TileFace.Left);
-    //    UnityGameManager.instance.GameManager.GameBoard.TryAddTile("1-2-3", "2-3-3", TileFace.Bottom, TileFace.Left);
-    //}
 
     #region InitGameBoard
     /// <summary>
@@ -126,6 +55,7 @@ public class BoardManager : MonoBehaviour
     private void InitGameBoard()
     {
         this.ResetTiles();
+        this.TilesToPlace = new Queue<TriominoTileEventArgs>();
         this.NewTilePositionsByOtherOrientationAndTileFace = this.InitNewTilePositionsByOtherOrientationAndTileFace();
         this.NewTileOrientationByOtherFaceAndThisFace = this.InitNewTileOrientationByOtherFaceAndThisFace();
 
@@ -144,7 +74,7 @@ public class BoardManager : MonoBehaviour
             kv.Value.GetComponent<DrawBoardManager>().Init(UnityGameManager.instance.GameManager.GetPlayersDrawBoard(kv.Key));
         }
 
-        switch (UnityGameManager.instance.GameMode)
+        switch (UnityGameManager.instance.GameManager.GameMode)
         {
             case GameMode.TwoPlayer:
                 break;
@@ -155,7 +85,7 @@ public class BoardManager : MonoBehaviour
                 DrawBoardManagers.Add(PlayerCode.Player4, DrawBoardPlayer4);
                 break;
             default:
-                throw new ArgumentException($"Unbekannter gameMode '{UnityGameManager.instance.GameMode}'");
+                throw new ArgumentException($"Unbekannter gameMode '{UnityGameManager.instance.GameManager.GameMode}'");
         }
 
         UnityGameManager.instance.GameManager.GameBoard.TilePlaced += this.OnTilePlaced;
@@ -280,18 +210,18 @@ public class BoardManager : MonoBehaviour
     }
     #endregion
 
-    //private GameObject DrawSpecificTile(string name, GameObject targetDrawBoard = null)
-    //{
-    //    GameObject tile = ActualTilePool.transform.Find(name).gameObject;
-    //    tile.SetActive(true);
-
-    //    if (targetDrawBoard != null)
-    //    {
-    //        targetDrawBoard.GetComponent<DrawBoardManager>().AddTile(tile);
-    //    }
-
-    //    return tile;
-    //}
+    #region DrawSpecificTile
+    /// <summary>
+    /// Draws a specific Tile from gameboard
+    /// </summary>
+    /// <param name="name">name of demanded tile</param>
+    /// <param name="targetDrawBoard">drawboard to which the drawn tile should be added.</param>
+    /// <returns></returns>
+    private bool DrawSpecificTile(string name, DrawBoard targetDrawBoard)
+    {
+        return UnityGameManager.instance.GameManager.DrawSpecificTile(name, targetDrawBoard);
+    }
+    #endregion
 
     #region StartDragging
     /// <summary>
@@ -489,20 +419,28 @@ public class BoardManager : MonoBehaviour
     /// <param name="e">event args</param>
     private void OnTilePlaced(object sender, TriominoTileEventArgs e)
     {
-        if (UnityGameManager.instance.GameManager.IsAiPlayer(UnityGameManager.instance.GameManager.ActivePlayer))
-        {            
-            StartCoroutine(WaitUntilReady(e));
-        }
+        this.TilesToPlace.Enqueue(e);
+        //if (UnityGameManager.instance.GameManager.IsAiPlayer(UnityGameManager.instance.GameManager.ActivePlayer))
+        //{            
+        //    StartCoroutine(WaitUntilReady(e));
+        //}
     }
     #endregion
 
+    #region WaitUntilReady
+    /// <summary>
+    /// Coroutine which waits with placing a tile until the board is ready for placing
+    /// (previous tiles has to be placed first)
+    /// </summary>
+    /// <param name="e">event args.</param>
+    /// <returns>IEnumerator for coroutine</returns>
     IEnumerator WaitUntilReady(TriominoTileEventArgs e)
     {
-        //for(int i = 0; i < 10; i++)
         while(!this.isReady)
         {
             yield return new WaitForSeconds(0.25f);
         }
         this.TryPlaceTileFromDrawBoard(e.Player.Value, e.TileName, e.OtherTileName, e.TileFace, e.OtherTileFAce);
     }
+    #endregion
 }

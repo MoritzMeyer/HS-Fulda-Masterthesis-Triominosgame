@@ -113,13 +113,10 @@ namespace GraphKI.Extensions
             {
                 case TileFace.Right:
                     return new List<string>() { parts[0], parts[1] }.ToArray();
-                    break;
                 case TileFace.Bottom:
                     return new List<string>() { parts[1], parts[2] }.ToArray();
-                    break;
                 case TileFace.Left:
                     return new List<string>() { parts[2], parts[0] }.ToArray();
-                    break;
                 default:
                     throw new ArgumentException("Face couldn't be recognized.");
             }

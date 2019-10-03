@@ -45,11 +45,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   boardManager: {fileID: 0}
-  GameMode: 1
+  GameMode: 4
   player1Score: {fileID: 0}
   player2Score: {fileID: 0}
-  ActivePlayer: 0
-  ParticipatingPlayers: 
+  PlayWithAI: 0
 --- !u!114 &2106975419933231653
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -63,8 +62,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   BoardPositionZ: 1
-  TilePool: {fileID: 5950395404757724860, guid: 4ca070697e0a74844b4b3db5c61421cc,
-    type: 3}
   DrawBoardPlayer1: {fileID: 0}
   DrawBoardPlayer2: {fileID: 0}
   DrawBoardPlayer3: {fileID: 0}
