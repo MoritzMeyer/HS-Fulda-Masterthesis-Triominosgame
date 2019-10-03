@@ -263,32 +263,21 @@ public class BoardManager : MonoBehaviour
     public bool TryPlaceTile(GameObject tile)
     {
         this.isReady = false;
-        // Check if tile can be placed
-        if (tile.GetComponent<TileManager>().CanPlaceTileOnGameBoard())
+
+        // if it's the first turn, tile hast to be placed in center with orientation straight
+        if (UnityGameManager.instance.GameManager.TurnCount == 0)
         {
-            // if it's the first turn, tile hast to be placed in center with orientation straight
-            if (UnityGameManager.instance.GameManager.TurnCount == 0 && UnityGameManager.instance.GameManager.TryPlaceOnGameBoard(tile.gameObject.name))
-            {
-                this.PlaceTileInCenter(tile);
-                this.isReady = true;
-                return true;
-            }
-
-            // if it's not the first turn, the tile hast to be placed adjacent to another tile, according to the others tile
-            // orientation and the faces with which both tiles should be placed adjacent to each other.
-            KeyValuePair<TileFace, GameObject> adjacentTile = tile.GetComponent<TileManager>().GetAllAdjacentTiles().First();
-            TileFace otherFace = adjacentTile.Value.GetComponent<TileManager>().GetAdjacentFaceToOtherTile(tile);
-
-            if (UnityGameManager.instance.GameManager.TryPlaceOnGameBoard(tile.name, adjacentTile.Value.name, adjacentTile.Key, otherFace))
-            {
-                this.PlaceTileNextToOther(tile, adjacentTile.Key, adjacentTile.Value);
-                this.isReady = true;
-                return true;
-            }
+            this.isReady = true;
+            return UnityGameManager.instance.GameManager.TryPlaceOnGameBoard(tile.gameObject.name);
         }
 
+        // if it's not the first turn, the tile hast to be placed adjacent to another tile, according to the others tile
+        // orientation and the faces with which both tiles should be placed adjacent to each other.
+        KeyValuePair<TileFace, GameObject> adjacentTile = tile.GetComponent<TileManager>().GetAllAdjacentTiles().First();
+        TileFace otherFace = adjacentTile.Value.GetComponent<TileManager>().GetAdjacentFaceToOtherTile(tile);
         this.isReady = true;
-        return false;
+
+        return UnityGameManager.instance.GameManager.TryPlaceOnGameBoard(tile.name, adjacentTile.Value.name, adjacentTile.Key, otherFace);
     }
     #endregion
 

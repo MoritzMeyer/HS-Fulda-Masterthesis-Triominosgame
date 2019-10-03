@@ -45,10 +45,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   boardManager: {fileID: 0}
-  GameMode: 4
+  GameMode: 1
   player1Score: {fileID: 0}
   player2Score: {fileID: 0}
-  PlayWithAI: 0
+  PlayWithAI: 1
 --- !u!114 &2106975419933231653
 MonoBehaviour:
   m_ObjectHideFlags: 0
