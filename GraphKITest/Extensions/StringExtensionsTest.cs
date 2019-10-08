@@ -4,8 +4,10 @@ using System.Collections.Generic;
 using System.Text;
 using GraphKI.Extensions;
 using GraphKI.GameManagement;
+using System.Security.Cryptography;
+using System.IO;
 
-namespace GraphKITest
+namespace GraphKITest.Extensions
 {
     /// <summary>
     /// TestClass for Class 'StringExtensions'
@@ -126,6 +128,7 @@ namespace GraphKITest
             Assert.IsFalse(tileName.CheckIfFacesMatches(otherTileName, TileFace.Right, TileFace.Bottom));
         }
         #endregion
+
     }
 }
 

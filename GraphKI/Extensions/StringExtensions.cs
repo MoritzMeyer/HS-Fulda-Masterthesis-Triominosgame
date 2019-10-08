@@ -1,7 +1,9 @@
 ﻿using GraphKI.GameManagement;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -140,5 +142,10 @@ namespace GraphKI.Extensions
             return tileFaceParts[0].Equals(otherFaceParts[1]) && tileFaceParts[1].Equals(otherFaceParts[0]);
         }
         #endregion
+
+        public static string GetVertexValue(this String str)
+        {
+            return str.Replace("_", "");
+        }
     }
 }

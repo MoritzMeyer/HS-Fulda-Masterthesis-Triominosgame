@@ -5,7 +5,7 @@ using System.Text;
 using GraphKI.GameManagement;
 using System.Drawing;
 
-namespace GraphKITest
+namespace GraphKITest.GameManagement
 {
     [TestClass]
     public class GameBoardTests

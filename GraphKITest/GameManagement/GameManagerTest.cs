@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using GraphKI.Extensions;
 
-namespace GraphKITest
+namespace GraphKITest.GameManagement
 {
     [TestClass]
     public class GameManagerTest

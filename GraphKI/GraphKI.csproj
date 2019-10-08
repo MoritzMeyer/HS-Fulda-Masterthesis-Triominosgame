@@ -56,11 +56,16 @@
     <Compile Include="GameManagement\TileOrientation.cs" />
     <Compile Include="GameManagement\TriominoTile.cs" />
     <Compile Include="GameManagement\TriominoTileEventArgs.cs" />
+    <Compile Include="GraphSuite\GraphGenerator.cs" />
+    <Compile Include="GraphSuite\HyperEdge.cs" />
+    <Compile Include="GraphSuite\HyperGraph.cs" />
+    <Compile Include="GraphSuite\Vertex.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ClassDiagram1.cd" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>copy /Y "$(TargetDir)$(TargetName).dll" "$(SolutionDir)Assets\Plugins\$(TargetName).dll"

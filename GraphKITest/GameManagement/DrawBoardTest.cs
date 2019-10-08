@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace GraphKITest
+namespace GraphKITest.GameManagement
 {
     [TestClass]
     public class DrawBoardTest
