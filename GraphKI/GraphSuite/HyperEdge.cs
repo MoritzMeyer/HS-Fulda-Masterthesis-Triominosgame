@@ -41,11 +41,6 @@ namespace GraphKI.GraphSuite
         /// <param name="vertex3">vertex3 (can be null, if edge has only two vertices)</param>
         public HyperEdge(Vertex vertex1, Vertex vertex2, Vertex vertex3 = null)
         {
-            if (vertex1.EqualsOnEdgeBasis(vertex2) || vertex1.EqualsOnEdgeBasis(vertex3) || vertex2.EqualsOnEdgeBasis(vertex3))
-            {
-                throw new ArgumentException("Vertices must not be equal.");
-            }
-
             if (vertex1 == null)
             {
                 throw new ArgumentException("Vertex1 cannot be null");
@@ -56,13 +51,16 @@ namespace GraphKI.GraphSuite
                 throw new ArgumentException("Vertex2 cannot be null");
             }
 
-            this.Vertices = new List<Vertex>()
-            {
-                vertex1,
-                vertex2
-            };
+            Vertex v1 = Vertex.CreateFromVertex(vertex1);
+            Vertex v2 = Vertex.CreateFromVertex(vertex2);
 
-            if (vertex3 != null) { this.Vertices.Add(vertex3); }
+            this.Vertices = new List<Vertex>() { v1, v2 };
+
+            if (vertex3 != null)
+            {
+                Vertex v3 = Vertex.CreateFromVertex(vertex3);
+                this.Vertices.Add(v3);
+            }
 
             this.VertexIsVisited = Enumerable
                 .Range(0, this.Vertices.Count)
@@ -187,6 +185,14 @@ namespace GraphKI.GraphSuite
         }
         #endregion
 
+        public Vertex GetEdgeVertexInstance(Vertex otherVertexInstance)
+        {
+            Vertex thisVertexInstance = this.Vertices.Where(v => v.EqualsOnValueBasis(otherVertexInstance)).First();
+            //thisVertexInstance.VisitVertex();
+
+            return thisVertexInstance;
+        }
+
         #region EqualsOnVertexBasis
         /// <summary>
         /// Verifies, if two HyperEdges are really the same (Vertex comparision on VertexBasis).
@@ -240,6 +246,7 @@ namespace GraphKI.GraphSuite
         }
         #endregion
 
+        #region EqualsOnValueBasis
         /// <summary>
         /// /// Verifies, if two HyperEdges are the same (Vertex comparision on Valu basis).
         /// </summary>
@@ -259,25 +266,12 @@ namespace GraphKI.GraphSuite
                 return false;
             }
 
-            foreach (Vertex otherVertex in other.Vertices)
-            {
-                bool hasCounterPartInThis = false;
-                foreach (Vertex thisVertex in this.Vertices)
-                {
-                    if (thisVertex.EqualsOnValueBasis(otherVertex))
-                    {
-                        hasCounterPartInThis = true;
-                    }
-                }
+            IEnumerable<string> thisVertices = this.Vertices.Select(v => v.Value);
+            IEnumerable<string> otherVertices = other.Vertices.Select(v => v.Value);
 
-                if (!hasCounterPartInThis)
-                {
-                    return false;
-                }
-            }
-
-            return true;
+            return !thisVertices.Except(otherVertices).Union(otherVertices.Except(thisVertices)).Any();
         }
+        #endregion
 
         #region Equals
         /// <summary>

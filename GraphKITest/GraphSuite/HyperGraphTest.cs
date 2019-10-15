@@ -12,9 +12,10 @@ namespace GraphKITest.GraphSuite
     public class HyperGraphTest
     {
         [TestMethod]
+        [Ignore]
         public void HyperGraph_has_to_work()
         {
-            string path = Path.Combine(Directory.GetParent(Directory.GetCurrentDirectory()).Parent.Parent.Parent.FullName, "TestFiles", "tEdgeGraph.txt");
+            string path = Path.Combine(Directory.GetParent(Directory.GetCurrentDirectory()).Parent.Parent.FullName, "TestFiles", "tEdgeGraph.txt");
             //string path = Path.Combine(Directory.GetParent(Directory.GetCurrentDirectory()).Parent.FullName, "TestFiles", "tEdgePieces.txt");
 
             HyperGraph hyperGraph = GraphGenerator.LoadHyperGraphFromFile(path);
@@ -39,8 +40,7 @@ namespace GraphKITest.GraphSuite
             string path = Path.Combine(Directory.GetParent(Directory.GetCurrentDirectory()).Parent.Parent.FullName, "TestFiles", "tEdgeGraph.txt");
             HyperGraph hyperGraph = GraphGenerator.LoadHyperGraphFromFile(path);
 
-            List<List<Tuple<HyperEdge, string>>> cycles = hyperGraph.GetAllSimpleCycles();
-
+            List<List<Tuple<HyperEdge, Vertex>>> cycles = hyperGraph.GetAllSimpleCycles();
         }
 
         #region HyperGraph_AddVertex_has_to_work
@@ -59,6 +59,10 @@ namespace GraphKITest.GraphSuite
         }
         #endregion
 
+        #region HyperGraph_AddEdge_has_to_work
+        /// <summary>
+        /// Verifies behaviour of MethodGroup AddEdge
+        /// </summary>
         [TestMethod]
         public void HyperGraph_AddEdge_has_to_work()
         {
@@ -92,39 +96,44 @@ namespace GraphKITest.GraphSuite
             Assert.ThrowsException<ArgumentException>(() => { hyperGraph.AddEdge(new Vertex("00"), new Vertex("01"), new Vertex("10")); }, $"This Graph has already an edge '-00-01-10->'.");
             Assert.ThrowsException<ArgumentException>(() => { hyperGraph.AddEdge("00", "01", "10"); }, $"This Graph has already an edge '-00-01-10->'.");
         }
+        #endregion
 
+        #region HyperGraph_GetAdjacentEdges_has_to_work
+        /// <summary>
+        /// Verifies Output of GetAdjacentEdges
+        /// </summary>
         [TestMethod]
         public void HyperGraph_GetAdjacentEdges_has_to_work()
         {
             HyperGraph hyperGraph = new HyperGraph();
-            hyperGraph.AddVertex("00");
-            hyperGraph.AddVertex("01");
-            hyperGraph.AddVertex("10");
+            Vertex v1 = hyperGraph.AddVertex("00");
+            Vertex v2 = hyperGraph.AddVertex("01");
+            Vertex v3 = hyperGraph.AddVertex("10");
 
             HyperEdge h1 = hyperGraph.AddEdge("00", "00", "00");
             HyperEdge h2 = hyperGraph.AddEdge("00", "01", "10");
             HyperEdge h3 = hyperGraph.AddEdge("00", "00");
             HyperEdge h4 = hyperGraph.AddEdge("01", "10");
 
-            List<HyperEdge> neighbors = hyperGraph.GetAdjacentEdges("00").ToList();
+            List<HyperEdge> neighbors = hyperGraph.GetAdjacentEdges(v1).ToList();
             Assert.AreEqual(3, neighbors.Count);
             Assert.IsTrue(neighbors.Contains(h1));
             Assert.IsTrue(neighbors.Contains(h2));
             Assert.IsTrue(neighbors.Contains(h3));
 
-            neighbors = hyperGraph.GetAdjacentEdges("01").ToList();
+            neighbors = hyperGraph.GetAdjacentEdges(v2).ToList();
             Assert.AreEqual(2, neighbors.Count);
             Assert.IsTrue(neighbors.Contains(h2));
             Assert.IsTrue(neighbors.Contains(h4));
 
-            neighbors = hyperGraph.GetAdjacentEdges("01", 2).ToList();
+            neighbors = hyperGraph.GetAdjacentEdges(v2, 2).ToList();
             Assert.AreEqual(1, neighbors.Count);
             Assert.IsTrue(neighbors.Contains(h4));
 
-            neighbors = hyperGraph.GetAdjacentEdges("01", 3).ToList();
+            neighbors = hyperGraph.GetAdjacentEdges(v2, 3).ToList();
             Assert.AreEqual(1, neighbors.Count);
             Assert.IsTrue(neighbors.Contains(h2));
-
         }
+        #endregion      
     }
 }

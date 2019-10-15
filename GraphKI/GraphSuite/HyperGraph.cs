@@ -87,7 +87,7 @@ namespace GraphKI.GraphSuite
 
         #region AddEdge
         /// <summary>
-        /// /// Adds a new Edge to this graph, if it isn't already part of it.
+        /// Adds a new Edge to this graph, if it isn't already part of it.
         /// </summary>
         /// <param name="vertex1">Vertex1 of the edge to be added.</param>
         /// <param name="vertex2">Vertex2 of the edge to be added.</param>
@@ -250,17 +250,15 @@ namespace GraphKI.GraphSuite
         /// Determines all edges within this graph, which are adjacent to a specific vertex.
         /// If edgeVertexCount is defined, only those edges with the number of vertices given in edgeVertexCount are considered.
         /// </summary>
-        /// <param name="vertexValue">Value of vertex for which the adjacent edges are sought.</param>
+        /// <param name="vertex">vertex for which the adjacent edges are sought.</param>
         /// <param name="edgeVertexCount">number of vertices to which the adjacent edges are limited.</param>
         /// <returns>All Edges which fulfill the given requirements.</returns>
-        public IEnumerable<HyperEdge> GetAdjacentEdges(string vertexValue, int edgeVertexCount = 0)
+        public IEnumerable<HyperEdge> GetAdjacentEdges(Vertex vertex, int edgeVertexCount = 0)
         {
-            if (!this.HasVertex(vertexValue))
+            if (!this.HasVertex(vertex))
             {
-                throw new ArgumentException($"This Graph does not contain a vertex with value '{vertexValue}'.");
+                throw new ArgumentException($"This Graph does not contain a vertex '{vertex}'.");
             }
-
-            Vertex vertex = this.GetVertex(vertexValue);
 
             if (edgeVertexCount != 0)
             {
@@ -298,7 +296,7 @@ namespace GraphKI.GraphSuite
         }
         #endregion
 
-        public List<List<Tuple<HyperEdge, string>>> GetAllSimpleCycles()
+        public List<List<Tuple<HyperEdge, Vertex>>> GetAllSimpleCycles()
         {
             // Alle Kanten mit 3 Knoten ermitteln
             IEnumerable<HyperEdge> threeSidedHyperEdges = this.Edges.Where(e => e.VertexCount() == 3);
@@ -307,21 +305,21 @@ namespace GraphKI.GraphSuite
             Dictionary<HyperEdge, int> color = threeSidedHyperEdges.ToDictionary(e => e, e => 0);
 
             // Für jede Kante die Vorgängerkante, sowie der Knoten über welchen die akutelle Kante erreicht wurde speichern.
-            Dictionary<HyperEdge, Tuple<HyperEdge, string>> parent = threeSidedHyperEdges.ToDictionary(e => e, e => new Tuple<HyperEdge, string>(null, null));
+            Dictionary<HyperEdge, Tuple<HyperEdge, Vertex>> parent = threeSidedHyperEdges.ToDictionary(e => e, e => new Tuple<HyperEdge, Vertex>(null, null));
 
             // Liste mit den Zyklen erstellen
-            List<List<Tuple<HyperEdge, string>>> cycles = new List<List<Tuple<HyperEdge, string>>>();
+            List<List<Tuple<HyperEdge, Vertex>>> cycles = new List<List<Tuple<HyperEdge, Vertex>>>();
 
-            this.GetSimpleCycle(threeSidedHyperEdges.First(), null, new List<Tuple<HyperEdge, string>>(), color, cycles);
-            /*
-            foreach (HyperEdge edge in threeSidedHyperEdges)
-            {
-                foreach(string vertex in edge.Vertices)
-                {
-                    this.GetSimpleCycle(edge, vertex, new Dictionary<HyperEdge, Tuple<HyperEdge, string>>(), color, cycles);
-                }
-            }
-            */
+            this.GetSimpleCycle(threeSidedHyperEdges.First(), null, new List<Tuple<HyperEdge, Vertex>>(), color, cycles);
+
+            //foreach (HyperEdge edge in threeSidedHyperEdges)
+            //{
+            //    foreach (Vertex vertex in edge.Vertices)
+            //    {
+            //        this.GetSimpleCycle(edge, vertex, new Dictionary<HyperEdge, Tuple<HyperEdge, Vertex>>(), color, cycles);
+            //    }
+            //}
+
 
             return cycles;
         }
@@ -333,87 +331,117 @@ namespace GraphKI.GraphSuite
         public void GetSimpleCycle(
             HyperEdge u,
             HyperEdge p,
-            List<Tuple<HyperEdge, string>> parent,
+            List<Tuple<HyperEdge, Vertex>> parent,
             Dictionary<HyperEdge, int> color,
-            List<List<Tuple<HyperEdge, string>>> cycles)
+            List<List<Tuple<HyperEdge, Vertex>>> cycles)
         {
             // edge was completly visited before
-            if (color.ContainsKey(u) && color[u] == 2)
+            //if (color.ContainsKey(u) && color[u] == 2)
+            //{
+            //    return;
+            //}
+
+            IEnumerable<HyperEdge> threeSidedParents = parent.Select(x => x.Item1).Where(e => e.IsThreeSidedEdge());
+
+            //Hier greift if noch nicht an der richtigen stelle, da immer noch drei kanten doppelt vorkommen. Warum?
+            if (u.IsThreeSidedEdge() && threeSidedParents.Count() >= 6 && parent.First().Item1 != u)
             {
                 return;
             }
 
             // possible cycle detected
-            if (color.ContainsKey(u) && color[u] == 1)
+            // if (color.ContainsKey(u) && color[u] == 1)
+            if (u.IsThreeSidedEdge() && threeSidedParents.Count() == 6 && u.EqualsOnEdgeBasis(parent.First().Item1))
             {
-                // Ein Zyklus im Triominograph muss immer min. die Länge 6 (nur 3er Kanten) bzw. 12 (inkl. 2er Kanten haben)
-                int cycleBegin = parent.Count - 12;
-                if (cycleBegin >= 0)
+
+                //// Ein Zyklus im Triominograph muss immer min. die Länge 6 (nur 3er Kanten) bzw. 12 (inkl. 2er Kanten haben)
+                //int cycleBegin = parent.Count - 12;
+                //if (cycleBegin >= 0)
+                //{
+                //    // Suche den Anfang des Zyklus (soweit vorhanden)
+                //    while (parent[cycleBegin].Item1 != u && cycleBegin > 0)
+                //    {
+                //        cycleBegin--;
+                //    }
+
+                int cycleBegin = 0;
+                // Wenn anfang gefunden wurde, den Zyklus speichern.
+                if (parent[cycleBegin].Item1.Equals(u))
                 {
-                    // Suche den Anfang des Zyklus (soweit vorhanden)
-                    while (parent[cycleBegin].Item1 != u && cycleBegin > 0)
+                    List<Tuple<HyperEdge, Vertex>> cycle = new List<Tuple<HyperEdge, Vertex>>();
+                    for (int i = cycleBegin; i < parent.Count; i++)
                     {
-                        cycleBegin--;
+                        cycle.Add(parent[i]);
                     }
 
-                    // Wenn anfang gefunden wurde, den Zyklus speichern.
-                    if (parent[cycleBegin].Item1.Equals(u))
-                    {
-                        List<Tuple<HyperEdge, string>> cycle = new List<Tuple<HyperEdge, string>>();
-                        for (int i = cycleBegin; i < parent.Count; i++)
-                        {
-                            cycle.Add(parent[i]);
-                        }
+                    cycles.Add(cycle);
+                }
+                //}
+            }
 
-                        cycles.Add(cycle);
-                    }
+            //if (color.ContainsKey(u))
+            //{
+            //    color[u] = 1;
+            //}
+
+            // Den Knoten ermitteln, über welchen die Kante u erreicht wurde.
+            IEnumerable<Vertex> adjacentVertices = null;
+            if (p != null)
+            {
+                //die Knoten der Kante u ermitteln, die nicht dem eingehenden Knoten entsprechen(diese müssen noch besucht werden)
+                adjacentVertices = u.GetNeighborVertices(parent.Last().Item2);
+            }
+            else
+            {
+                // Beim ersten aufruf sind noch keine Parentknoten vorhanden, und jeder Knoten der ersten Kante muss besucht werden.
+                adjacentVertices = u.Vertices;
+            }
+
+            // Die Anzahl der Knoten welche die nächste Kante besitzen muss 
+            // ermitteln (Kanten mit 2 und 3 Knoten werden immer im Wechsel durchlaufen).
+            int vCount = (u.VertexCount() == 2) ? 3 : 2;
+
+            // die weiteren Knoten der Kante u besuchen 
+            foreach (Vertex vertex in adjacentVertices)
+            {
+                // Alle möglichen Kanten von dem aktuellen Knoten aus ermitteln und die bisherigen Parents ausschließen
+                IEnumerable<HyperEdge> edges = this.GetAdjacentEdges(vertex, vCount);
+                if (threeSidedParents.Count() >= 5)
+                {
+                    edges = edges.Except(threeSidedParents.ToList().GetRange(threeSidedParents.Count() - 4, 4));
+                }
+                else
+                {
+                    edges = edges.Except(threeSidedParents);
+                }
+
+                //// (und dann die 5 zuletzt besuchten Kanten wieder entfernen) da erst ab 6 ein Cycle möglich ist.
+                //IEnumerable<HyperEdge> edges = this.GetAdjacentEdges(vertex, vCount);
+                //IEnumerable<HyperEdge> threeSidedParents = parent.Where(x => x.Item1.IsThreeSidedEdge()).Select(x => x.Item1);
+                //if (threeSidedParents.Count() > 5)
+                //{
+                //    threeSidedParents = threeSidedParents.ToList().GetRange(threeSidedParents.Count() - 5, 5);
+                //}
+                //edges = edges.Except(threeSidedParents);
+
+                foreach (HyperEdge edge in edges)
+                {
+                    // List<Tuple<HyperEdge, Vertex>> newParent = u.IsThreeSidedEdge() ? new List<Tuple<HyperEdge, Vertex>>(parent) : parent;
+                    List<Tuple<HyperEdge, Vertex>> newParent = new List<Tuple<HyperEdge, Vertex>>(parent);
+                    // Parent Kante und Knoten für die nächste Kante hinzfügen.
+                    newParent.Add(new Tuple<HyperEdge, Vertex>(u, edge.GetEdgeVertexInstance(vertex)));
+
+                    string edgeName = u.ToString();
+                    string vertexName = vertex.ToString();
+
+                    this.GetSimpleCycle(edge, u, newParent, color, cycles);
                 }
             }
 
-            if (color.ContainsKey(u))
-            {
-                color[u] = 1;
-            }
-
-            // Den Knoten ermitteln, über welchen die Kante u erreicht wurde.
-            string parentVertex = string.Empty;
-            if (parent.Count > 0)
-            {
-                parentVertex = parent.Last().Item2;
-            }
-
-            //die Knoten der Kante u ermitteln, die nicht dem eingehenden Knoten entsprechen(diese müssen noch besucht werden)
-            //IEnumerable<string> adjacentVertices = u.GetNeighborVertices(parentVertex);
-
-            //// Die Anzahl der Knoten welche die nächste Kante besitzen muss 
-            ////ermitteln (Kanten mit 2 und 3 Knoten werden immer im Wechsel durchlaufen).
-            //int vCount = (u.VertexCount() == 2) ? 3 : 2;
-
-            //// die weiteren Knoten der Kante u besuchen 
-            //foreach (string vertex in adjacentVertices)
+            //if (color.ContainsKey(u))
             //{
-            //    // Alle möglichen Kanten von dem aktuellen Knoten aus ermitteln.
-            //    IEnumerable<HyperEdge> edges = this.GetAdjacentEdges(vertex, vCount);
-            //    if (parent.Count - 2 >= 0)
-            //    {
-            //        edges = edges.Where(e => !e.Equals(parent[parent.Count - 1].Item1));
-            //    }
-
-            //    foreach (HyperEdge edge in edges)
-            //    {
-            //        // Parent Kante und Knoten für die nächste Kante hinzfügen.
-            //        // Für den nachfolgenden Knotenvergleich muss darauf geachtet werden, s
-            //        // dass hier der Wert des Knotens der nächsten Kante verwendet wird 
-            //        // (in diesem ist die Position des Knotens in der nächsten Kante gespeichert)
-            //        parent.Add(new Tuple<HyperEdge, string>(u, edge.GetVertexEdgeValue(vertex)));
-            //        this.GetSimpleCycle(edge, u, parent, color, cycles);
-            //    }
+            //    color[u] = 2;
             //}
-
-            if (color.ContainsKey(u))
-            {
-                color[u] = 2;
-            }
         }
     }
 }

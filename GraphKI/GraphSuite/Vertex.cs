@@ -11,6 +11,11 @@ namespace GraphKI.GraphSuite
         public string Value { get; private set; }
 
         /// <summary>
+        /// Property which indicates, if this vertex was visited.
+        /// </summary>
+        public bool IsVisited { get; private set; }
+
+        /// <summary>
         /// unique guid for this vertex (to copmare on vertex basis).
         /// </summary>
         public readonly Guid VertexGuid;
@@ -59,7 +64,7 @@ namespace GraphKI.GraphSuite
 
             Vertex other = (Vertex)obj;
 
-            if (other.VertexGuid != this.VertexGuid || other.EdgeGuid != this.EdgeGuid || other.Value != this.Value)
+            if (other.VertexGuid != this.VertexGuid || other.EdgeGuid != this.EdgeGuid || other.Value != this.Value || this.IsVisited != other.IsVisited)
             {
                 return false;
             }
@@ -139,6 +144,16 @@ namespace GraphKI.GraphSuite
         {
             Vertex vertex = new Vertex(otherVertex.Value, otherVertex.VertexGuid);
             return vertex;
+        }
+        #endregion
+
+        #region VisitVertex
+        /// <summary>
+        /// Sets the IsVisited Property to true.
+        /// </summary>
+        public void VisitVertex()
+        {
+            this.IsVisited = true;
         }
         #endregion
 

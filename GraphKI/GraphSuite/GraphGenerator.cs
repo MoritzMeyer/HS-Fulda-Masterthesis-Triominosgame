@@ -69,6 +69,30 @@ namespace GraphKI.GraphSuite
         }
         #endregion
 
+        #region GetAllTriominoVertices
+        /// <summary>
+        /// Returns all Vertices for an Triomino graph.
+        /// </summary>
+        /// <returns></returns>
+        public static IEnumerable<string> GetAllTriominoVertices()
+        {
+            List<string> vertices = new List<string>();
+            for (int i = 0; i < 6; i++)
+            {
+                for (int j = i; j < 6; j++)
+                {
+                    vertices.Add($"{i}{j}");
+                    if (i != j)
+                    {
+                        vertices.Add($"{j}{i}");
+                    }
+                }
+            }
+
+            return vertices;
+        }
+        #endregion
+
         #region GetAllTriominoEdges
         /// <summary>
         /// Creates all Edges for a TriominoEdgeGraph.
@@ -79,10 +103,13 @@ namespace GraphKI.GraphSuite
             List<HyperEdge> triominoEdges = new List<HyperEdge>();
             //List<string> test = new List<string>();
 
+            // Threesided edges
             for (int i = 0; i < 6; i++)
             {
                 for (int j = i; j < 6; j++)
                 {
+                    //test.Add($"{i}-{j}: {i}{j}-{j}{i}");
+                    triominoEdges.Add(new HyperEdge($"{i}{j}", $"{j}{i}"));
                     for (int k = j; k < 6; k++)
                     {
                         //test.Add($"{i}-{j}-{k}: {i}{j}-{j}{k}-{k}{i}");
@@ -94,5 +121,33 @@ namespace GraphKI.GraphSuite
             return triominoEdges;
         }
         #endregion
+
+        public static HyperGraph CreateTriominoGraph()
+        {
+            IEnumerable<string> vertices = GraphGenerator.GetAllTriominoVertices();
+            IEnumerable<HyperEdge> edges = GraphGenerator.GetAllTriominoEdges();
+            HyperGraph triomionGraph = new HyperGraph();
+
+            // Add all vertices
+            foreach(string vertexValue in vertices)
+            {
+                triomionGraph.AddVertex(vertexValue);
+            }
+
+            // Add all Edges
+            foreach(HyperEdge edge in edges)
+            {
+                if (edge.IsTwoSidedEdge())
+                {
+                    triomionGraph.AddEdge(edge.Vertices[0].Value, edge.Vertices[1].Value);
+                }
+                else
+                {
+                    triomionGraph.AddEdge(edge.Vertices[0].Value, edge.Vertices[1].Value, edge.Vertices[2].Value);
+                }
+            }
+
+            return triomionGraph;
+        }
     }
 }

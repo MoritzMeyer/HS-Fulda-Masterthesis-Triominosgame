@@ -96,16 +96,20 @@ namespace GraphKITest.GameManagement
         public void DrawSpecificTile_has_to_work()
         {
             GameManager gameManager = new GameManager(GameMode.TwoPlayer);
+            List<string> tilePool = new List<string>(gameManager.TilePool);
+            string tile1 = tilePool[0];
+            string tile2 = tilePool[1];
+            string tile3 = tilePool[2];
 
-            Assert.IsTrue(gameManager.DrawSpecificTile("0-0-0", gameManager.DrawBoards[PlayerCode.Player1]));
-            Assert.IsTrue(gameManager.DrawSpecificTile("1-2-3", gameManager.DrawBoards[PlayerCode.Player1]));
-            Assert.IsTrue(gameManager.DrawSpecificTile("4-4-5", gameManager.DrawBoards[PlayerCode.Player1]));
+            Assert.IsTrue(gameManager.DrawSpecificTile(tile1, gameManager.DrawBoards[PlayerCode.Player1]));
+            Assert.IsTrue(gameManager.DrawSpecificTile(tile2, gameManager.DrawBoards[PlayerCode.Player1]));
+            Assert.IsTrue(gameManager.DrawSpecificTile(tile3, gameManager.DrawBoards[PlayerCode.Player1]));
 
-            Assert.IsTrue(gameManager.DrawBoards[PlayerCode.Player1].HasTile("0-0-0"));
-            Assert.IsTrue(gameManager.DrawBoards[PlayerCode.Player1].HasTile("1-2-3"));
-            Assert.IsTrue(gameManager.DrawBoards[PlayerCode.Player1].HasTile("4-4-5"));
+            Assert.IsTrue(gameManager.DrawBoards[PlayerCode.Player1].HasTile(tile1));
+            Assert.IsTrue(gameManager.DrawBoards[PlayerCode.Player1].HasTile(tile2));
+            Assert.IsTrue(gameManager.DrawBoards[PlayerCode.Player1].HasTile(tile3));
 
-            Assert.IsFalse(gameManager.DrawSpecificTile("0-0-0", gameManager.DrawBoards[PlayerCode.Player1]));
+            Assert.IsFalse(gameManager.DrawSpecificTile(tile1, gameManager.DrawBoards[PlayerCode.Player1]));
         }
         #endregion
     }

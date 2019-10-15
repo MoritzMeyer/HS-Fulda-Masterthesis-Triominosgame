@@ -142,10 +142,5 @@ namespace GraphKI.Extensions
             return tileFaceParts[0].Equals(otherFaceParts[1]) && tileFaceParts[1].Equals(otherFaceParts[0]);
         }
         #endregion
-
-        public static string GetVertexValue(this String str)
-        {
-            return str.Replace("_", "");
-        }
     }
 }

@@ -609,6 +609,8 @@ namespace GraphKI.GameManagement
                 case 1:
                     this.DrawTilesForTestScene1();
                     break;
+                default:
+                    return;
             }
         }
 
