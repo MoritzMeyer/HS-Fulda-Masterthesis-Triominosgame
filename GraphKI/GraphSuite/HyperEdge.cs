@@ -1,4 +1,5 @@
 ﻿using GraphKI.Extensions;
+using GraphKI.GameManagement;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,7 +14,12 @@ namespace GraphKI.GraphSuite
         /// <summary>
         /// All vertices within this edge.
         /// </summary>
-        public List<Vertex> Vertices { get; private set; }
+        public List<Vertex> Vertices { get; }
+
+        /// <summary>
+        /// Orientation of Tile in TriominoGame.
+        /// </summary>
+        public TileOrientation Orientation { get; set; }
 
         /// <summary>
         /// Dictionary which stores the isVisited property for each vertex.
@@ -28,8 +34,8 @@ namespace GraphKI.GraphSuite
         /// <param name="vertex1">vertex1</param>
         /// <param name="vertex2">vertex2</param>
         /// <param name="vertex3">vertex3 (can be null, if edge has only two vertices)</param>
-        public HyperEdge(string vertex1, string vertex2, string vertex3 = null)
-            : this(new Vertex(vertex1), new Vertex(vertex2), (vertex3 != null) ? new Vertex(vertex3) : null)
+        public HyperEdge(string vertex1, string vertex2, string vertex3 = null, TileOrientation orientation = TileOrientation.None)
+            : this(new Vertex(vertex1), new Vertex(vertex2), (vertex3 != null) ? new Vertex(vertex3) : null, orientation)
         {
         }
 
@@ -39,7 +45,7 @@ namespace GraphKI.GraphSuite
         /// <param name="vertex1">vertex1</param>
         /// <param name="vertex2">vertex2</param>
         /// <param name="vertex3">vertex3 (can be null, if edge has only two vertices)</param>
-        public HyperEdge(Vertex vertex1, Vertex vertex2, Vertex vertex3 = null)
+        public HyperEdge(Vertex vertex1, Vertex vertex2, Vertex vertex3 = null, TileOrientation orientation = TileOrientation.None)
         {
             if (vertex1 == null)
             {
@@ -65,6 +71,8 @@ namespace GraphKI.GraphSuite
             this.VertexIsVisited = Enumerable
                 .Range(0, this.Vertices.Count)
                 .ToDictionary(i => this.Vertices[i], i => false);
+
+            this.Orientation = orientation;
         }
         #endregion
 
@@ -148,6 +156,26 @@ namespace GraphKI.GraphSuite
         }
         #endregion
 
+        #region ContainsVertexOnValueBasis
+        /// <summary>
+        /// Verifies, if this edge contains a vertex (on ValueBasis).
+        /// </summary>
+        /// <param name="vertex">vertex to be checked</param>
+        /// <returns>True if this edge contains vertex.</returns>
+        public bool ContainsVertexOnValueBasis(Vertex vertex)
+        {
+            foreach (Vertex thisVertex in this.Vertices)
+            {
+                if (thisVertex.EqualsOnValueBasis(vertex))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+        #endregion
+
         #region ContainsOnEdgeBasis
         /// <summary>
         /// Verifies, if this edge contains a vertex (on EdgeBasis, EdgeGuid for vertices will be considered).
@@ -191,6 +219,56 @@ namespace GraphKI.GraphSuite
             //thisVertexInstance.VisitVertex();
 
             return thisVertexInstance;
+        }
+
+        public Vertex GetVertexOnSpecificSide(TileFace tileFace)
+        {
+            switch(tileFace)
+            {
+                case TileFace.Right:
+                    return this.Vertices[0];
+                case TileFace.Bottom:
+                    return this.Vertices[1];
+                case TileFace.Left:
+                    return this.Vertices[2];
+            }
+
+            throw new ArgumentException($"No vertex for Side '{tileFace}'.");
+        }
+
+        internal TileFace GetTileFaceFromVertex(Vertex vertex)
+        {
+            if (!this.IsThreeSidedEdge())
+            {
+                throw new ArgumentException("Only for three-sided-edges the TileFace can be determined.");
+            }
+
+            List<char> edgeChars = new List<char>();
+            foreach (Vertex v in this.Vertices)
+            {
+                edgeChars.Add(v.Value[0]);
+            }
+
+            string firstSide = edgeChars[0] + "" + edgeChars[1];
+            string secondSide = edgeChars[1] + "" + edgeChars[2];
+            string thirdSide = edgeChars[2] + "" + edgeChars[0];
+
+            if (vertex.Value.Equals(firstSide))
+            {
+                return TileFace.Right;
+            }
+
+            if (vertex.Value.Equals(secondSide))
+            {
+                return TileFace.Bottom;
+            }
+
+            if (vertex.Value.Equals(thirdSide))
+            {
+                return TileFace.Left;
+            }
+
+            throw new Exception($"Could not determine the TileFace for Edge '{this}'");
         }
 
         #region EqualsOnVertexBasis

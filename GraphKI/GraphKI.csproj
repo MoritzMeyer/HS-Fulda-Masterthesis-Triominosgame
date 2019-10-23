@@ -57,6 +57,7 @@
     <Compile Include="GameManagement\TriominoTile.cs" />
     <Compile Include="GameManagement\TriominoTileEventArgs.cs" />
     <Compile Include="GraphSuite\GraphGenerator.cs" />
+    <Compile Include="GraphSuite\Hexagon.cs" />
     <Compile Include="GraphSuite\HyperEdge.cs" />
     <Compile Include="GraphSuite\HyperGraph.cs" />
     <Compile Include="GraphSuite\Vertex.cs" />

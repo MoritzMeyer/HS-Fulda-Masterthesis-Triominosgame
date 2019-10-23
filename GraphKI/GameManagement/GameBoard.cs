@@ -111,7 +111,7 @@ namespace GraphKI.GameManagement
                 return false;
             }
 
-            TileOrientation tileOrientation = this.GetTileOrienationFromOtherTileOrientationAndFaces(this.GetTileFromGrid(otherTileGridCoordinates).Orientation, otherFace.Value, tileFace.Value);
+            TileOrientation tileOrientation = GameBoard.GetTileOrienationFromOtherTileOrientationAndFaces(this.GetTileFromGrid(otherTileGridCoordinates).Orientation, otherFace.Value, tileFace.Value);
             TriominoTile tile = new TriominoTile(tileName, tileOrientation, possibleNewGridCoordinates);
 
             // If Tile values can be placed it will be returned
@@ -189,7 +189,7 @@ namespace GraphKI.GameManagement
         /// <param name="otherFace">Other tiles face.</param>
         /// <param name="tileFace">New tiles face.</param>
         /// <returns>the orientation of the new tile.</returns>
-        internal TileOrientation GetTileOrienationFromOtherTileOrientationAndFaces(TileOrientation otherOrientation, TileFace otherFace, TileFace tileFace)
+        internal static TileOrientation GetTileOrienationFromOtherTileOrientationAndFaces(TileOrientation otherOrientation, TileFace otherFace, TileFace tileFace)
         {
             if ((otherOrientation == TileOrientation.Straight && otherFace == TileFace.Left && tileFace == TileFace.Left) ||
                 (otherOrientation == TileOrientation.Straight && otherFace == TileFace.Right && tileFace == TileFace.Right) ||

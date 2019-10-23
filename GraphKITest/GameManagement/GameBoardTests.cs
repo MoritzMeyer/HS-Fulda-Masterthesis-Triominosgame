@@ -21,99 +21,99 @@ namespace GraphKITest.GameManagement
 
             // Other Orientation = Straight
             // Other Face = Left
-            Assert.AreEqual(expected: TileOrientation.Flipped, actual: gameBoard.GetTileOrienationFromOtherTileOrientationAndFaces(otherOrientation: TileOrientation.Straight, otherFace: TileFace.Left, tileFace: TileFace.Left));
-            Assert.AreEqual(expected: TileOrientation.TiltRight, actual: gameBoard.GetTileOrienationFromOtherTileOrientationAndFaces(otherOrientation: TileOrientation.Straight, otherFace: TileFace.Left, tileFace: TileFace.Right));
-            Assert.AreEqual(expected: TileOrientation.TiltLeft, actual: gameBoard.GetTileOrienationFromOtherTileOrientationAndFaces(otherOrientation: TileOrientation.Straight, otherFace: TileFace.Left, tileFace: TileFace.Bottom));
+            Assert.AreEqual(expected: TileOrientation.Flipped, actual: GameBoard.GetTileOrienationFromOtherTileOrientationAndFaces(otherOrientation: TileOrientation.Straight, otherFace: TileFace.Left, tileFace: TileFace.Left));
+            Assert.AreEqual(expected: TileOrientation.TiltRight, actual: GameBoard.GetTileOrienationFromOtherTileOrientationAndFaces(otherOrientation: TileOrientation.Straight, otherFace: TileFace.Left, tileFace: TileFace.Right));
+            Assert.AreEqual(expected: TileOrientation.TiltLeft, actual: GameBoard.GetTileOrienationFromOtherTileOrientationAndFaces(otherOrientation: TileOrientation.Straight, otherFace: TileFace.Left, tileFace: TileFace.Bottom));
 
             // Other Face = Right
-            Assert.AreEqual(expected: TileOrientation.TiltLeft, actual: gameBoard.GetTileOrienationFromOtherTileOrientationAndFaces(otherOrientation: TileOrientation.Straight, otherFace: TileFace.Right, tileFace: TileFace.Left));
-            Assert.AreEqual(expected: TileOrientation.Flipped, actual: gameBoard.GetTileOrienationFromOtherTileOrientationAndFaces(otherOrientation: TileOrientation.Straight, otherFace: TileFace.Right, tileFace: TileFace.Right));
-            Assert.AreEqual(expected: TileOrientation.TiltRight, actual: gameBoard.GetTileOrienationFromOtherTileOrientationAndFaces(otherOrientation: TileOrientation.Straight, otherFace: TileFace.Right, tileFace: TileFace.Bottom));            
+            Assert.AreEqual(expected: TileOrientation.TiltLeft, actual: GameBoard.GetTileOrienationFromOtherTileOrientationAndFaces(otherOrientation: TileOrientation.Straight, otherFace: TileFace.Right, tileFace: TileFace.Left));
+            Assert.AreEqual(expected: TileOrientation.Flipped, actual: GameBoard.GetTileOrienationFromOtherTileOrientationAndFaces(otherOrientation: TileOrientation.Straight, otherFace: TileFace.Right, tileFace: TileFace.Right));
+            Assert.AreEqual(expected: TileOrientation.TiltRight, actual: GameBoard.GetTileOrienationFromOtherTileOrientationAndFaces(otherOrientation: TileOrientation.Straight, otherFace: TileFace.Right, tileFace: TileFace.Bottom));            
 
             // Other Face = Bottom
-            Assert.AreEqual(expected: TileOrientation.TiltRight, actual: gameBoard.GetTileOrienationFromOtherTileOrientationAndFaces(otherOrientation: TileOrientation.Straight, otherFace: TileFace.Bottom, tileFace: TileFace.Left));
-            Assert.AreEqual(expected: TileOrientation.TiltLeft, actual: gameBoard.GetTileOrienationFromOtherTileOrientationAndFaces(otherOrientation: TileOrientation.Straight, otherFace: TileFace.Bottom, tileFace: TileFace.Right));
-            Assert.AreEqual(expected: TileOrientation.Flipped, actual: gameBoard.GetTileOrienationFromOtherTileOrientationAndFaces(otherOrientation: TileOrientation.Straight, otherFace: TileFace.Bottom, tileFace: TileFace.Bottom));
+            Assert.AreEqual(expected: TileOrientation.TiltRight, actual: GameBoard.GetTileOrienationFromOtherTileOrientationAndFaces(otherOrientation: TileOrientation.Straight, otherFace: TileFace.Bottom, tileFace: TileFace.Left));
+            Assert.AreEqual(expected: TileOrientation.TiltLeft, actual: GameBoard.GetTileOrienationFromOtherTileOrientationAndFaces(otherOrientation: TileOrientation.Straight, otherFace: TileFace.Bottom, tileFace: TileFace.Right));
+            Assert.AreEqual(expected: TileOrientation.Flipped, actual: GameBoard.GetTileOrienationFromOtherTileOrientationAndFaces(otherOrientation: TileOrientation.Straight, otherFace: TileFace.Bottom, tileFace: TileFace.Bottom));
 
             // Other Orientation = TiltLeft
             // Other Face = Left
-            Assert.AreEqual(expected: TileOrientation.DoubleTiltRight, actual: gameBoard.GetTileOrienationFromOtherTileOrientationAndFaces(otherOrientation: TileOrientation.TiltLeft, otherFace: TileFace.Left, tileFace: TileFace.Left));
-            Assert.AreEqual(expected: TileOrientation.Straight, actual: gameBoard.GetTileOrienationFromOtherTileOrientationAndFaces(otherOrientation: TileOrientation.TiltLeft, otherFace: TileFace.Left, tileFace: TileFace.Right));
-            Assert.AreEqual(expected: TileOrientation.DoubleTiltLeft, actual: gameBoard.GetTileOrienationFromOtherTileOrientationAndFaces(otherOrientation: TileOrientation.TiltLeft, otherFace: TileFace.Left, tileFace: TileFace.Bottom));
+            Assert.AreEqual(expected: TileOrientation.DoubleTiltRight, actual: GameBoard.GetTileOrienationFromOtherTileOrientationAndFaces(otherOrientation: TileOrientation.TiltLeft, otherFace: TileFace.Left, tileFace: TileFace.Left));
+            Assert.AreEqual(expected: TileOrientation.Straight, actual: GameBoard.GetTileOrienationFromOtherTileOrientationAndFaces(otherOrientation: TileOrientation.TiltLeft, otherFace: TileFace.Left, tileFace: TileFace.Right));
+            Assert.AreEqual(expected: TileOrientation.DoubleTiltLeft, actual: GameBoard.GetTileOrienationFromOtherTileOrientationAndFaces(otherOrientation: TileOrientation.TiltLeft, otherFace: TileFace.Left, tileFace: TileFace.Bottom));
 
             // Other Face = Right
-            Assert.AreEqual(expected: TileOrientation.DoubleTiltLeft, actual: gameBoard.GetTileOrienationFromOtherTileOrientationAndFaces(otherOrientation: TileOrientation.TiltLeft, otherFace: TileFace.Right, tileFace: TileFace.Left));
-            Assert.AreEqual(expected: TileOrientation.DoubleTiltRight, actual: gameBoard.GetTileOrienationFromOtherTileOrientationAndFaces(otherOrientation: TileOrientation.TiltLeft, otherFace: TileFace.Right, tileFace: TileFace.Right));
-            Assert.AreEqual(expected: TileOrientation.Straight, actual: gameBoard.GetTileOrienationFromOtherTileOrientationAndFaces(otherOrientation: TileOrientation.TiltLeft, otherFace: TileFace.Right, tileFace: TileFace.Bottom));
+            Assert.AreEqual(expected: TileOrientation.DoubleTiltLeft, actual: GameBoard.GetTileOrienationFromOtherTileOrientationAndFaces(otherOrientation: TileOrientation.TiltLeft, otherFace: TileFace.Right, tileFace: TileFace.Left));
+            Assert.AreEqual(expected: TileOrientation.DoubleTiltRight, actual: GameBoard.GetTileOrienationFromOtherTileOrientationAndFaces(otherOrientation: TileOrientation.TiltLeft, otherFace: TileFace.Right, tileFace: TileFace.Right));
+            Assert.AreEqual(expected: TileOrientation.Straight, actual: GameBoard.GetTileOrienationFromOtherTileOrientationAndFaces(otherOrientation: TileOrientation.TiltLeft, otherFace: TileFace.Right, tileFace: TileFace.Bottom));
 
             // Other Face = Bottom
-            Assert.AreEqual(expected: TileOrientation.Straight, actual: gameBoard.GetTileOrienationFromOtherTileOrientationAndFaces(otherOrientation: TileOrientation.TiltLeft, otherFace: TileFace.Bottom, tileFace: TileFace.Left));
-            Assert.AreEqual(expected: TileOrientation.DoubleTiltLeft, actual: gameBoard.GetTileOrienationFromOtherTileOrientationAndFaces(otherOrientation: TileOrientation.TiltLeft, otherFace: TileFace.Bottom, tileFace: TileFace.Right));
-            Assert.AreEqual(expected: TileOrientation.DoubleTiltRight, actual: gameBoard.GetTileOrienationFromOtherTileOrientationAndFaces(otherOrientation: TileOrientation.TiltLeft, otherFace: TileFace.Bottom, tileFace: TileFace.Bottom));
+            Assert.AreEqual(expected: TileOrientation.Straight, actual: GameBoard.GetTileOrienationFromOtherTileOrientationAndFaces(otherOrientation: TileOrientation.TiltLeft, otherFace: TileFace.Bottom, tileFace: TileFace.Left));
+            Assert.AreEqual(expected: TileOrientation.DoubleTiltLeft, actual: GameBoard.GetTileOrienationFromOtherTileOrientationAndFaces(otherOrientation: TileOrientation.TiltLeft, otherFace: TileFace.Bottom, tileFace: TileFace.Right));
+            Assert.AreEqual(expected: TileOrientation.DoubleTiltRight, actual: GameBoard.GetTileOrienationFromOtherTileOrientationAndFaces(otherOrientation: TileOrientation.TiltLeft, otherFace: TileFace.Bottom, tileFace: TileFace.Bottom));
 
             // Other Orientation = DoubleTiltLeft
             // Other Face = Left
-            Assert.AreEqual(expected: TileOrientation.TiltRight, actual: gameBoard.GetTileOrienationFromOtherTileOrientationAndFaces(otherOrientation: TileOrientation.DoubleTiltLeft, otherFace: TileFace.Left, tileFace: TileFace.Left));
-            Assert.AreEqual(expected: TileOrientation.TiltLeft, actual: gameBoard.GetTileOrienationFromOtherTileOrientationAndFaces(otherOrientation: TileOrientation.DoubleTiltLeft, otherFace: TileFace.Left, tileFace: TileFace.Right));
-            Assert.AreEqual(expected: TileOrientation.Flipped, actual: gameBoard.GetTileOrienationFromOtherTileOrientationAndFaces(otherOrientation: TileOrientation.DoubleTiltLeft, otherFace: TileFace.Left, tileFace: TileFace.Bottom));
+            Assert.AreEqual(expected: TileOrientation.TiltRight, actual: GameBoard.GetTileOrienationFromOtherTileOrientationAndFaces(otherOrientation: TileOrientation.DoubleTiltLeft, otherFace: TileFace.Left, tileFace: TileFace.Left));
+            Assert.AreEqual(expected: TileOrientation.TiltLeft, actual: GameBoard.GetTileOrienationFromOtherTileOrientationAndFaces(otherOrientation: TileOrientation.DoubleTiltLeft, otherFace: TileFace.Left, tileFace: TileFace.Right));
+            Assert.AreEqual(expected: TileOrientation.Flipped, actual: GameBoard.GetTileOrienationFromOtherTileOrientationAndFaces(otherOrientation: TileOrientation.DoubleTiltLeft, otherFace: TileFace.Left, tileFace: TileFace.Bottom));
 
             // Other Face = Right
-            Assert.AreEqual(expected: TileOrientation.Flipped, actual: gameBoard.GetTileOrienationFromOtherTileOrientationAndFaces(otherOrientation: TileOrientation.DoubleTiltLeft, otherFace: TileFace.Right, tileFace: TileFace.Left));
-            Assert.AreEqual(expected: TileOrientation.TiltRight, actual: gameBoard.GetTileOrienationFromOtherTileOrientationAndFaces(otherOrientation: TileOrientation.DoubleTiltLeft, otherFace: TileFace.Right, tileFace: TileFace.Right));
-            Assert.AreEqual(expected: TileOrientation.TiltLeft, actual: gameBoard.GetTileOrienationFromOtherTileOrientationAndFaces(otherOrientation: TileOrientation.DoubleTiltLeft, otherFace: TileFace.Right, tileFace: TileFace.Bottom));
+            Assert.AreEqual(expected: TileOrientation.Flipped, actual: GameBoard.GetTileOrienationFromOtherTileOrientationAndFaces(otherOrientation: TileOrientation.DoubleTiltLeft, otherFace: TileFace.Right, tileFace: TileFace.Left));
+            Assert.AreEqual(expected: TileOrientation.TiltRight, actual: GameBoard.GetTileOrienationFromOtherTileOrientationAndFaces(otherOrientation: TileOrientation.DoubleTiltLeft, otherFace: TileFace.Right, tileFace: TileFace.Right));
+            Assert.AreEqual(expected: TileOrientation.TiltLeft, actual: GameBoard.GetTileOrienationFromOtherTileOrientationAndFaces(otherOrientation: TileOrientation.DoubleTiltLeft, otherFace: TileFace.Right, tileFace: TileFace.Bottom));
 
             // Other Face = Bottom
-            Assert.AreEqual(expected: TileOrientation.TiltLeft, actual: gameBoard.GetTileOrienationFromOtherTileOrientationAndFaces(otherOrientation: TileOrientation.DoubleTiltLeft, otherFace: TileFace.Bottom, tileFace: TileFace.Left));
-            Assert.AreEqual(expected: TileOrientation.Flipped, actual: gameBoard.GetTileOrienationFromOtherTileOrientationAndFaces(otherOrientation: TileOrientation.DoubleTiltLeft, otherFace: TileFace.Bottom, tileFace: TileFace.Right));
-            Assert.AreEqual(expected: TileOrientation.TiltRight, actual: gameBoard.GetTileOrienationFromOtherTileOrientationAndFaces(otherOrientation: TileOrientation.DoubleTiltLeft, otherFace: TileFace.Bottom, tileFace: TileFace.Bottom));
+            Assert.AreEqual(expected: TileOrientation.TiltLeft, actual: GameBoard.GetTileOrienationFromOtherTileOrientationAndFaces(otherOrientation: TileOrientation.DoubleTiltLeft, otherFace: TileFace.Bottom, tileFace: TileFace.Left));
+            Assert.AreEqual(expected: TileOrientation.Flipped, actual: GameBoard.GetTileOrienationFromOtherTileOrientationAndFaces(otherOrientation: TileOrientation.DoubleTiltLeft, otherFace: TileFace.Bottom, tileFace: TileFace.Right));
+            Assert.AreEqual(expected: TileOrientation.TiltRight, actual: GameBoard.GetTileOrienationFromOtherTileOrientationAndFaces(otherOrientation: TileOrientation.DoubleTiltLeft, otherFace: TileFace.Bottom, tileFace: TileFace.Bottom));
 
             // Other Orientation = Flipped
             // Other Face = Left
-            Assert.AreEqual(expected: TileOrientation.Straight, actual: gameBoard.GetTileOrienationFromOtherTileOrientationAndFaces(otherOrientation: TileOrientation.Flipped, otherFace: TileFace.Left, tileFace: TileFace.Left));
-            Assert.AreEqual(expected: TileOrientation.DoubleTiltLeft, actual: gameBoard.GetTileOrienationFromOtherTileOrientationAndFaces(otherOrientation: TileOrientation.Flipped, otherFace: TileFace.Left, tileFace: TileFace.Right));
-            Assert.AreEqual(expected: TileOrientation.DoubleTiltRight, actual: gameBoard.GetTileOrienationFromOtherTileOrientationAndFaces(otherOrientation: TileOrientation.Flipped, otherFace: TileFace.Left, tileFace: TileFace.Bottom));
+            Assert.AreEqual(expected: TileOrientation.Straight, actual: GameBoard.GetTileOrienationFromOtherTileOrientationAndFaces(otherOrientation: TileOrientation.Flipped, otherFace: TileFace.Left, tileFace: TileFace.Left));
+            Assert.AreEqual(expected: TileOrientation.DoubleTiltLeft, actual: GameBoard.GetTileOrienationFromOtherTileOrientationAndFaces(otherOrientation: TileOrientation.Flipped, otherFace: TileFace.Left, tileFace: TileFace.Right));
+            Assert.AreEqual(expected: TileOrientation.DoubleTiltRight, actual: GameBoard.GetTileOrienationFromOtherTileOrientationAndFaces(otherOrientation: TileOrientation.Flipped, otherFace: TileFace.Left, tileFace: TileFace.Bottom));
 
             // Other Face = Right
-            Assert.AreEqual(expected: TileOrientation.DoubleTiltRight, actual: gameBoard.GetTileOrienationFromOtherTileOrientationAndFaces(otherOrientation: TileOrientation.Flipped, otherFace: TileFace.Right, tileFace: TileFace.Left));
-            Assert.AreEqual(expected: TileOrientation.Straight, actual: gameBoard.GetTileOrienationFromOtherTileOrientationAndFaces(otherOrientation: TileOrientation.Flipped, otherFace: TileFace.Right, tileFace: TileFace.Right));
-            Assert.AreEqual(expected: TileOrientation.DoubleTiltLeft, actual: gameBoard.GetTileOrienationFromOtherTileOrientationAndFaces(otherOrientation: TileOrientation.Flipped, otherFace: TileFace.Right, tileFace: TileFace.Bottom));
+            Assert.AreEqual(expected: TileOrientation.DoubleTiltRight, actual: GameBoard.GetTileOrienationFromOtherTileOrientationAndFaces(otherOrientation: TileOrientation.Flipped, otherFace: TileFace.Right, tileFace: TileFace.Left));
+            Assert.AreEqual(expected: TileOrientation.Straight, actual: GameBoard.GetTileOrienationFromOtherTileOrientationAndFaces(otherOrientation: TileOrientation.Flipped, otherFace: TileFace.Right, tileFace: TileFace.Right));
+            Assert.AreEqual(expected: TileOrientation.DoubleTiltLeft, actual: GameBoard.GetTileOrienationFromOtherTileOrientationAndFaces(otherOrientation: TileOrientation.Flipped, otherFace: TileFace.Right, tileFace: TileFace.Bottom));
 
             // Other Face = Bottom
-            Assert.AreEqual(expected: TileOrientation.DoubleTiltLeft, actual: gameBoard.GetTileOrienationFromOtherTileOrientationAndFaces(otherOrientation: TileOrientation.Flipped, otherFace: TileFace.Bottom, tileFace: TileFace.Left));
-            Assert.AreEqual(expected: TileOrientation.DoubleTiltRight, actual: gameBoard.GetTileOrienationFromOtherTileOrientationAndFaces(otherOrientation: TileOrientation.Flipped, otherFace: TileFace.Bottom, tileFace: TileFace.Right));
-            Assert.AreEqual(expected: TileOrientation.Straight, actual: gameBoard.GetTileOrienationFromOtherTileOrientationAndFaces(otherOrientation: TileOrientation.Flipped, otherFace: TileFace.Bottom, tileFace: TileFace.Bottom));
+            Assert.AreEqual(expected: TileOrientation.DoubleTiltLeft, actual: GameBoard.GetTileOrienationFromOtherTileOrientationAndFaces(otherOrientation: TileOrientation.Flipped, otherFace: TileFace.Bottom, tileFace: TileFace.Left));
+            Assert.AreEqual(expected: TileOrientation.DoubleTiltRight, actual: GameBoard.GetTileOrienationFromOtherTileOrientationAndFaces(otherOrientation: TileOrientation.Flipped, otherFace: TileFace.Bottom, tileFace: TileFace.Right));
+            Assert.AreEqual(expected: TileOrientation.Straight, actual: GameBoard.GetTileOrienationFromOtherTileOrientationAndFaces(otherOrientation: TileOrientation.Flipped, otherFace: TileFace.Bottom, tileFace: TileFace.Bottom));
 
             // Other Orientation = DoubleTiltRight
             // Other Face = Left
-            Assert.AreEqual(expected: TileOrientation.TiltLeft, actual: gameBoard.GetTileOrienationFromOtherTileOrientationAndFaces(otherOrientation: TileOrientation.DoubleTiltRight, otherFace: TileFace.Left, tileFace: TileFace.Left));
-            Assert.AreEqual(expected: TileOrientation.Flipped, actual: gameBoard.GetTileOrienationFromOtherTileOrientationAndFaces(otherOrientation: TileOrientation.DoubleTiltRight, otherFace: TileFace.Left, tileFace: TileFace.Right));
-            Assert.AreEqual(expected: TileOrientation.TiltRight, actual: gameBoard.GetTileOrienationFromOtherTileOrientationAndFaces(otherOrientation: TileOrientation.DoubleTiltRight, otherFace: TileFace.Left, tileFace: TileFace.Bottom));
+            Assert.AreEqual(expected: TileOrientation.TiltLeft, actual: GameBoard.GetTileOrienationFromOtherTileOrientationAndFaces(otherOrientation: TileOrientation.DoubleTiltRight, otherFace: TileFace.Left, tileFace: TileFace.Left));
+            Assert.AreEqual(expected: TileOrientation.Flipped, actual: GameBoard.GetTileOrienationFromOtherTileOrientationAndFaces(otherOrientation: TileOrientation.DoubleTiltRight, otherFace: TileFace.Left, tileFace: TileFace.Right));
+            Assert.AreEqual(expected: TileOrientation.TiltRight, actual: GameBoard.GetTileOrienationFromOtherTileOrientationAndFaces(otherOrientation: TileOrientation.DoubleTiltRight, otherFace: TileFace.Left, tileFace: TileFace.Bottom));
 
             // Other Face = Right
-            Assert.AreEqual(expected: TileOrientation.TiltRight, actual: gameBoard.GetTileOrienationFromOtherTileOrientationAndFaces(otherOrientation: TileOrientation.DoubleTiltRight, otherFace: TileFace.Right, tileFace: TileFace.Left));
-            Assert.AreEqual(expected: TileOrientation.TiltLeft, actual: gameBoard.GetTileOrienationFromOtherTileOrientationAndFaces(otherOrientation: TileOrientation.DoubleTiltRight, otherFace: TileFace.Right, tileFace: TileFace.Right));
-            Assert.AreEqual(expected: TileOrientation.Flipped, actual: gameBoard.GetTileOrienationFromOtherTileOrientationAndFaces(otherOrientation: TileOrientation.DoubleTiltRight, otherFace: TileFace.Right, tileFace: TileFace.Bottom));
+            Assert.AreEqual(expected: TileOrientation.TiltRight, actual: GameBoard.GetTileOrienationFromOtherTileOrientationAndFaces(otherOrientation: TileOrientation.DoubleTiltRight, otherFace: TileFace.Right, tileFace: TileFace.Left));
+            Assert.AreEqual(expected: TileOrientation.TiltLeft, actual: GameBoard.GetTileOrienationFromOtherTileOrientationAndFaces(otherOrientation: TileOrientation.DoubleTiltRight, otherFace: TileFace.Right, tileFace: TileFace.Right));
+            Assert.AreEqual(expected: TileOrientation.Flipped, actual: GameBoard.GetTileOrienationFromOtherTileOrientationAndFaces(otherOrientation: TileOrientation.DoubleTiltRight, otherFace: TileFace.Right, tileFace: TileFace.Bottom));
 
             // Other Face = Bottom
-            Assert.AreEqual(expected: TileOrientation.Flipped, actual: gameBoard.GetTileOrienationFromOtherTileOrientationAndFaces(otherOrientation: TileOrientation.DoubleTiltRight, otherFace: TileFace.Bottom, tileFace: TileFace.Left));
-            Assert.AreEqual(expected: TileOrientation.TiltRight, actual: gameBoard.GetTileOrienationFromOtherTileOrientationAndFaces(otherOrientation: TileOrientation.DoubleTiltRight, otherFace: TileFace.Bottom, tileFace: TileFace.Right));
-            Assert.AreEqual(expected: TileOrientation.TiltLeft, actual: gameBoard.GetTileOrienationFromOtherTileOrientationAndFaces(otherOrientation: TileOrientation.DoubleTiltRight, otherFace: TileFace.Bottom, tileFace: TileFace.Bottom));
+            Assert.AreEqual(expected: TileOrientation.Flipped, actual: GameBoard.GetTileOrienationFromOtherTileOrientationAndFaces(otherOrientation: TileOrientation.DoubleTiltRight, otherFace: TileFace.Bottom, tileFace: TileFace.Left));
+            Assert.AreEqual(expected: TileOrientation.TiltRight, actual: GameBoard.GetTileOrienationFromOtherTileOrientationAndFaces(otherOrientation: TileOrientation.DoubleTiltRight, otherFace: TileFace.Bottom, tileFace: TileFace.Right));
+            Assert.AreEqual(expected: TileOrientation.TiltLeft, actual: GameBoard.GetTileOrienationFromOtherTileOrientationAndFaces(otherOrientation: TileOrientation.DoubleTiltRight, otherFace: TileFace.Bottom, tileFace: TileFace.Bottom));
 
             // Other Orientation = TiltRight
             // Other Face = Left
-            Assert.AreEqual(expected: TileOrientation.DoubleTiltLeft, actual: gameBoard.GetTileOrienationFromOtherTileOrientationAndFaces(otherOrientation: TileOrientation.TiltRight, otherFace: TileFace.Left, tileFace: TileFace.Left));
-            Assert.AreEqual(expected: TileOrientation.DoubleTiltRight, actual: gameBoard.GetTileOrienationFromOtherTileOrientationAndFaces(otherOrientation: TileOrientation.TiltRight, otherFace: TileFace.Left, tileFace: TileFace.Right));
-            Assert.AreEqual(expected: TileOrientation.Straight, actual: gameBoard.GetTileOrienationFromOtherTileOrientationAndFaces(otherOrientation: TileOrientation.TiltRight, otherFace: TileFace.Left, tileFace: TileFace.Bottom));
+            Assert.AreEqual(expected: TileOrientation.DoubleTiltLeft, actual: GameBoard.GetTileOrienationFromOtherTileOrientationAndFaces(otherOrientation: TileOrientation.TiltRight, otherFace: TileFace.Left, tileFace: TileFace.Left));
+            Assert.AreEqual(expected: TileOrientation.DoubleTiltRight, actual: GameBoard.GetTileOrienationFromOtherTileOrientationAndFaces(otherOrientation: TileOrientation.TiltRight, otherFace: TileFace.Left, tileFace: TileFace.Right));
+            Assert.AreEqual(expected: TileOrientation.Straight, actual: GameBoard.GetTileOrienationFromOtherTileOrientationAndFaces(otherOrientation: TileOrientation.TiltRight, otherFace: TileFace.Left, tileFace: TileFace.Bottom));
 
             // Other Face = Right
-            Assert.AreEqual(expected: TileOrientation.Straight, actual: gameBoard.GetTileOrienationFromOtherTileOrientationAndFaces(otherOrientation: TileOrientation.TiltRight, otherFace: TileFace.Right, tileFace: TileFace.Left));
-            Assert.AreEqual(expected: TileOrientation.DoubleTiltLeft, actual: gameBoard.GetTileOrienationFromOtherTileOrientationAndFaces(otherOrientation: TileOrientation.TiltRight, otherFace: TileFace.Right, tileFace: TileFace.Right));
-            Assert.AreEqual(expected: TileOrientation.DoubleTiltRight, actual: gameBoard.GetTileOrienationFromOtherTileOrientationAndFaces(otherOrientation: TileOrientation.TiltRight, otherFace: TileFace.Right, tileFace: TileFace.Bottom));
+            Assert.AreEqual(expected: TileOrientation.Straight, actual: GameBoard.GetTileOrienationFromOtherTileOrientationAndFaces(otherOrientation: TileOrientation.TiltRight, otherFace: TileFace.Right, tileFace: TileFace.Left));
+            Assert.AreEqual(expected: TileOrientation.DoubleTiltLeft, actual: GameBoard.GetTileOrienationFromOtherTileOrientationAndFaces(otherOrientation: TileOrientation.TiltRight, otherFace: TileFace.Right, tileFace: TileFace.Right));
+            Assert.AreEqual(expected: TileOrientation.DoubleTiltRight, actual: GameBoard.GetTileOrienationFromOtherTileOrientationAndFaces(otherOrientation: TileOrientation.TiltRight, otherFace: TileFace.Right, tileFace: TileFace.Bottom));
 
             // Other Face = Bottom
-            Assert.AreEqual(expected: TileOrientation.DoubleTiltRight, actual: gameBoard.GetTileOrienationFromOtherTileOrientationAndFaces(otherOrientation: TileOrientation.TiltRight, otherFace: TileFace.Bottom, tileFace: TileFace.Left));
-            Assert.AreEqual(expected: TileOrientation.Straight, actual: gameBoard.GetTileOrienationFromOtherTileOrientationAndFaces(otherOrientation: TileOrientation.TiltRight, otherFace: TileFace.Bottom, tileFace: TileFace.Right));
-            Assert.AreEqual(expected: TileOrientation.DoubleTiltLeft, actual: gameBoard.GetTileOrienationFromOtherTileOrientationAndFaces(otherOrientation: TileOrientation.TiltRight, otherFace: TileFace.Bottom, tileFace: TileFace.Bottom));
+            Assert.AreEqual(expected: TileOrientation.DoubleTiltRight, actual: GameBoard.GetTileOrienationFromOtherTileOrientationAndFaces(otherOrientation: TileOrientation.TiltRight, otherFace: TileFace.Bottom, tileFace: TileFace.Left));
+            Assert.AreEqual(expected: TileOrientation.Straight, actual: GameBoard.GetTileOrienationFromOtherTileOrientationAndFaces(otherOrientation: TileOrientation.TiltRight, otherFace: TileFace.Bottom, tileFace: TileFace.Right));
+            Assert.AreEqual(expected: TileOrientation.DoubleTiltLeft, actual: GameBoard.GetTileOrienationFromOtherTileOrientationAndFaces(otherOrientation: TileOrientation.TiltRight, otherFace: TileFace.Bottom, tileFace: TileFace.Bottom));
         }
         #endregion
 

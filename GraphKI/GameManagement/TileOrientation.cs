@@ -8,7 +8,7 @@ namespace GraphKI.GameManagement
 {
     public enum TileOrientation
     {
-        Straight, TiltLeft, TiltRight, DoubleTiltLeft, DoubleTiltRight, Flipped
+        Straight, TiltLeft, TiltRight, DoubleTiltLeft, DoubleTiltRight, Flipped, None
     }
 
     public static class TileOrientationExtension

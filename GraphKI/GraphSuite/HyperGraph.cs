@@ -1,4 +1,5 @@
 ﻿using GraphKI.Extensions;
+using GraphKI.GameManagement;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -301,16 +302,13 @@ namespace GraphKI.GraphSuite
             // Alle Kanten mit 3 Knoten ermitteln
             IEnumerable<HyperEdge> threeSidedHyperEdges = this.Edges.Where(e => e.VertexCount() == 3);
 
-            // Für die Kanten mit 3 Knoten das Dictionary mit der Color füllen
-            Dictionary<HyperEdge, int> color = threeSidedHyperEdges.ToDictionary(e => e, e => 0);
-
             // Für jede Kante die Vorgängerkante, sowie der Knoten über welchen die akutelle Kante erreicht wurde speichern.
             Dictionary<HyperEdge, Tuple<HyperEdge, Vertex>> parent = threeSidedHyperEdges.ToDictionary(e => e, e => new Tuple<HyperEdge, Vertex>(null, null));
 
             // Liste mit den Zyklen erstellen
             List<List<Tuple<HyperEdge, Vertex>>> cycles = new List<List<Tuple<HyperEdge, Vertex>>>();
 
-            this.GetSimpleCycle(threeSidedHyperEdges.First(), null, new List<Tuple<HyperEdge, Vertex>>(), color, cycles);
+            this.GetSimpleCycle(threeSidedHyperEdges.First(), null, new List<Tuple<HyperEdge, Vertex>>(), new List<Tuple<HyperEdge, TileOrientation>>(), cycles);
 
             //foreach (HyperEdge edge in threeSidedHyperEdges)
             //{
@@ -332,14 +330,14 @@ namespace GraphKI.GraphSuite
             HyperEdge u,
             HyperEdge p,
             List<Tuple<HyperEdge, Vertex>> parent,
-            Dictionary<HyperEdge, int> color,
+            List<Tuple<HyperEdge, TileOrientation>> orientations,
             List<List<Tuple<HyperEdge, Vertex>>> cycles)
         {
-            // edge was completly visited before
-            //if (color.ContainsKey(u) && color[u] == 2)
-            //{
-            //    return;
-            //}
+            IEnumerable<TileOrientation> threeSidedOrientations = orientations.Where(x => x.Item1.IsThreeSidedEdge()).Select(x => x.Item2);
+            if (threeSidedOrientations.Distinct().Count() != threeSidedOrientations.Count())
+            {
+                return;
+            }
 
             IEnumerable<HyperEdge> threeSidedParents = parent.Select(x => x.Item1).Where(e => e.IsThreeSidedEdge());
 
@@ -350,20 +348,8 @@ namespace GraphKI.GraphSuite
             }
 
             // possible cycle detected
-            // if (color.ContainsKey(u) && color[u] == 1)
             if (u.IsThreeSidedEdge() && threeSidedParents.Count() == 6 && u.EqualsOnEdgeBasis(parent.First().Item1))
             {
-
-                //// Ein Zyklus im Triominograph muss immer min. die Länge 6 (nur 3er Kanten) bzw. 12 (inkl. 2er Kanten haben)
-                //int cycleBegin = parent.Count - 12;
-                //if (cycleBegin >= 0)
-                //{
-                //    // Suche den Anfang des Zyklus (soweit vorhanden)
-                //    while (parent[cycleBegin].Item1 != u && cycleBegin > 0)
-                //    {
-                //        cycleBegin--;
-                //    }
-
                 int cycleBegin = 0;
                 // Wenn anfang gefunden wurde, den Zyklus speichern.
                 if (parent[cycleBegin].Item1.Equals(u))
@@ -376,13 +362,7 @@ namespace GraphKI.GraphSuite
 
                     cycles.Add(cycle);
                 }
-                //}
             }
-
-            //if (color.ContainsKey(u))
-            //{
-            //    color[u] = 1;
-            //}
 
             // Den Knoten ermitteln, über welchen die Kante u erreicht wurde.
             IEnumerable<Vertex> adjacentVertices = null;
@@ -415,15 +395,6 @@ namespace GraphKI.GraphSuite
                     edges = edges.Except(threeSidedParents);
                 }
 
-                //// (und dann die 5 zuletzt besuchten Kanten wieder entfernen) da erst ab 6 ein Cycle möglich ist.
-                //IEnumerable<HyperEdge> edges = this.GetAdjacentEdges(vertex, vCount);
-                //IEnumerable<HyperEdge> threeSidedParents = parent.Where(x => x.Item1.IsThreeSidedEdge()).Select(x => x.Item1);
-                //if (threeSidedParents.Count() > 5)
-                //{
-                //    threeSidedParents = threeSidedParents.ToList().GetRange(threeSidedParents.Count() - 5, 5);
-                //}
-                //edges = edges.Except(threeSidedParents);
-
                 foreach (HyperEdge edge in edges)
                 {
                     // List<Tuple<HyperEdge, Vertex>> newParent = u.IsThreeSidedEdge() ? new List<Tuple<HyperEdge, Vertex>>(parent) : parent;
@@ -431,17 +402,64 @@ namespace GraphKI.GraphSuite
                     // Parent Kante und Knoten für die nächste Kante hinzfügen.
                     newParent.Add(new Tuple<HyperEdge, Vertex>(u, edge.GetEdgeVertexInstance(vertex)));
 
+                    List<Tuple<HyperEdge, TileOrientation>> newOrientations = new List<Tuple<HyperEdge, TileOrientation>>(orientations);
+                    TileOrientation actualOrientation = TileOrientation.None;
+
+                    if (u.IsThreeSidedEdge())
+                    {
+                        actualOrientation = TileOrientation.Straight;
+
+                        if (threeSidedParents.Count() > 0)
+                        {
+                            Tuple<HyperEdge, Vertex> lastThreeSidedParent = parent.Where(x => x.Item1.IsThreeSidedEdge()).Last();
+                            TileFace previousFace = lastThreeSidedParent.Item1.GetTileFaceFromVertex(lastThreeSidedParent.Item2);
+                            TileFace actualFace = u.GetTileFaceFromVertex(parent.Last().Item2);
+
+                            actualOrientation = GameBoard.GetTileOrienationFromOtherTileOrientationAndFaces(
+                                orientations.Where(x => x.Item1.IsThreeSidedEdge()).Last().Item2,
+                                previousFace,
+                                actualFace);
+                        }
+                    }
+
+                    newOrientations.Add(new Tuple<HyperEdge, TileOrientation>(u, actualOrientation));
+
                     string edgeName = u.ToString();
                     string vertexName = vertex.ToString();
 
-                    this.GetSimpleCycle(edge, u, newParent, color, cycles);
+                    this.GetSimpleCycle(edge, u, newParent, newOrientations, cycles);
                 }
             }
-
-            //if (color.ContainsKey(u))
-            //{
-            //    color[u] = 2;
-            //}
         }
+
+        //public bool IsPartOfHexagon(HyperEdge edge, out List<List<Tuple<HyperEdge, Vertex>>> cycles)
+        //{
+        //    if (!edge.IsThreeSidedEdge())
+        //    {
+        //        throw new ArgumentException($"Edge: '{edge}' is not three sided.");
+        //    }
+
+        //    if (!this.Edges.Contains(edge))
+        //    {
+        //        throw new ArgumentException($"This Graph does not conatain an edge '{edge}'");
+        //    }
+        //}
+
+        //public void CheckForHexagon(
+        //    HyperEdge u,
+        //    HyperEdge p,
+        //    List<Tuple<HyperEdge, Vertex>> parent,
+        //    List<List<Tuple<HyperEdge, Vertex>>> cycles)
+        //{
+        //    IEnumerable<HyperEdge> threeSidedParents = parent.Select(x => x.Item1).Where(x => x.IsThreeSidedEdge());
+
+        //    // Ein Hexagon kann nur 6 unterschiedliche Kanten enthalten.
+        //    if (u.IsThreeSidedEdge() && threeSidedParents.Count() >= 6 && parent.First().Item1 != u)
+        //    {
+        //        return;
+        //    }
+        //}
+
+        
     }
 }
