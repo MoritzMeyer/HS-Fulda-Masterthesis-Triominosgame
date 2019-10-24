@@ -10,8 +10,9 @@ namespace GraphKI.GraphSuite
     public class Hexagon
     {
         #region fields
+        public bool IsComplete { get; private set; }
         private List<HyperEdge> Triominos;
-        private List<HyperEdge> Connectors;
+        private List<HyperEdge> outgoingConnectors;
         private List<TileFace> TriominoOutgoingFaces;
         internal int Pointer;
         #endregion
@@ -22,12 +23,37 @@ namespace GraphKI.GraphSuite
         /// </summary>
         /// <param name="edge">the starting tile of this hexagon.</param>
         /// <param name="tileFace">the face of the starting tile for the next tile.</param>
-        public Hexagon(HyperEdge edge, TileFace tileFace)
+        public Hexagon(HyperEdge edge, TileFace tileFace, HyperEdge outgoingConnector)
         {
+            if (!edge.IsThreeSidedEdge())
+            {
+                throw new ArgumentException($"Edge '{edge}' has to be threesided.");
+            }
+
+            if (!outgoingConnector.IsTwoSidedEdge())
+            {
+                throw new ArgumentException($"Edge '{outgoingConnector}' has to be twosided.");
+            }
+
+            if (!outgoingConnector.ContainsVertexOnValueBasis(edge.GetVertexOnSpecificSide(tileFace)))
+            {
+                throw new ArgumentException($"Connector '{outgoingConnector}' has no vertex with edge '{edge}' in common.");
+            }
+
             this.Triominos = new List<HyperEdge>(6);
-            this.Connectors = new List<HyperEdge>(6);
+            this.Triominos.AddRange(Enumerable.Repeat(default(HyperEdge), 6));
+
+            this.outgoingConnectors = new List<HyperEdge>(6);
+            this.outgoingConnectors.AddRange(Enumerable.Repeat(default(HyperEdge), 6));
+
             this.TriominoOutgoingFaces = new List<TileFace>(6);
+            this.TriominoOutgoingFaces.AddRange(Enumerable.Repeat(default(TileFace), 6));
+
             this.Pointer = this.DetermineHexagonPosition(edge.Orientation, tileFace);
+            this.Triominos[this.Pointer] = edge;
+            this.TriominoOutgoingFaces[this.Pointer] = tileFace;
+            this.outgoingConnectors[this.Pointer] = outgoingConnector;
+            this.IsComplete = false;
         }
         #endregion
 
@@ -88,76 +114,87 @@ namespace GraphKI.GraphSuite
         }
         #endregion
 
-        public bool TryAddToHexagon(HyperEdge edge)
+        public bool TryAddToHexagon(HyperEdge edge, HyperEdge outgoingConnector)
         {
             if (!edge.IsThreeSidedEdge())
             {
-                throw new ArgumentException($"Edges added to a hexagon must be threesided ('{edge}' isn't).");
+                throw new ArgumentException($"Only three sided edges are eligible as triomino edge ('{edge}' isn't).");
             }
 
-            if (this.Triominos.Count != this.Connectors.Count)
+            if (!outgoingConnector.IsTwoSidedEdge())
             {
-                throw new ArgumentException($"Bevor adding a new Triomino Edge to this hexagon a connecting edge is needed.");
+                throw new ArgumentException($"Only two sided edges are eligible as connector ('{outgoingConnector}' isn't).");
+
             }
 
             // Check orientation for new edge according to the next free hexagon position.
-            if (edge.Orientation.ToArrayTileOrientation() != this.GetDemandedOrientationForHexagonPosition(this.Pointer + 1))
+            if (edge.Orientation.ToArrayTileOrientation() != this.GetDemandedOrientationForHexagonPosition(this.GetNextPointerValue(this.Pointer)))
             {
+                return false;
+            }
+
+            // check if connector contains outgoing face vertex 
+            TileFace thisOutgoingFace = this.GetOutgoingFace(this.GetNextPointerValue(this.Pointer), edge.Orientation);
+            if (!outgoingConnector.ContainsVertexOnValueBasis(edge.GetVertexOnSpecificSide(thisOutgoingFace)))
+            {
+                //throw new ArgumentException($"Connector '{outgoingConnector}' has no vertex with edge '{edge}' in common.");
                 return false;
             }
 
             HyperEdge lastHexagonTile = this.GetLastEdgeAdded();
-            TileFace lastTileFace = this.GetLastEdgeOutgoingFace();
-            TileFace incomingTileFace = this.GetIncomingFaceForNextHexagonPosition(edge.Orientation);
+            TileFace lastOutgoingFace = this.GetLastEdgeOutgoingFace();
+            TileFace thisIncomingTileFace = this.GetIncomingFaceForNextHexagonPosition(edge.Orientation);
 
-            if (!this.CheckIfLastConnectorConnectsInAndOutgoing(lastHexagonTile.GetVertexOnSpecificSide(lastTileFace), edge.GetVertexOnSpecificSide(incomingTileFace), this.Connectors[this.Pointer]))
+            if (!this.CheckIfLastConnectorConnectsInAndOutgoing(lastHexagonTile.GetVertexOnSpecificSide(lastOutgoingFace), edge.GetVertexOnSpecificSide(thisIncomingTileFace), this.outgoingConnectors[this.Pointer]))
             {
                 return false;
             }
 
-            this.Pointer++;
+            // if this tile completes the hexagon, not only ingoing face must fit with previous tile
+            // but also outgoing face must fit with first tile
+            int lookAHeadPointer = this.GetNextPointerValue(this.Pointer);
+            lookAHeadPointer = this.GetNextPointerValue(lookAHeadPointer);
+            if (this.Triominos[lookAHeadPointer] != null)
+            {
+                HyperEdge firstHexagonTile = this.Triominos[lookAHeadPointer];
+                TileFace firstIncomingFace = this.GetIncomingFace(lookAHeadPointer, firstHexagonTile.Orientation);
+
+                if (!this.CheckIfLastConnectorConnectsInAndOutgoing(edge.GetVertexOnSpecificSide(thisOutgoingFace), firstHexagonTile.GetVertexOnSpecificSide(firstIncomingFace), outgoingConnector))
+                {
+                    return false;
+                }
+            }
+
+            this.Pointer = this.GetNextPointerValue(this.Pointer);
+
             this.Triominos[this.Pointer] = edge;
             this.TriominoOutgoingFaces[this.Pointer] = this.GetOutgoingFace(this.Pointer, edge.Orientation);
+            this.outgoingConnectors[this.Pointer] = outgoingConnector;
 
-
-            // Get the last edge of this hexagon and it's face
-            // get the face of the new edge according to the next free hexagon position
-            // if all matches add to hexagon
-            // increase pointer (6++ == 0)
-
-            // write tests
+            if (this.Triominos[this.GetNextPointerValue(this.Pointer)] != null)
+            {
+                this.IsComplete = true;
+            }
 
             return true;
         }
 
-        #region TryAddConnector
+        #region GetNextPointerValue
         /// <summary>
-        /// Tries to add a connecting edge for the last triomino edge.
+        /// Calculates new Pointer value, and considers the max pointer of 6 (after 6 comes 0).
         /// </summary>
-        /// <param name="connector">the connecting edge.</param>
-        /// <returns>True, if connector could be added, false if not.</returns>
-        public bool TryAddConnector(HyperEdge connector)
+        /// <param name="pointer">The actual pointer value.</param>
+        /// <returns>New pointer Value.</returns>
+        private int GetNextPointerValue(int pointer)
         {
-            if (!connector.IsTwoSidedEdge())
+            pointer++;
+
+            if (pointer >= 6)
             {
-                throw new ArgumentException($"Only two sided edges are eligible as connector ('{connector}' isn't).");
-                
+                pointer = 0;
             }
 
-            if (this.Triominos.Count == this.Connectors.Count)
-            {
-                throw new ArgumentException("Bevor adding a connector you need to add a Triomino edge.");
-            }
-
-            Vertex outgoingVertex = this.Triominos[this.Pointer].GetVertexOnSpecificSide(this.TriominoOutgoingFaces[this.Pointer]);
-            if (!connector.ContainsVertexOnValueBasis(outgoingVertex))
-            {
-                //throw new ArgumentException($"The ")
-                return false;
-            }
-
-            this.Connectors[this.Pointer] = connector;
-            return true;
+            return pointer;
         }
         #endregion
 
@@ -191,7 +228,7 @@ namespace GraphKI.GraphSuite
         /// <returns>Incoming face for new hexgon position.</returns>
         private TileFace GetIncomingFaceForNextHexagonPosition(TileOrientation nextTileOrientation)
         {
-            return this.GetIncomingFace(this.Pointer + 1, nextTileOrientation);
+            return this.GetIncomingFace(this.GetNextPointerValue(this.Pointer), nextTileOrientation);
         }
         #endregion
 
