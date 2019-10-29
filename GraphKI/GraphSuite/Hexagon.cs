@@ -11,7 +11,7 @@ namespace GraphKI.GraphSuite
     {
         #region fields
         public bool IsComplete { get; private set; }
-        private List<HyperEdge> Triominos;
+        internal List<HyperEdge> Triominos;
         private List<HyperEdge> outgoingConnectors;
         private List<TileFace> TriominoOutgoingFaces;
         internal int Pointer;
@@ -128,13 +128,13 @@ namespace GraphKI.GraphSuite
             }
 
             // Check orientation for new edge according to the next free hexagon position.
-            if (edge.Orientation.ToArrayTileOrientation() != this.GetDemandedOrientationForHexagonPosition(this.GetNextPointerValue(this.Pointer)))
+            if (edge.Orientation.ToArrayTileOrientation() != this.GetDemandedOrientationForHexagonPosition(this.GetNextPointerValue()))
             {
                 return false;
             }
 
             // check if connector contains outgoing face vertex 
-            TileFace thisOutgoingFace = this.GetOutgoingFace(this.GetNextPointerValue(this.Pointer), edge.Orientation);
+            TileFace thisOutgoingFace = this.GetOutgoingFace(this.GetNextPointerValue(), edge.Orientation);
             if (!outgoingConnector.ContainsVertexOnValueBasis(edge.GetVertexOnSpecificSide(thisOutgoingFace)))
             {
                 //throw new ArgumentException($"Connector '{outgoingConnector}' has no vertex with edge '{edge}' in common.");
@@ -152,8 +152,8 @@ namespace GraphKI.GraphSuite
 
             // if this tile completes the hexagon, not only ingoing face must fit with previous tile
             // but also outgoing face must fit with first tile
-            int lookAHeadPointer = this.GetNextPointerValue(this.Pointer);
-            lookAHeadPointer = this.GetNextPointerValue(lookAHeadPointer);
+            int lookAHeadPointer = this.GetNextPointerValue();
+            lookAHeadPointer = this.CalcNextPointerValue(lookAHeadPointer);
             if (this.Triominos[lookAHeadPointer] != null)
             {
                 HyperEdge firstHexagonTile = this.Triominos[lookAHeadPointer];
@@ -165,13 +165,13 @@ namespace GraphKI.GraphSuite
                 }
             }
 
-            this.Pointer = this.GetNextPointerValue(this.Pointer);
+            this.Pointer = this.GetNextPointerValue();
 
             this.Triominos[this.Pointer] = edge;
             this.TriominoOutgoingFaces[this.Pointer] = this.GetOutgoingFace(this.Pointer, edge.Orientation);
             this.outgoingConnectors[this.Pointer] = outgoingConnector;
 
-            if (this.Triominos[this.GetNextPointerValue(this.Pointer)] != null)
+            if (this.Triominos[this.GetNextPointerValue()] != null)
             {
                 this.IsComplete = true;
             }
@@ -179,22 +179,50 @@ namespace GraphKI.GraphSuite
             return true;
         }
 
-        #region GetNextPointerValue
+        #region CalcNextPointerValue
         /// <summary>
         /// Calculates new Pointer value, and considers the max pointer of 6 (after 6 comes 0).
         /// </summary>
         /// <param name="pointer">The actual pointer value.</param>
         /// <returns>New pointer Value.</returns>
-        private int GetNextPointerValue(int pointer)
+        private int CalcNextPointerValue(int pointer)
         {
             pointer++;
 
-            if (pointer >= 6)
+            if (pointer > 5)
             {
                 pointer = 0;
             }
 
             return pointer;
+        }
+        #endregion
+
+        private int CalcPreviousPointerValue(int pointer)
+        {
+            pointer--;
+
+            if (pointer < 0)
+            {
+                pointer = 5;
+            }
+
+            return pointer;
+        }
+
+        public int GetPreviousPointerValue()
+        {
+            return this.CalcPreviousPointerValue(this.Pointer);
+        }
+
+        #region GetNextPointerValue
+        /// <summary>
+        /// Returns the next value for the pointer of this Hexagon.
+        /// </summary>
+        /// <returns>the next pointers value.</returns>
+        public int GetNextPointerValue()
+        {
+            return this.CalcNextPointerValue(this.Pointer);
         }
         #endregion
 
@@ -228,7 +256,7 @@ namespace GraphKI.GraphSuite
         /// <returns>Incoming face for new hexgon position.</returns>
         private TileFace GetIncomingFaceForNextHexagonPosition(TileOrientation nextTileOrientation)
         {
-            return this.GetIncomingFace(this.GetNextPointerValue(this.Pointer), nextTileOrientation);
+            return this.GetIncomingFace(this.CalcNextPointerValue(this.Pointer), nextTileOrientation);
         }
         #endregion
 

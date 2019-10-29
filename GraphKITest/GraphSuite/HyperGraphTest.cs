@@ -1,4 +1,5 @@
-﻿using GraphKI.GraphSuite;
+﻿using GraphKI.GameManagement;
+using GraphKI.GraphSuite;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
@@ -35,6 +36,7 @@ namespace GraphKITest.GraphSuite
         }
 
         [TestMethod]
+        [Ignore]
         public void HyperGraph_GetAllCycles_has_to_work()
         {
             string path = Path.Combine(Directory.GetParent(Directory.GetCurrentDirectory()).Parent.Parent.FullName, "TestFiles", "tEdgeGraph.txt");
@@ -134,6 +136,71 @@ namespace GraphKITest.GraphSuite
             Assert.AreEqual(1, neighbors.Count);
             Assert.IsTrue(neighbors.Contains(h2));
         }
-        #endregion      
+        #endregion
+
+        #region HyperGraph_IsPartOfHexagon_has_to_work
+        /// <summary>
+        /// Verifies functionality of method IsPartOfHexagon.
+        /// </summary>
+        [TestMethod]
+        public void HyperGraph_IsPartOfHexagon_has_to_work()
+        {
+            List<Vertex> vertices = new List<Vertex>();
+            List<HyperEdge> twoSidedEdges = new List<HyperEdge>();
+            for (int i = 0; i < 6; i++)
+            {
+                for (int j = i; j < 6; j++)
+                {
+                    vertices.Add(new Vertex(i + "" + j));
+                    if (i != j)
+                    {
+                        vertices.Add(new Vertex(j + "" + i));
+                    }
+
+                    twoSidedEdges.Add(new HyperEdge(i + "" + j, j + "" + i));
+                }
+            }
+
+            HyperGraph hyperGraph = new HyperGraph(vertices);
+            foreach(HyperEdge twoSidedEdge in twoSidedEdges)
+            {
+                hyperGraph.AddEdge(twoSidedEdge);
+            }
+
+            HyperEdge edge1 = new HyperEdge("00", "00", "00", TileOrientation.Straight);
+            HyperEdge edge2 = new HyperEdge("00", "02", "20", TileOrientation.Flipped);
+            HyperEdge edge3 = new HyperEdge("02", "22", "20", TileOrientation.DoubleTiltLeft);
+            HyperEdge edge4 = new HyperEdge("01", "12", "20", TileOrientation.Flipped);
+            HyperEdge edge5 = new HyperEdge("01", "11", "10", TileOrientation.DoubleTiltRight);
+            HyperEdge edge6 = new HyperEdge("00", "01", "10", TileOrientation.TiltRight);
+
+            List<Hexagon> hexagons = new List<Hexagon>();
+
+            HyperEdge addedEdge1 = hyperGraph.AddEdge(edge1);
+            Assert.IsFalse(hyperGraph.IsPartOfHexagon(edge1, out hexagons));
+            Assert.AreEqual(0, hexagons.Count);
+
+            hyperGraph.AddEdgeWithDirectNeighbor(edge2, edge1, out HyperEdge addedEdge2);
+            Assert.IsFalse(hyperGraph.IsPartOfHexagon(edge2, out hexagons));
+            Assert.AreEqual(0, hexagons.Count);
+
+            hyperGraph.AddEdgeWithDirectNeighbor(edge3, edge2, out HyperEdge addedEdge3);
+            Assert.IsFalse(hyperGraph.IsPartOfHexagon(edge3, out hexagons));
+            Assert.AreEqual(0, hexagons.Count);
+
+            hyperGraph.AddEdgeWithDirectNeighbor(edge4, edge3, out HyperEdge addedEdge4);
+            Assert.IsFalse(hyperGraph.IsPartOfHexagon(edge4, out hexagons));
+            Assert.AreEqual(0, hexagons.Count);
+
+            hyperGraph.AddEdgeWithDirectNeighbor(edge5, edge4, out HyperEdge addedEdge5);
+            Assert.IsFalse(hyperGraph.IsPartOfHexagon(edge5, out hexagons));
+            Assert.AreEqual(0, hexagons.Count);
+
+            hyperGraph.AddEdgeWithDirectNeighbor(edge6, edge5, out HyperEdge addedEdge6);
+            addedEdge6.AddDirectNeighbor(addedEdge1);
+            Assert.IsTrue(hyperGraph.IsPartOfHexagon(edge6, out hexagons));
+            Assert.AreEqual(1, hexagons.Count);
+        }
+        #endregion
     }
 }

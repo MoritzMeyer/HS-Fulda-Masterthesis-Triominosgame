@@ -41,6 +41,7 @@ namespace GraphKI.GraphSuite
         public HyperGraph(IEnumerable<Vertex> vertices)
         {
             this.Vertices = vertices.ToList();
+            this.Edges = new List<HyperEdge>();
         }
 
         /// <summary>
@@ -88,13 +89,28 @@ namespace GraphKI.GraphSuite
 
         #region AddEdge
         /// <summary>
+        /// Adds an edge to this graph (it creates a new Instance of edge, based on the graphs vertices).
+        /// </summary>
+        /// <param name="edge">Edge to be added.</param>
+        /// <returns>The new edge.</returns>
+        public HyperEdge AddEdge(HyperEdge edge)
+        {
+            if (edge.IsTwoSidedEdge())
+            {
+                return this.AddEdge(edge.Vertices[0], edge.Vertices[1]);
+            }
+
+            return this.AddEdge(edge.Vertices[0], edge.Vertices[1], edge.Vertices[2], edge.Orientation);
+        }
+
+        /// <summary>
         /// Adds a new Edge to this graph, if it isn't already part of it.
         /// </summary>
         /// <param name="vertex1">Vertex1 of the edge to be added.</param>
         /// <param name="vertex2">Vertex2 of the edge to be added.</param>
         /// <param name="vertex3">Vertex3 of the edge to be added.</param>
         /// <returns></returns>
-        public HyperEdge AddEdge(string vertex1, string vertex2, string vertex3 = null)
+        public HyperEdge AddEdge(string vertex1, string vertex2, string vertex3 = null, TileOrientation tileOrientation = TileOrientation.None)
         {
             if (!this.HasVertex(vertex1))
             {
@@ -115,7 +131,7 @@ namespace GraphKI.GraphSuite
             Vertex v2 = Vertex.CreateFromVertex(this.Vertices.Where(v => v.Value.Equals(vertex2)).First());
             Vertex v3 = vertex3 != null ? Vertex.CreateFromVertex(this.Vertices.Where(v => v.Value.Equals(vertex3)).First()) : null;
 
-            HyperEdge edge = new HyperEdge(v1, v2, v3);
+            HyperEdge edge = new HyperEdge(v1, v2, v3, tileOrientation);
 
             if (this.HasEdge(edge))
             {
@@ -133,7 +149,7 @@ namespace GraphKI.GraphSuite
         /// <param name="vertex2">Vertex2 of the edge to be added.</param>
         /// <param name="vertex3">Vertex3 of the edge to be added.</param>
         /// <returns></returns>
-        public HyperEdge AddEdge(Vertex vertex1, Vertex vertex2, Vertex vertex3 = null)
+        public HyperEdge AddEdge(Vertex vertex1, Vertex vertex2, Vertex vertex3 = null, TileOrientation tileOrientation = TileOrientation.None)
         {
             if (vertex1.EqualsOnEdgeBasis(vertex2) || vertex1.EqualsOnEdgeBasis(vertex3) || vertex2.EqualsOnEdgeBasis(vertex3))
             {
@@ -159,7 +175,7 @@ namespace GraphKI.GraphSuite
             Vertex v2 = Vertex.CreateFromVertex(this.Vertices.Where(v => v.Value.Equals(vertex2.Value)).First());
             Vertex v3 = vertex3 != null ? Vertex.CreateFromVertex(this.Vertices.Where(v => v.Value.Equals(vertex3.Value)).First()) : null;
 
-            HyperEdge edge = new HyperEdge(v1, v2, v3);
+            HyperEdge edge = new HyperEdge(v1, v2, v3, tileOrientation);
 
             if (this.HasEdge(edge))
             {
@@ -168,6 +184,100 @@ namespace GraphKI.GraphSuite
 
             this.Edges.Add(edge);
             return edge;
+        }
+        #endregion
+
+        #region AddEdgeWithDirectNeighbor
+        /// <summary>
+        /// Adds an Edge to this graph and sets a directNeighbor for this edge.
+        /// </summary>
+        /// <param name="vertex1">First vertex of new Edge.</param>
+        /// <param name="vertex2">Second vertex of new Edge.</param>
+        /// <param name="vertex3">Third vertex of new Edge.</param>
+        /// <param name="directNeigbor">The direct Neighbor of new edge.</param>
+        /// <param name="edge">The added edge.</param>
+        /// <returns>True if edge with neighbor could be added, false if not.</returns>
+        public bool AddEdgeWithDirectNeighbor(HyperEdge edge, HyperEdge directNeigbor, out HyperEdge addedEdge)
+        {
+            addedEdge = null;
+            if (!directNeigbor.IsThreeSidedEdge())
+            {
+                throw new ArgumentException($"DirectNeighbor has to be three-sided ('{directNeigbor}' isn't.");
+            }
+
+            if (!this.HasEdge(directNeigbor))
+            {
+                return false;
+            }
+
+            if (!this.TryGetEdge(out HyperEdge directNeigborGraphInstance, directNeigbor.Vertices[0], directNeigbor.Vertices[1], directNeigbor.Vertices[2]))
+            {
+                throw new ArgumentException($"Could not get Graph-Edge-Instance of '{directNeigbor}', although it exists within this graph.");
+            }
+
+            addedEdge = this.AddEdge(edge);
+            addedEdge.AddDirectNeighbor(directNeigborGraphInstance);
+            directNeigborGraphInstance.AddDirectNeighbor(addedEdge);
+
+            return true;
+        }
+        #endregion
+
+        #region TryGetEdge
+        /// <summary>
+        /// Returns an edge from this graph with specific vertices, if existing.
+        /// </summary>
+        /// <param name="matchingEdge">The edge with specific vertices (null if none was existing)</param>
+        /// <param name="vertex1">First vertex of edge.</param>
+        /// <param name="vertex2">Second vertex of edge.</param>
+        /// <param name="vertex3">Third vertex of edge (null if edge is twosided)</param>
+        /// <returns>True, if edge could be found, false if not.</returns>
+        public bool TryGetEdge(out HyperEdge matchingEdge, string vertex1, string vertex2, string vertex3 = null)
+        {
+            if (vertex3 == null)
+            {
+                return this.TryGetEdge(out matchingEdge, new Vertex(vertex1), new Vertex(vertex2));
+            }
+
+            return this.TryGetEdge(out matchingEdge, new Vertex(vertex1), new Vertex(vertex2), new Vertex(vertex3));
+        }
+
+        /// <summary>
+        /// Returns an edge from this graph with specific vertices, if existing.
+        /// </summary>
+        /// <param name="matchingEdge">The edge with specific vertices (null if none was existing)</param>
+        /// <param name="vertex1">First vertex of edge.</param>
+        /// <param name="vertex2">Second vertex of edge.</param>
+        /// <param name="vertex3">Third vertex of edge (null if edge is twosided)</param>
+        /// <returns>True, if edge could be found, false if not.</returns>
+        public bool TryGetEdge(out HyperEdge matchingEdge, Vertex vertex1, Vertex vertex2, Vertex vertex3 = null)
+        {
+            IEnumerable<HyperEdge> possibleEdges = (vertex3 == null) ? this.Edges.Where(e => e.IsTwoSidedEdge()) : this.Edges.Where(e => e.IsThreeSidedEdge());
+
+            matchingEdge = null;
+            IEnumerable<HyperEdge> matchingEdges = null;
+            if (vertex3 == null)
+            {
+                matchingEdges = possibleEdges.Where(e => e.Vertices[0].EqualsOnValueBasis(vertex1) && e.Vertices[1].EqualsOnValueBasis(vertex2));
+            }
+            else
+            {
+                matchingEdges = possibleEdges.Where(e => e.Vertices[0].EqualsOnValueBasis(vertex1) && e.Vertices[1].EqualsOnValueBasis(vertex2) && e.Vertices[2].EqualsOnValueBasis(vertex3));
+            }
+
+            if (matchingEdges.Count() > 1)
+            {
+                throw new ArgumentException($"More than one Edge with Vertices ({vertex1}, {vertex2}, {vertex3}) where found.");
+            }
+
+            if (matchingEdges.Count() < 1)
+            {
+                return false;
+            }
+
+            // At this point it is clear, that only one edge was found.
+            matchingEdge = matchingEdges.First();
+            return true;
         }
         #endregion
 
@@ -432,34 +542,71 @@ namespace GraphKI.GraphSuite
             }
         }
 
-        //public bool IsPartOfHexagon(HyperEdge edge, out List<List<Tuple<HyperEdge, Vertex>>> cycles)
-        //{
-        //    if (!edge.IsThreeSidedEdge())
-        //    {
-        //        throw new ArgumentException($"Edge: '{edge}' is not three sided.");
-        //    }
+        public bool IsPartOfHexagon(HyperEdge edge, out List<Hexagon> hexagons)
+        {
+            if (!edge.IsThreeSidedEdge())
+            {
+                throw new ArgumentException($"Edge: '{edge}' is not three sided.");
+            }
 
-        //    if (!this.Edges.Contains(edge))
-        //    {
-        //        throw new ArgumentException($"This Graph does not conatain an edge '{edge}'");
-        //    }
-        //}
+            if (!this.HasEdge(edge) || !this.TryGetEdge(out HyperEdge edgeGraphInstance, edge.Vertices[0], edge.Vertices[1], edge.Vertices[2]))
+            {
+                throw new ArgumentException($"This Graph does not conatain an edge '{edge}'");
+            }
 
-        //public void CheckForHexagon(
-        //    HyperEdge u,
-        //    HyperEdge p,
-        //    List<Tuple<HyperEdge, Vertex>> parent,
-        //    List<List<Tuple<HyperEdge, Vertex>>> cycles)
-        //{
-        //    IEnumerable<HyperEdge> threeSidedParents = parent.Select(x => x.Item1).Where(x => x.IsThreeSidedEdge());
+            hexagons = new List<Hexagon>();
+            List<TileFace> faces = new List<TileFace>() { TileFace.Left, TileFace.Right, TileFace.Bottom };
+            for (int i = 0; i < faces.Count; i++)
+            {
+                if (this.TryBuildHexagon(edgeGraphInstance, faces[i], out Hexagon hexagon))
+                {
+                    hexagons.Add(hexagon);
+                }
+            }
 
-        //    // Ein Hexagon kann nur 6 unterschiedliche Kanten enthalten.
-        //    if (u.IsThreeSidedEdge() && threeSidedParents.Count() >= 6 && parent.First().Item1 != u)
-        //    {
-        //        return;
-        //    }
-        //}
+            if (hexagons.Count() < 1)
+            {
+                return false;
+            }
 
-        
+            return true;
+        }
+
+        private bool TryBuildHexagon(HyperEdge edge, TileFace startingFace, out Hexagon hexagon)
+        {
+            Vertex outgoingVertex = edge.GetVertexOnSpecificSide(startingFace);
+            HyperEdge outgoingConnector = this.Edges.Where(e => e.IsTwoSidedEdge() && e.ContainsVertexOnValueBasis(outgoingVertex)).First();
+
+            hexagon = new Hexagon(edge, startingFace, outgoingConnector);
+            if (edge.DirectNeighbors.Count < 1)
+            {
+                return false;
+            }
+
+            HyperEdge possibleNextTile = edge.DirectNeighbors.Where(e => e.ContainsVertexOnValueBasis(outgoingConnector.GetNeighborVertices(outgoingConnector.GetEdgeVertexInstance(outgoingVertex)).First())).FirstOrDefault();
+
+            if (possibleNextTile == null)
+            {
+                return false;
+            }
+
+            while (!hexagon.IsComplete && possibleNextTile != null)
+            {
+                
+                TileFace nextOutgoingFace = hexagon.GetOutgoingFace(hexagon.GetNextPointerValue(), possibleNextTile.Orientation);
+                Vertex nextOutgoingVertex = possibleNextTile.GetVertexOnSpecificSide(nextOutgoingFace);
+                HyperEdge nextOutgiongConnector = this.Edges.Where(e => e.IsTwoSidedEdge() && e.ContainsVertexOnValueBasis(nextOutgoingVertex)).First();
+
+                if (!hexagon.TryAddToHexagon(possibleNextTile, nextOutgiongConnector))
+                {
+                    return false;
+                }
+
+                HyperEdge previousTile = hexagon.Triominos[hexagon.GetPreviousPointerValue()];
+                possibleNextTile = possibleNextTile.DirectNeighbors.Where(e => !e.Equals(previousTile) && e.ContainsVertexOnValueBasis(nextOutgiongConnector.GetNeighborVertices(nextOutgiongConnector.GetEdgeVertexInstance(nextOutgoingVertex)).First())).FirstOrDefault();
+            }
+
+            return hexagon.IsComplete;
+        }
     }
 }

@@ -21,6 +21,8 @@ namespace GraphKI.GraphSuite
         /// </summary>
         public TileOrientation Orientation { get; set; }
 
+        public List<HyperEdge> DirectNeighbors { get; private set; }
+
         /// <summary>
         /// Dictionary which stores the isVisited property for each vertex.
         /// </summary>
@@ -73,6 +75,7 @@ namespace GraphKI.GraphSuite
                 .ToDictionary(i => this.Vertices[i], i => false);
 
             this.Orientation = orientation;
+            this.DirectNeighbors = new List<HyperEdge>();
         }
         #endregion
 
@@ -210,6 +213,34 @@ namespace GraphKI.GraphSuite
             }
 
             return this.Vertices.Where(v => !v.EqualsOnEdgeBasis(vertex)).ToArray();
+        }
+        #endregion
+
+        #region AddDirectNeighbor
+        /// <summary>
+        ///  Adds a direct neigbor for this edge.
+        /// </summary>
+        /// <param name="edge"></param>
+        /// <returns>True if neighbor could be added, false if not.</returns>
+        public bool AddDirectNeighbor(HyperEdge edge)
+        {
+            if (!edge.IsThreeSidedEdge())
+            {
+                throw new ArgumentException($"Only three-sided edges are allowed as DirectNeighbors. '{edge}' isn't three sided.");
+            }
+
+            if (this.DirectNeighbors.Contains(edge))
+            {
+                throw new ArgumentException($"'{edge}' is already set as direct neighbor.");
+            }
+
+            if (this.DirectNeighbors.Count() >= 3)
+            {
+                throw new ArgumentException($"This edge contains already three direct neighbors.");
+            }
+
+            this.DirectNeighbors.Add(edge);
+            return true;
         }
         #endregion
 
