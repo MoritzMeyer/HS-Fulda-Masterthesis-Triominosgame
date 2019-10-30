@@ -389,6 +389,15 @@ namespace GraphKI.GraphSuite
 
             return connectorOutgoingVertex.EqualsOnValueBasis(incomingVertex);
         }
+
+        public Hexagon DeepCopy()
+        {
+            Hexagon other = (Hexagon)this.MemberwiseClone();
+            other.Triominos = new List<HyperEdge>(this.Triominos);
+            other.TriominoOutgoingFaces = new List<TileFace>(this.TriominoOutgoingFaces);
+            other.outgoingConnectors = new List<HyperEdge>(this.outgoingConnectors);
+            return other;
+        }
         #endregion
     }
 }

@@ -558,7 +558,13 @@ namespace GraphKI.GraphSuite
             List<TileFace> faces = new List<TileFace>() { TileFace.Left, TileFace.Right, TileFace.Bottom };
             for (int i = 0; i < faces.Count; i++)
             {
-                if (this.TryBuildHexagon(edgeGraphInstance, faces[i], out Hexagon hexagon))
+                //if (this.TryBuildHexagon(edgeGraphInstance, faces[i], out Hexagon hexagon))
+                //{
+                //    hexagons.Add(hexagon);
+                //}
+
+                Hexagon hexagon = null;
+                if (this.TryBuildHexagonRec(edgeGraphInstance, faces[i], ref hexagon))
                 {
                     hexagons.Add(hexagon);
                 }
@@ -583,30 +589,120 @@ namespace GraphKI.GraphSuite
                 return false;
             }
 
-            HyperEdge possibleNextTile = edge.DirectNeighbors.Where(e => e.ContainsVertexOnValueBasis(outgoingConnector.GetNeighborVertices(outgoingConnector.GetEdgeVertexInstance(outgoingVertex)).First())).FirstOrDefault();
+            IEnumerable<HyperEdge> possibleNextTiles = edge.DirectNeighbors
+                .Where(e => e.ContainsVertexOnValueBasis(outgoingConnector.GetNeighborVertices(outgoingConnector.GetEdgeVertexInstance(outgoingVertex)).First()));
+                //.FirstOrDefault();
 
-            if (possibleNextTile == null)
+            if (possibleNextTiles.Count() < 1)
             {
                 return false;
             }
 
-            while (!hexagon.IsComplete && possibleNextTile != null)
+            bool tileAdded = true;
+            while (!hexagon.IsComplete && tileAdded)
             {
-                
-                TileFace nextOutgoingFace = hexagon.GetOutgoingFace(hexagon.GetNextPointerValue(), possibleNextTile.Orientation);
-                Vertex nextOutgoingVertex = possibleNextTile.GetVertexOnSpecificSide(nextOutgoingFace);
-                HyperEdge nextOutgiongConnector = this.Edges.Where(e => e.IsTwoSidedEdge() && e.ContainsVertexOnValueBasis(nextOutgoingVertex)).First();
+                tileAdded = false;
+                foreach (HyperEdge possibleNextTile in possibleNextTiles)
+                {
+                    TileFace nextOutgoingFace = TileFace.None;
+                    try
+                    {
+                        nextOutgoingFace = hexagon.GetOutgoingFace(hexagon.GetNextPointerValue(), possibleNextTile.Orientation);
+                    }
+                    catch(ArgumentException argEx)
+                    {
+                        continue;
+                    }
 
-                if (!hexagon.TryAddToHexagon(possibleNextTile, nextOutgiongConnector))
+                    if (!tileAdded && nextOutgoingFace != TileFace.None)
+                    {
+                        Vertex nextOutgoingVertex = possibleNextTile.GetVertexOnSpecificSide(nextOutgoingFace);
+                        HyperEdge nextOutgiongConnector = this.Edges.Where(e => e.IsTwoSidedEdge() && e.ContainsVertexOnValueBasis(nextOutgoingVertex)).First();
+
+                        if (hexagon.TryAddToHexagon(possibleNextTile, nextOutgiongConnector))
+                        {
+                            //HyperEdge previousTile = hexagon.Triominos[hexagon.GetPreviousPointerValue()];
+                            List<HyperEdge> possibleTileNeigbors = new List<HyperEdge>();
+                            foreach (HyperEdge neighbor in possibleNextTile.DirectNeighbors)
+                            {
+                                if (!hexagon.Triominos.Contains(neighbor))
+                                {
+                                    possibleTileNeigbors.Add(neighbor);
+                                }
+                            }
+
+                            possibleNextTiles = possibleTileNeigbors
+                                .Where(e => e.ContainsVertexOnValueBasis(nextOutgiongConnector.GetNeighborVertices(nextOutgiongConnector.GetEdgeVertexInstance(nextOutgoingVertex)).First()));
+
+                            //possibleNextTiles = possibleNextTile.DirectNeighbors
+                            //    .Where(e => !e.Equals(previousTile) && e.ContainsVertexOnValueBasis(nextOutgiongConnector.GetNeighborVertices(nextOutgiongConnector.GetEdgeVertexInstance(nextOutgoingVertex)).First()));
+                            //.FirstOrDefault();
+                            tileAdded = true;
+                        }
+                    }                    
+                }
+            }
+
+            return hexagon.IsComplete;
+        }
+
+
+
+        public bool TryBuildHexagonRec(HyperEdge nextTile, TileFace nextOutgoingFace, ref Hexagon hexagon)
+        {
+            Vertex nextOutgoingVertex = nextTile.GetVertexOnSpecificSide(nextOutgoingFace);
+            HyperEdge nextOutgoingConnector = this.Edges.Where(e => e.IsTwoSidedEdge() && e.ContainsVertexOnValueBasis(nextOutgoingVertex)).First();
+
+            if (hexagon == null || hexagon.Triominos.Count < 1)
+            {
+                hexagon = new Hexagon(nextTile, nextOutgoingFace, nextOutgoingConnector);
+            }
+            else
+            {
+                if (!hexagon.TryAddToHexagon(nextTile, nextOutgoingConnector))
                 {
                     return false;
                 }
 
-                HyperEdge previousTile = hexagon.Triominos[hexagon.GetPreviousPointerValue()];
-                possibleNextTile = possibleNextTile.DirectNeighbors.Where(e => !e.Equals(previousTile) && e.ContainsVertexOnValueBasis(nextOutgiongConnector.GetNeighborVertices(nextOutgiongConnector.GetEdgeVertexInstance(nextOutgoingVertex)).First())).FirstOrDefault();
+                if (hexagon.IsComplete)
+                {
+                    return true;
+                }
             }
 
-            return hexagon.IsComplete;
+            List<HyperEdge> possibleTileNeigbors = new List<HyperEdge>();
+            foreach (HyperEdge neighbor in nextTile.DirectNeighbors)
+            {
+                if (!hexagon.Triominos.Contains(neighbor))
+                {
+                    possibleTileNeigbors.Add(neighbor);
+                }
+            }
+
+            IEnumerable<HyperEdge> possibleNextTiles = possibleTileNeigbors
+                .Where(e => e.ContainsVertexOnValueBasis(nextOutgoingConnector.GetNeighborVertices(nextOutgoingConnector.GetEdgeVertexInstance(nextOutgoingVertex)).First()));
+
+            foreach (HyperEdge possibleNextTile in possibleNextTiles)
+            {
+                TileFace nextPossibleOutgoingFace = TileFace.None;
+                try
+                {
+                    nextPossibleOutgoingFace = hexagon.GetOutgoingFace(hexagon.GetNextPointerValue(), possibleNextTile.Orientation);
+                }
+                catch (ArgumentException argEx)
+                {
+                    continue;
+                }
+
+                Hexagon memHexagon = hexagon.DeepCopy();
+                if (this.TryBuildHexagonRec(possibleNextTile, nextPossibleOutgoingFace, ref memHexagon))
+                {
+                    hexagon = memHexagon;
+                    return true;
+                }
+            }
+
+            return false;
         }
     }
 }

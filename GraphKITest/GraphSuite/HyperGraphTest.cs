@@ -180,25 +180,185 @@ namespace GraphKITest.GraphSuite
             Assert.IsFalse(hyperGraph.IsPartOfHexagon(edge1, out hexagons));
             Assert.AreEqual(0, hexagons.Count);
 
-            hyperGraph.AddEdgeWithDirectNeighbor(edge2, edge1, out HyperEdge addedEdge2);
+            Assert.IsTrue(hyperGraph.AddEdgeWithDirectNeighbor(edge2, edge1, out HyperEdge addedEdge2));
             Assert.IsFalse(hyperGraph.IsPartOfHexagon(edge2, out hexagons));
             Assert.AreEqual(0, hexagons.Count);
 
-            hyperGraph.AddEdgeWithDirectNeighbor(edge3, edge2, out HyperEdge addedEdge3);
+            Assert.IsTrue(hyperGraph.AddEdgeWithDirectNeighbor(edge3, edge2, out HyperEdge addedEdge3));
             Assert.IsFalse(hyperGraph.IsPartOfHexagon(edge3, out hexagons));
             Assert.AreEqual(0, hexagons.Count);
 
-            hyperGraph.AddEdgeWithDirectNeighbor(edge4, edge3, out HyperEdge addedEdge4);
+            Assert.IsTrue(hyperGraph.AddEdgeWithDirectNeighbor(edge4, edge3, out HyperEdge addedEdge4));
             Assert.IsFalse(hyperGraph.IsPartOfHexagon(edge4, out hexagons));
             Assert.AreEqual(0, hexagons.Count);
 
-            hyperGraph.AddEdgeWithDirectNeighbor(edge5, edge4, out HyperEdge addedEdge5);
+            Assert.IsTrue(hyperGraph.AddEdgeWithDirectNeighbor(edge5, edge4, out HyperEdge addedEdge5));
             Assert.IsFalse(hyperGraph.IsPartOfHexagon(edge5, out hexagons));
             Assert.AreEqual(0, hexagons.Count);
 
-            hyperGraph.AddEdgeWithDirectNeighbor(edge6, edge5, out HyperEdge addedEdge6);
+            Assert.IsTrue(hyperGraph.AddEdgeWithDirectNeighbor(edge6, edge5, out HyperEdge addedEdge6));
             addedEdge6.AddDirectNeighbor(addedEdge1);
             Assert.IsTrue(hyperGraph.IsPartOfHexagon(edge6, out hexagons));
+            Assert.AreEqual(1, hexagons.Count);
+
+            //-----------------------------------------------------------------------------------
+            hyperGraph = new HyperGraph(vertices);
+            foreach (HyperEdge twoSidedEdge in twoSidedEdges)
+            {
+                hyperGraph.AddEdge(twoSidedEdge);
+            }
+
+            addedEdge2 = hyperGraph.AddEdge(edge2);
+            Assert.IsFalse(hyperGraph.IsPartOfHexagon(edge2, out hexagons));
+            Assert.AreEqual(0, hexagons.Count);
+
+            Assert.IsTrue(hyperGraph.AddEdgeWithDirectNeighbor(edge3, edge2, out addedEdge3));
+            Assert.IsFalse(hyperGraph.IsPartOfHexagon(edge3, out hexagons));
+            Assert.AreEqual(0, hexagons.Count);
+
+            Assert.IsTrue(hyperGraph.AddEdgeWithDirectNeighbor(edge4, edge3, out addedEdge4));
+            Assert.IsFalse(hyperGraph.IsPartOfHexagon(edge4, out hexagons));
+            Assert.AreEqual(0, hexagons.Count);
+
+            Assert.IsTrue(hyperGraph.AddEdgeWithDirectNeighbor(edge5, edge4, out addedEdge5));
+            Assert.IsFalse(hyperGraph.IsPartOfHexagon(edge5, out hexagons));
+            Assert.AreEqual(0, hexagons.Count);
+
+            Assert.IsTrue(hyperGraph.AddEdgeWithDirectNeighbor(edge6, edge5, out addedEdge6));
+            Assert.IsFalse(hyperGraph.IsPartOfHexagon(edge6, out hexagons));
+            Assert.AreEqual(0, hexagons.Count);
+
+            Assert.IsTrue(hyperGraph.AddEdgeWithDirectNeighbor(edge1, edge6, out addedEdge1));
+            addedEdge1.AddDirectNeighbor(addedEdge2);
+            Assert.IsTrue(hyperGraph.IsPartOfHexagon(edge1, out hexagons));
+            Assert.AreEqual(1, hexagons.Count);
+
+            //-----------------------------------------------------------------------------------
+            hyperGraph = new HyperGraph(vertices);
+            foreach (HyperEdge twoSidedEdge in twoSidedEdges)
+            {
+                hyperGraph.AddEdge(twoSidedEdge);
+            }
+
+            addedEdge3 = hyperGraph.AddEdge(edge3);
+            Assert.IsFalse(hyperGraph.IsPartOfHexagon(edge3, out hexagons));
+            Assert.AreEqual(0, hexagons.Count);
+
+            Assert.IsTrue(hyperGraph.AddEdgeWithDirectNeighbor(edge4, edge3, out addedEdge4));
+            Assert.IsFalse(hyperGraph.IsPartOfHexagon(edge4, out hexagons));
+            Assert.AreEqual(0, hexagons.Count);
+
+            Assert.IsTrue(hyperGraph.AddEdgeWithDirectNeighbor(edge5, edge4, out addedEdge5));
+            Assert.IsFalse(hyperGraph.IsPartOfHexagon(edge5, out hexagons));
+            Assert.AreEqual(0, hexagons.Count);
+
+            Assert.IsTrue(hyperGraph.AddEdgeWithDirectNeighbor(edge6, edge5, out addedEdge6));
+            Assert.IsFalse(hyperGraph.IsPartOfHexagon(edge6, out hexagons));
+            Assert.AreEqual(0, hexagons.Count);
+
+            Assert.IsTrue(hyperGraph.AddEdgeWithDirectNeighbor(edge1, edge6, out addedEdge1));
+            Assert.IsFalse(hyperGraph.IsPartOfHexagon(edge1, out hexagons));
+            Assert.AreEqual(0, hexagons.Count);
+
+            Assert.IsTrue(hyperGraph.AddEdgeWithDirectNeighbor(edge2, edge1, out addedEdge2));
+            addedEdge2.AddDirectNeighbor(addedEdge3);
+            Assert.IsTrue(hyperGraph.IsPartOfHexagon(edge2, out hexagons));
+            Assert.AreEqual(1, hexagons.Count);
+
+            //-----------------------------------------------------------------------------------
+            hyperGraph = new HyperGraph(vertices);
+            foreach (HyperEdge twoSidedEdge in twoSidedEdges)
+            {
+                hyperGraph.AddEdge(twoSidedEdge);
+            }
+
+            addedEdge4 = hyperGraph.AddEdge(edge4);
+            Assert.IsFalse(hyperGraph.IsPartOfHexagon(edge4, out hexagons));
+            Assert.AreEqual(0, hexagons.Count);
+
+            Assert.IsTrue(hyperGraph.AddEdgeWithDirectNeighbor(edge5, edge4, out addedEdge5));
+            Assert.IsFalse(hyperGraph.IsPartOfHexagon(edge5, out hexagons));
+            Assert.AreEqual(0, hexagons.Count);
+
+            Assert.IsTrue(hyperGraph.AddEdgeWithDirectNeighbor(edge6, edge5, out addedEdge6));
+            Assert.IsFalse(hyperGraph.IsPartOfHexagon(edge6, out hexagons));
+            Assert.AreEqual(0, hexagons.Count);
+
+            Assert.IsTrue(hyperGraph.AddEdgeWithDirectNeighbor(edge1, edge6, out addedEdge1));
+            Assert.IsFalse(hyperGraph.IsPartOfHexagon(edge1, out hexagons));
+            Assert.AreEqual(0, hexagons.Count);
+
+            Assert.IsTrue(hyperGraph.AddEdgeWithDirectNeighbor(edge2, edge1, out addedEdge2));
+            Assert.IsFalse(hyperGraph.IsPartOfHexagon(edge2, out hexagons));
+            Assert.AreEqual(0, hexagons.Count);
+
+            Assert.IsTrue(hyperGraph.AddEdgeWithDirectNeighbor(edge3, edge2, out addedEdge3));
+            addedEdge3.AddDirectNeighbor(addedEdge4);
+            Assert.IsTrue(hyperGraph.IsPartOfHexagon(edge3, out hexagons));
+            Assert.AreEqual(1, hexagons.Count);
+
+            //-----------------------------------------------------------------------------------
+            hyperGraph = new HyperGraph(vertices);
+            foreach (HyperEdge twoSidedEdge in twoSidedEdges)
+            {
+                hyperGraph.AddEdge(twoSidedEdge);
+            }
+
+            addedEdge5 = hyperGraph.AddEdge(edge5);
+            Assert.IsFalse(hyperGraph.IsPartOfHexagon(edge5, out hexagons));
+            Assert.AreEqual(0, hexagons.Count);
+
+            Assert.IsTrue(hyperGraph.AddEdgeWithDirectNeighbor(edge6, edge5, out addedEdge6));
+            Assert.IsFalse(hyperGraph.IsPartOfHexagon(edge6, out hexagons));
+            Assert.AreEqual(0, hexagons.Count);
+
+            Assert.IsTrue(hyperGraph.AddEdgeWithDirectNeighbor(edge1, edge6, out addedEdge1));
+            Assert.IsFalse(hyperGraph.IsPartOfHexagon(edge1, out hexagons));
+            Assert.AreEqual(0, hexagons.Count);
+
+            Assert.IsTrue(hyperGraph.AddEdgeWithDirectNeighbor(edge2, edge1, out addedEdge2));
+            Assert.IsFalse(hyperGraph.IsPartOfHexagon(edge2, out hexagons));
+            Assert.AreEqual(0, hexagons.Count);
+
+            Assert.IsTrue(hyperGraph.AddEdgeWithDirectNeighbor(edge3, edge2, out addedEdge3));
+            Assert.IsFalse(hyperGraph.IsPartOfHexagon(edge3, out hexagons));
+            Assert.AreEqual(0, hexagons.Count);
+
+            Assert.IsTrue(hyperGraph.AddEdgeWithDirectNeighbor(edge4, edge3, out addedEdge4));
+            addedEdge4.AddDirectNeighbor(addedEdge5);
+            Assert.IsTrue(hyperGraph.IsPartOfHexagon(edge4, out hexagons));
+            Assert.AreEqual(1, hexagons.Count);
+
+            //-----------------------------------------------------------------------------------
+            hyperGraph = new HyperGraph(vertices);
+            foreach (HyperEdge twoSidedEdge in twoSidedEdges)
+            {
+                hyperGraph.AddEdge(twoSidedEdge);
+            }
+
+            addedEdge6 = hyperGraph.AddEdge(edge6);
+            Assert.IsFalse(hyperGraph.IsPartOfHexagon(edge6, out hexagons));
+            Assert.AreEqual(0, hexagons.Count);
+
+            Assert.IsTrue(hyperGraph.AddEdgeWithDirectNeighbor(edge1, edge6, out addedEdge1));
+            Assert.IsFalse(hyperGraph.IsPartOfHexagon(edge1, out hexagons));
+            Assert.AreEqual(0, hexagons.Count);
+
+            Assert.IsTrue(hyperGraph.AddEdgeWithDirectNeighbor(edge2, edge1, out addedEdge2));
+            Assert.IsFalse(hyperGraph.IsPartOfHexagon(edge2, out hexagons));
+            Assert.AreEqual(0, hexagons.Count);
+
+            Assert.IsTrue(hyperGraph.AddEdgeWithDirectNeighbor(edge3, edge2, out addedEdge3));
+            Assert.IsFalse(hyperGraph.IsPartOfHexagon(edge3, out hexagons));
+            Assert.AreEqual(0, hexagons.Count);
+
+            Assert.IsTrue(hyperGraph.AddEdgeWithDirectNeighbor(edge4, edge3, out addedEdge4));
+            Assert.IsFalse(hyperGraph.IsPartOfHexagon(edge4, out hexagons));
+            Assert.AreEqual(0, hexagons.Count);
+
+            Assert.IsTrue(hyperGraph.AddEdgeWithDirectNeighbor(edge5, edge4, out addedEdge5));
+            addedEdge5.AddDirectNeighbor(addedEdge6);
+            Assert.IsTrue(hyperGraph.IsPartOfHexagon(edge5, out hexagons));
             Assert.AreEqual(1, hexagons.Count);
         }
         #endregion
