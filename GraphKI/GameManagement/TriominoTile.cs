@@ -1,4 +1,5 @@
 ﻿using GraphKI.Extensions;
+using GraphKI.GraphSuite;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -58,5 +59,11 @@ namespace GraphKI.GameManagement
             return name.IsTriominoTileName();
         }
         #endregion
+
+        public HyperEdge CreateHyperEdgeFromTile()
+        {
+            string[] nameParts = this.Name.Split('-');
+            return new HyperEdge(nameParts[0] + nameParts[1], nameParts[1] + nameParts[2], nameParts[2] + nameParts[0], this.Orientation);
+        }
     }
 }

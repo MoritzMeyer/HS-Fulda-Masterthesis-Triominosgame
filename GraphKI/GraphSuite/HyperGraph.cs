@@ -194,34 +194,50 @@ namespace GraphKI.GraphSuite
         /// <param name="vertex1">First vertex of new Edge.</param>
         /// <param name="vertex2">Second vertex of new Edge.</param>
         /// <param name="vertex3">Third vertex of new Edge.</param>
-        /// <param name="directNeigbor">The direct Neighbor of new edge.</param>
+        /// <param name="directNeighbor">The direct Neighbor of new edge.</param>
         /// <param name="edge">The added edge.</param>
         /// <returns>True if edge with neighbor could be added, false if not.</returns>
-        public bool AddEdgeWithDirectNeighbor(HyperEdge edge, HyperEdge directNeigbor, out HyperEdge addedEdge)
+        public bool AddEdgeWithDirectNeighbor(HyperEdge edge, HyperEdge directNeighbor, out HyperEdge addedEdge)
+        {
+            return this.AddEdgeWithDirectNeighbors(edge, new List<HyperEdge>() { directNeighbor }, out addedEdge);
+        }
+        #endregion
+
+        public bool AddEdgeWithDirectNeighbors(HyperEdge edge, IEnumerable<HyperEdge> directNeighbors, out HyperEdge addedEdge)
         {
             addedEdge = null;
-            if (!directNeigbor.IsThreeSidedEdge())
+            List<HyperEdge> directNeighborInstances = new List<HyperEdge>();
+            foreach (HyperEdge directNeighbor in directNeighbors)
             {
-                throw new ArgumentException($"DirectNeighbor has to be three-sided ('{directNeigbor}' isn't.");
-            }
+                if (!directNeighbor.IsThreeSidedEdge())
+                {
+                    throw new ArgumentException($"DirectNeighbor has to be three-sided ('{directNeighbor}' isn't.");
+                }
 
-            if (!this.HasEdge(directNeigbor))
-            {
-                return false;
-            }
+                if (!this.HasEdge(directNeighbor))
+                {
+                    return false;
+                }
 
-            if (!this.TryGetEdge(out HyperEdge directNeigborGraphInstance, directNeigbor.Vertices[0], directNeigbor.Vertices[1], directNeigbor.Vertices[2]))
-            {
-                throw new ArgumentException($"Could not get Graph-Edge-Instance of '{directNeigbor}', although it exists within this graph.");
+                if (!this.TryGetEdge(out HyperEdge directNeighborInstance, directNeighbor.Vertices[0], directNeighbor.Vertices[1], directNeighbor.Vertices[2]))
+                {
+                    throw new ArgumentException($"Could not get Graph-Edge-Instance of '{directNeighbor}', although it exists within this graph.");
+                }
+
+                directNeighborInstances.Add(directNeighborInstance);
             }
+            
 
             addedEdge = this.AddEdge(edge);
-            addedEdge.AddDirectNeighbor(directNeigborGraphInstance);
-            directNeigborGraphInstance.AddDirectNeighbor(addedEdge);
+
+            foreach (HyperEdge directNeighborInstance in directNeighborInstances)
+            {
+                addedEdge.AddDirectNeighbor(directNeighborInstance);
+                directNeighborInstance.AddDirectNeighbor(addedEdge);
+            }            
 
             return true;
         }
-        #endregion
 
         #region TryGetEdge
         /// <summary>

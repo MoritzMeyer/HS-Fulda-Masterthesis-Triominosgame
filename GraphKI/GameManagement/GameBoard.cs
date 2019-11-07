@@ -1,4 +1,5 @@
 ﻿using GraphKI.Extensions;
+using GraphKI.GraphSuite;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -33,6 +34,10 @@ namespace GraphKI.GameManagement
         /// Dictionary with all actual free faces on the gameboard.
         /// </summary>
         public Dictionary<string, List<TileFace>> tilesWithFreeFaces;
+
+        private readonly int maxGameBoardSize = 56;
+
+        private readonly HyperGraph tileGraph;
         #endregion
 
         #region ctor
@@ -41,20 +46,32 @@ namespace GraphKI.GameManagement
         /// </summary>
         public GameBoard()
         {
-            this.InitTriominosGameBoard();
-        }
-        #endregion
-
-        #region InitTriominosGameBoard
-        /// <summary>
-        /// Initializes the GameBoard variables.
-        /// </summary>
-        public void InitTriominosGameBoard()
-        {
-            this.tileValueGrid = new int?[57, 57];
-            this.tileGrid = new TriominoTile[56, 56];
+            this.tileValueGrid = new int?[this.maxGameBoardSize + 1, this.maxGameBoardSize + 1];
+            this.tileGrid = new TriominoTile[this.maxGameBoardSize, this.maxGameBoardSize];
             this.NumbTilesOnBoard = 0;
             this.tilesWithFreeFaces = new Dictionary<string, List<TileFace>>();
+
+            List<Vertex> vertices = new List<Vertex>();
+            List<HyperEdge> twoSidedEdges = new List<HyperEdge>();
+            for (int i = 0; i < 6; i++)
+            {
+                for (int j = i; j < 6; j++)
+                {
+                    vertices.Add(new Vertex(i + "" + j));
+                    if (i != j)
+                    {
+                        vertices.Add(new Vertex(j + "" + i));
+                    }
+
+                    twoSidedEdges.Add(new HyperEdge(i + "" + j, j + "" + i));
+                }
+            }
+
+            tileGraph = new HyperGraph(vertices);
+            foreach (HyperEdge twoSidedEdge in twoSidedEdges)
+            {
+                tileGraph.AddEdge(twoSidedEdge);
+            }
         }
         #endregion
 
@@ -93,7 +110,7 @@ namespace GraphKI.GameManagement
             // if it's the first tile it can always be placed.
             if (this.NumbTilesOnBoard == 0)
             {
-                placableTile = new TriominoTile(tileName, TileOrientation.Straight, new Point(23, 23));
+                placableTile = new TriominoTile(tileName, TileOrientation.Straight, new Point(this.maxGameBoardSize/2, this.maxGameBoardSize/2));
                 return true;
             }
 
@@ -273,14 +290,17 @@ namespace GraphKI.GameManagement
         /// Adds a tile on the GameBoard, based on the tiles Value, another Tile on the GameBoard besides which the new Tile should be placed
         /// and the faces with which both tiles should be placed towards each other.
         /// </summary>
+        /// <param name="player">Der PlayerCode des aktiven Spielers.</param>
         /// <param name="tileName">The new tile.</param>
+        /// <param name="hexagons">Die Liste mit Hexagonen, falls vorhanden.</param>
         /// <param name="otherName">The other tile besides which the new tile should be placed.</param>
         /// <param name="tileFace">The new tiles face wich points to the other tile.</param>
         /// <param name="otherFace">The other tiles face which points to the new tile.</param>
         /// <returns>True if tile could be added, false if not</returns>
-        public bool TryAddTile(PlayerCode player, string tileName, string otherName = null, TileFace? tileFace = null, TileFace? otherFace = null)
+        public bool TryAddTile(PlayerCode player, string tileName, out List<Hexagon> hexagons, string otherName = null, TileFace? tileFace = null, TileFace? otherFace = null)
         {
             tileName.EnsureTriominoTileName();
+            hexagons = new List<Hexagon>();
 
             if (!this.CanPlaceTileOnGameBoard(tileName, otherName, tileFace, otherFace, out TriominoTile placeableTile))
             {
@@ -289,6 +309,11 @@ namespace GraphKI.GameManagement
 
             this.AddTile(placeableTile);
             this.AddFreeFaces(tileName, otherName, tileFace, otherFace);
+
+            IEnumerable<TriominoTile> directNeighbors = this.GetTileNeighbors(placeableTile);
+            this.tileGraph.AddEdgeWithDirectNeighbors(placeableTile.CreateHyperEdgeFromTile(), directNeighbors.Select(n => n.CreateHyperEdgeFromTile()), out HyperEdge addedEdge);
+            this.tileGraph.IsPartOfHexagon(addedEdge, out hexagons);
+
             this.OnTilePlaced(new TriominoTileEventArgs()
             {
                 TileName = tileName,
@@ -301,6 +326,32 @@ namespace GraphKI.GameManagement
             return true;
         }
         #endregion
+
+        private IEnumerable<TriominoTile> GetTileNeighbors(TriominoTile tile)
+        {
+            // No Checks for Arraybounds, cause this should create an Exception (so, the bounds can be enlargened then).
+            List<TriominoTile> neighbors = new List<TriominoTile>();
+            Point tileGridPosition = this.GetTileCoordsByName(tile.Name);
+
+            // Add neighbors from both tile sides (left and right, according to orientation)
+            neighbors.Add(this.tileGrid[tileGridPosition.Y, tileGridPosition.X - 1]);
+            neighbors.Add(this.tileGrid[tileGridPosition.Y, tileGridPosition.X + 1]);
+
+            if (tile.Orientation.ToArrayTileOrientation() == ArrayTileOrientation.BottomUp)
+            {
+                // Bottom
+                neighbors.Add(this.tileGrid[tileGridPosition.Y + 1, tileGridPosition.X]);
+            }
+
+            if (tile.Orientation.ToArrayTileOrientation() == ArrayTileOrientation.TopDown)
+            {
+                // Top
+                neighbors.Add(this.tileGrid[tileGridPosition.Y - 1, tileGridPosition.X]);
+            }
+
+            neighbors = neighbors.Where(n => n != null).ToList();
+            return neighbors;
+        }
 
         #region AddTile
         /// <summary>

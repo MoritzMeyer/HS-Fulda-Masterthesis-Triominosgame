@@ -1,5 +1,6 @@
 ﻿using GraphKI.AIManagement;
 using GraphKI.Extensions;
+using GraphKI.GraphSuite;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -96,6 +97,13 @@ namespace GraphKI.GameManagement
             {
                 this.TestScene = gameMode;
                 testScene = 1;
+                gameMode = GameMode.TwoPlayer;
+            }
+
+            if (gameMode == GameMode.TestScene2)
+            {
+                this.TestScene = gameMode;
+                testScene = 2;
                 gameMode = GameMode.TwoPlayer;
             }
 
@@ -236,9 +244,19 @@ namespace GraphKI.GameManagement
 
             if (!this.HasPlaced && 
                 this.GetActivePlayersDrawBoard().TryRemoveTile(tileName) && 
-                this.GameBoard.TryAddTile(this.ActivePlayer, tileName, otherName, tileFace, otherFace))
+                this.GameBoard.TryAddTile(this.ActivePlayer, tileName, out List<Hexagon> hexagons, otherName, tileFace, otherFace))
             {               
                 this.PlayerPoints[this.ActivePlayer] += tileName.GetTriominoTileValue();
+
+                if (hexagons.Count == 1)
+                {
+                    this.PlayerPoints[this.ActivePlayer] += 50;
+                }
+                else if (hexagons.Count > 1)
+                {
+                    this.PlayerPoints[this.ActivePlayer] += 70;
+                }
+
                 this.HasPlaced = true;
                 this.NextTurn();
                 return true;
@@ -609,6 +627,9 @@ namespace GraphKI.GameManagement
                 case 1:
                     this.DrawTilesForTestScene1();
                     break;
+                case 2:
+                    this.DrawTilesForTestScene2();
+                    break;
                 default:
                     return;
             }
@@ -639,12 +660,40 @@ namespace GraphKI.GameManagement
             this.DrawSpecificTile(tile9, this.DrawBoards[PlayerCode.Player2]);
         }
 
+        private void DrawTilesForTestScene2()
+        {
+            string tile0 = "0-0-0"; //1
+            string tile1 = "0-0-2"; //2
+            string tile2 = "0-2-2"; //1
+            string tile3 = "0-1-2"; //2
+            string tile4 = "0-1-1"; //1
+            string tile5 = "0-0-1"; //2
+            string tile6 = "0-2-4"; //1
+            string tile7 = "0-4-5"; //2
+            string tile8 = "0-5-5"; //1
+            string tile9 = "0-0-5"; //2
+
+            this.DrawSpecificTile(tile0, this.DrawBoards[PlayerCode.Player1]);
+            this.DrawSpecificTile(tile1, this.DrawBoards[PlayerCode.Player2]);
+            this.DrawSpecificTile(tile2, this.DrawBoards[PlayerCode.Player1]);
+            this.DrawSpecificTile(tile3, this.DrawBoards[PlayerCode.Player2]);
+            this.DrawSpecificTile(tile4, this.DrawBoards[PlayerCode.Player1]);
+            this.DrawSpecificTile(tile5, this.DrawBoards[PlayerCode.Player2]);
+            this.DrawSpecificTile(tile6, this.DrawBoards[PlayerCode.Player1]);
+            this.DrawSpecificTile(tile7, this.DrawBoards[PlayerCode.Player2]);
+            this.DrawSpecificTile(tile8, this.DrawBoards[PlayerCode.Player1]);
+            this.DrawSpecificTile(tile9, this.DrawBoards[PlayerCode.Player2]);
+        }
+
         private void InitTestScene()
         {
             switch(this.TestScene)
             {
                 case GameMode.TestScene1:
                     this.InitTestScene1();
+                    break;
+                case GameMode.TestScene2:
+                    this.InitTestScene2();
                     break;
                 default:
                     return;
@@ -662,6 +711,22 @@ namespace GraphKI.GameManagement
             this.TryPlaceOnGameBoard("3-3-3", "3-3-4", TileFace.Bottom, TileFace.Right);
             this.TryPlaceOnGameBoard("2-3-3", "3-3-3", TileFace.Bottom, TileFace.Left);
             this.TryPlaceOnGameBoard("1-2-3", "2-3-3", TileFace.Bottom, TileFace.Left);
+        }
+
+        private void InitTestScene2()
+        {
+            this.ActivePlayer = PlayerCode.Player2;
+            this.TryPlaceOnGameBoard("0-0-2"); //2
+            this.TryPlaceOnGameBoard("0-2-2", "0-0-2", TileFace.Left, TileFace.Bottom); //1
+            this.TryPlaceOnGameBoard("0-1-2", "0-2-2", TileFace.Left, TileFace.Right); //2
+            this.TryPlaceOnGameBoard("0-1-1", "0-1-2", TileFace.Left, TileFace.Right); //1
+            this.TryPlaceOnGameBoard("0-0-1", "0-1-1", TileFace.Left, TileFace.Right); //2
+            this.TryPlaceOnGameBoard("0-2-4", "0-0-2", TileFace.Right, TileFace.Left); //1
+            this.TryPlaceOnGameBoard("0-4-5", "0-2-4", TileFace.Right, TileFace.Left); //2
+            this.TryPlaceOnGameBoard("0-5-5", "0-4-5", TileFace.Right, TileFace.Left); //1
+            this.TryPlaceOnGameBoard("0-0-5", "0-5-5", TileFace.Bottom, TileFace.Left); //2
+
+            //this.TryPlaceOnGameBoard("0-0-2", "0-0-0", TileFace.Right, TileFace.Right); //1
         }
     }
 }

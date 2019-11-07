@@ -36,7 +36,7 @@ namespace GraphKITest.GraphSuite
         }
 
         [TestMethod]
-        [Ignore]
+        //[Ignore]
         public void HyperGraph_GetAllCycles_has_to_work()
         {
             string path = Path.Combine(Directory.GetParent(Directory.GetCurrentDirectory()).Parent.Parent.FullName, "TestFiles", "tEdgeGraph.txt");

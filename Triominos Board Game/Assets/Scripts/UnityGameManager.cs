@@ -43,7 +43,7 @@ public class UnityGameManager : MonoBehaviour
     #endregion
 
     #region Update
-    private void Update()
+    void Update()
     {
         this.player1Score.text = PlayerCode.Player1 + ": " + this.GameManager.PlayerPoints[PlayerCode.Player1];
         this.player2Score.text = PlayerCode.Player2 + ": " + this.GameManager.PlayerPoints[PlayerCode.Player2];
