@@ -45,7 +45,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   boardManager: {fileID: 0}
-  GameMode: 5
+  GameMode: 1
   player1Score: {fileID: 0}
   player2Score: {fileID: 0}
   PlayWithAI: 0

@@ -177,5 +177,20 @@ namespace GraphSuite
         {
             return "-" + this.Vertices.Aggregate((a, b) => a.GetVertexValue() + "-" + b.GetVertexValue()) + "->";
         }
+
+        public int BlueSideCount()
+        {
+            return this.Vertices.Where(v => v.IsBlueSide()).Count();
+        }
+
+        public int GreenSideCount()
+        {
+            return this.Vertices.Where(v => v.IsGreenSide()).Count();
+        }
+
+        public int RedSideCount()
+        {
+            return this.Vertices.Where(v => v.IsRedSide()).Count();
+        }
     }
 }
