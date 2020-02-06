@@ -61,6 +61,7 @@
     <Compile Include="GraphSuite\HyperEdge.cs" />
     <Compile Include="GraphSuite\HyperGraph.cs" />
     <Compile Include="GraphSuite\Vertex.cs" />
+    <Compile Include="GraphSuite\VertexColor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

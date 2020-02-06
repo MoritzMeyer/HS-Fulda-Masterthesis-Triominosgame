@@ -125,6 +125,9 @@ namespace GraphSuiteTest
             Tuple<string, int>[] degrees = hyperGraph.GetVertexEulerDegrees();
 
             Dictionary<HyperEdge, float> probabilities = new Dictionary<HyperEdge, float>();
+
+            int blueBlueBlueValues,  greenGreenRedValues,  greenBlueRedValues;
+            blueBlueBlueValues = greenGreenRedValues = greenBlueRedValues = 0;
             
             foreach(HyperEdge edge in hyperGraph.Edges)
             {
@@ -151,10 +154,29 @@ namespace GraphSuiteTest
                 //float ws = (float)tileSideWs/168.0f;
                 float ws = (float)tileSideWs/56.0f;
                 probabilities.Add(edge, ws);
+
+                switch(edge.Vertices.Select(v => v.GetVertexColor()).Distinct().Count())
+                {
+                    case 1:
+                        blueBlueBlueValues += edge.Vertices.Select(v => Int32.Parse(v.GetVertexValue()[0].ToString())).Sum();
+                        break;
+                    case 2:
+                        greenGreenRedValues += edge.Vertices.Select(v => Int32.Parse(v.GetVertexValue()[0].ToString())).Sum();
+                        break;
+                    case 3:
+                        greenBlueRedValues += edge.Vertices.Select(v => Int32.Parse(v.GetVertexValue()[0].ToString())).Sum();
+                        break;
+                    default:
+                        throw new InvalidOperationException($"Cannot determine SideType for Tile: {edge.Vertices.Select(v => v.GetVertexValue()[0].ToString()).Aggregate((a,b) => a + " - " + b)}");
+                }
+
+                //45 / 6 => 7.5
+                //150 / 20 => 7.5
+                //225 / 30 => 7.5
             }
 
             string outputPath = @"C:\Users\Moritz\Dropbox\Studium\Fulda\5_SS19\Project\Triominos\Graphsuite\GraphSuite\Files";
-            string outputFile = "tileProbabilitiesOnTileBasisCorrect.txt";
+            string outputFile = "tileProbabilitiesAndValues.txt";
 
             if (File.Exists(Path.Combine(outputPath, outputFile)))
             {
@@ -165,6 +187,7 @@ namespace GraphSuiteTest
                 Path.Combine(outputPath, outputFile), 
                 probabilities.OrderBy(kv => kv.Key.GreenSideCount()).Select(
                     kv => kv.Key.Vertices.Select(v => v.GetVertexValue()[0].ToString()).Aggregate((a, b) => a + "-" + b) + " | " + 
+                    kv.Key.Vertices.Select(v => Int32.Parse(v.GetVertexValue()[0].ToString())).Sum() + " | " + 
                     kv.Key.Vertices.Select(v => v.GetVertexColor().ToString()).Aggregate((a, b) => a + "-" + b) + " | " + 
                     kv.Value));
         }

@@ -8,6 +8,6 @@ namespace GraphKI.GameManagement
 {
     public enum GameMode
     {
-        None, TwoPlayer, ThreePlayer, FourPlayer, TestScene1, TestScene2
+        None, TwoPlayer, ThreePlayer, FourPlayer, TestScene1, TestScene2, TestScene3
     }
 }

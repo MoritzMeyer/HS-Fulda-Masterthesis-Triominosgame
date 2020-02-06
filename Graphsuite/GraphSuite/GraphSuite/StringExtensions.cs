@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Text;
 
@@ -9,6 +10,11 @@ namespace GraphSuite
         public static string GetVertexValue(this string str)
         {
             return str.Replace("_", "");
+        }
+
+        public static int GetTileValue(this string str)
+        {
+            return str.Split('_').Select(v => Int32.Parse(v)).Sum();
         }
 
         public static string Reverse(this string str)

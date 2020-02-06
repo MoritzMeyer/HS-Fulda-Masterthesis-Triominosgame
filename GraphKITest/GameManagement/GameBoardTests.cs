@@ -202,5 +202,28 @@ namespace GraphKITest.GameManagement
             Assert.IsFalse(gameBoard.tilesWithFreeFaces["2-3-3"].Contains(TileFace.Left));
         }
         #endregion
+
+        [TestMethod]
+        public void GetAdjacentTileAtSpecificFace_has_to_work()
+        {
+            GameBoard gameBoard = new GameBoard();
+
+            gameBoard.tileGrid[25, 24] = new TriominoTile("0-0-1", TileOrientation.Straight, new Point(24, 25));
+            gameBoard.tileGrid[25, 26] = new TriominoTile("0-0-2", TileOrientation.Straight, new Point(26, 25));
+            gameBoard.tileGrid[24, 25] = new TriominoTile("0-0-3", TileOrientation.Straight, new Point(25, 24));
+            gameBoard.tileGrid[26, 25] = new TriominoTile("0-0-4", TileOrientation.Straight, new Point(25, 26));
+
+            TriominoTile tile = new TriominoTile("0-0-0", TileOrientation.Straight, new Point(25, 25));
+
+            Assert.AreEqual("0-0-1", gameBoard.GetAdjacentTileAtSpecificFace(tile, TileFace.Left).Name);
+            Assert.AreEqual("0-0-2", gameBoard.GetAdjacentTileAtSpecificFace(tile, TileFace.Right).Name);
+            Assert.AreEqual("0-0-4", gameBoard.GetAdjacentTileAtSpecificFace(tile, TileFace.Bottom).Name);
+
+            tile = new TriominoTile("0-0-0", TileOrientation.Flipped, new Point(25, 25));
+
+            Assert.AreEqual("0-0-2", gameBoard.GetAdjacentTileAtSpecificFace(tile, TileFace.Left).Name);
+            Assert.AreEqual("0-0-1", gameBoard.GetAdjacentTileAtSpecificFace(tile, TileFace.Right).Name);
+            Assert.AreEqual("0-0-3", gameBoard.GetAdjacentTileAtSpecificFace(tile, TileFace.Bottom).Name);
+        }
     }
 }

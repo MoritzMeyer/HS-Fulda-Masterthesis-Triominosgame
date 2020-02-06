@@ -28,7 +28,7 @@ namespace GraphKI.GameManagement
         /// <summary>
         /// Array with tiles on the GameBoard
         /// </summary>
-        private TriominoTile[,] tileGrid;
+        internal TriominoTile[,] tileGrid;
 
         /// <summary>
         /// Dictionary with all actual free faces on the gameboard.
@@ -92,7 +92,7 @@ namespace GraphKI.GameManagement
         }
         #endregion
 
-        #region CanPlaceTileOnGameBoard
+        #region CanPlaceTileOnGameBoard!!!
         /// <summary>
         /// Checks if a tile can placed on the GameBoard, based on the tiles orientation, 
         /// and another tile next to which the new tile should be placed
@@ -104,8 +104,6 @@ namespace GraphKI.GameManagement
         public bool CanPlaceTileOnGameBoard(string tileName, string otherName, TileFace? tileFace, TileFace? otherFace, out TriominoTile placableTile)
         {
             placableTile = null;
-
-
 
             // if it's the first tile it can always be placed.
             if (this.NumbTilesOnBoard == 0)
@@ -139,6 +137,134 @@ namespace GraphKI.GameManagement
             }
 
             return false;
+        }
+        #endregion
+
+        private bool CheckMatchingAdjacentTiles(TriominoTile newTile)
+        {
+            bool newTileMatchesAdjacentTiles = true;
+            TileFace[] facesToCheck = new TileFace[] { TileFace.Bottom, TileFace.Right, TileFace.Left };
+
+            foreach (TileFace faceToCheck in facesToCheck)
+            {
+                TriominoTile adjacenTileAtFace = this.GetAdjacentTileAtSpecificFace(newTile, faceToCheck);
+
+                if (adjacenTileAtFace != null)
+                {
+                    newTileMatchesAdjacentTiles = newTileMatchesAdjacentTiles && this.CheckMatchingAdjacentTileFaces(newTile, adjacenTileAtFace);
+                }
+                else
+                {
+                    newTileMatchesAdjacentTiles = newTileMatchesAdjacentTiles && this.CheckBridgeEdgesAtTileFace(newTile, faceToCheck);
+                }
+            }
+
+            return newTileMatchesAdjacentTiles;
+        }
+
+        private bool CheckMatchingAdjacentTileFaces(TriominoTile thisTile, TriominoTile otherTile)
+        {
+            // adjacentTiles must have different Orientations.
+            if (thisTile.Orientation.ToArrayTileOrientation() == otherTile.Orientation.ToArrayTileOrientation())
+            {
+                return false;
+            }
+
+            // other tile is right of this tile
+            if (thisTile.TileGridPosition.Y == otherTile.TileGridPosition.Y && thisTile.TileGridPosition.X + 1 == otherTile.TileGridPosition.X)
+            {
+                switch (thisTile.Orientation.ToArrayTileOrientation())
+                {
+                    case ArrayTileOrientation.BottomUp:
+                        return thisTile.Name.CheckIfFacesMatches(otherTile.Name, TileFace.Right, TileFace.Right);
+                    case ArrayTileOrientation.TopDown:
+                        return thisTile.Name.CheckIfFacesMatches(otherTile.Name, TileFace.Left, TileFace.Left);
+                    default:
+                        throw new ArgumentException("Unknown TileOrientation.");
+                }
+            }
+
+            // other tile is left of this tile
+            if (thisTile.TileGridPosition.Y == otherTile.TileGridPosition.Y && thisTile.TileGridPosition.X - 1 == otherTile.TileGridPosition.X)
+            {
+                switch (thisTile.Orientation.ToArrayTileOrientation())
+                {
+                    case ArrayTileOrientation.BottomUp:
+                        return thisTile.Name.CheckIfFacesMatches(otherTile.Name, TileFace.Left, TileFace.Left);
+                    case ArrayTileOrientation.TopDown:
+                        return thisTile.Name.CheckIfFacesMatches(otherTile.Name, TileFace.Right, TileFace.Right);
+                    default:
+                        throw new ArgumentException("Unknown TileOrientation.");
+                }
+            }
+
+            // other tile is top of this tile
+            if (thisTile.TileGridPosition.Y - 1 == otherTile.TileGridPosition.Y && thisTile.TileGridPosition.X == otherTile.TileGridPosition.X)
+            {
+                if (thisTile.Orientation.ToArrayTileOrientation() == ArrayTileOrientation.TopDown)
+                {
+                    return thisTile.Name.CheckIfFacesMatches(otherTile.Name, TileFace.Bottom, TileFace.Bottom);
+                }
+                else
+                {
+                    throw new ArgumentException("Tiles got now adjacent faces.");
+                }
+            }
+
+            // other tile is bottom of this tile
+            if (thisTile.TileGridPosition.Y + 1 == otherTile.TileGridPosition.Y && thisTile.TileGridPosition.X == otherTile.TileGridPosition.X)
+            {
+                if (thisTile.Orientation.ToArrayTileOrientation() == ArrayTileOrientation.BottomUp)
+                {
+                    return thisTile.Name.CheckIfFacesMatches(otherTile.Name, TileFace.Bottom, TileFace.Bottom);
+                }
+                else
+                {
+                    throw new ArgumentException("Tiles got now adjacent faces.");
+                }
+            }
+
+            return false;
+        }
+
+        private bool CheckBridgeEdgesAtTileFace(TriominoTile newTile, TileFace tileFace)
+        {
+            throw new NotImplementedException();
+        }
+
+        #region GetAdjacentTileAtSpecificFace
+        /// <summary>
+        /// Returns a tile from the tileGrid starting from a given face of a specific tile (and it's position on the tileGrid).
+        /// </summary>
+        /// <param name="tile">Tile to start from.</param>
+        /// <returns></returns>
+        internal TriominoTile GetAdjacentTileAtSpecificFace(TriominoTile tile, TileFace tileFace)
+        {
+            ArrayTileOrientation orientation = tile.Orientation.ToArrayTileOrientation();
+
+            if (orientation == ArrayTileOrientation.BottomUp && tileFace == TileFace.Bottom)
+            {
+                return this.tileGrid[tile.TileGridPosition.Y + 1, tile.TileGridPosition.X];
+            }
+
+            if (orientation == ArrayTileOrientation.TopDown && tileFace == TileFace.Bottom)
+            {
+                return this.tileGrid[tile.TileGridPosition.Y - 1, tile.TileGridPosition.X];
+            }
+
+            if (orientation == ArrayTileOrientation.BottomUp && tileFace == TileFace.Right ||
+                orientation == ArrayTileOrientation.TopDown && tileFace == TileFace.Left)
+            {
+                return this.tileGrid[tile.TileGridPosition.Y, tile.TileGridPosition.X + 1];
+            }
+
+            if (orientation == ArrayTileOrientation.BottomUp && tileFace == TileFace.Left ||
+                orientation == ArrayTileOrientation.TopDown && tileFace == TileFace.Right)
+            {
+                return this.tileGrid[tile.TileGridPosition.Y, tile.TileGridPosition.X - 1];
+            }
+
+            return null;
         }
         #endregion
 
@@ -285,7 +411,7 @@ namespace GraphKI.GameManagement
         }
         #endregion
 
-        #region TryAddTile
+        #region TryAddTile!!!
         /// <summary>
         /// Adds a tile on the GameBoard, based on the tiles Value, another Tile on the GameBoard besides which the new Tile should be placed
         /// and the faces with which both tiles should be placed towards each other.

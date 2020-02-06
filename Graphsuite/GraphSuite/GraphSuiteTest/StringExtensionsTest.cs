@@ -15,5 +15,12 @@ namespace GraphSuiteTest
             string test = "test";
             Assert.AreEqual("tset", test.Reverse());
         }
+
+        [TestMethod]
+        public void GetTileValue_has_to_work()
+        {
+            string test = "1_2_3";
+            Assert.AreEqual(6, test.GetTileValue());
+        }
     }
 }

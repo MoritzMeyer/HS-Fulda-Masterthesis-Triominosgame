@@ -444,5 +444,20 @@ namespace GraphKI.GraphSuite
             return "-" + this.Vertices.Select(v => v.Value).Aggregate((a, b) => a + "-" + b) + "->";
         }
         #endregion
+
+        public int BlueSideCount()
+        {
+            return this.Vertices.Where(v => v.Value.IsBlueSide()).Count();
+        }
+
+        public int GreenSideCount()
+        {
+            return this.Vertices.Where(v => v.Value.IsGreenSide()).Count();
+        }
+
+        public int RedSideCount()
+        {
+            return this.Vertices.Where(v => v.Value.IsRedSide()).Count();
+        }
     }
 }

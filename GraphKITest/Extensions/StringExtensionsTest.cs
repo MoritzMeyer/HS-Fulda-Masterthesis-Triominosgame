@@ -129,6 +129,17 @@ namespace GraphKITest.Extensions
         }
         #endregion
 
+        #region ReverseString_has_to_work
+        /// <summary>
+        /// Checks output of Reverse Extension method.
+        /// </summary>
+        [TestMethod]
+        public void ReverseString_has_to_work()
+        {
+            string test = "test";
+            Assert.AreEqual("tset", test.ReverseString());
+        }
+        #endregion
     }
 }
 

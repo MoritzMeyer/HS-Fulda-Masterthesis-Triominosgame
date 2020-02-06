@@ -107,6 +107,13 @@ namespace GraphKI.GameManagement
                 gameMode = GameMode.TwoPlayer;
             }
 
+            if (gameMode == GameMode.TestScene3)
+            {
+                this.TestScene = gameMode;
+                testScene = 3;
+                gameMode = GameMode.TwoPlayer;
+            }
+
             this.TurnCount = 0;
             this.MaxTileDrawCount = 3;
             this.HasPlaced = false;
@@ -630,6 +637,9 @@ namespace GraphKI.GameManagement
                 case 2:
                     this.DrawTilesForTestScene2();
                     break;
+                case 3:
+                    this.DrawTilesForTestScene3();
+                    break;
                 default:
                     return;
             }
@@ -685,6 +695,23 @@ namespace GraphKI.GameManagement
             this.DrawSpecificTile(tile9, this.DrawBoards[PlayerCode.Player2]);
         }
 
+        private void DrawTilesForTestScene3()
+        {
+            string tile0 = "2-2-2"; //1
+            string tile1 = "1-2-2"; //2
+            string tile2 = "1-2-5"; //1
+            string tile3 = "2-5-5"; //2
+            string tile4 = "2-3-5"; //1
+            string tile5 = "2-2-3"; //2
+
+            this.DrawSpecificTile(tile0, this.DrawBoards[PlayerCode.Player1]);
+            this.DrawSpecificTile(tile1, this.DrawBoards[PlayerCode.Player2]);
+            this.DrawSpecificTile(tile2, this.DrawBoards[PlayerCode.Player1]);
+            this.DrawSpecificTile(tile3, this.DrawBoards[PlayerCode.Player2]);
+            this.DrawSpecificTile(tile4, this.DrawBoards[PlayerCode.Player1]);
+            this.DrawSpecificTile(tile5, this.DrawBoards[PlayerCode.Player2]);
+        }
+
         private void InitTestScene()
         {
             switch(this.TestScene)
@@ -694,6 +721,9 @@ namespace GraphKI.GameManagement
                     break;
                 case GameMode.TestScene2:
                     this.InitTestScene2();
+                    break;
+                case GameMode.TestScene3:
+                    this.InitTestScene3();
                     break;
                 default:
                     return;
@@ -727,6 +757,17 @@ namespace GraphKI.GameManagement
             this.TryPlaceOnGameBoard("0-0-5", "0-5-5", TileFace.Bottom, TileFace.Left); //2
 
             //this.TryPlaceOnGameBoard("0-0-2", "0-0-0", TileFace.Right, TileFace.Right); //1
+        }
+
+        private void InitTestScene3()
+        {
+            this.ActivePlayer = PlayerCode.Player1;
+            this.TryPlaceOnGameBoard("2-2-2");
+            this.TryPlaceOnGameBoard("1-2-2", "2-2-2", TileFace.Bottom, TileFace.Right);
+            this.TryPlaceOnGameBoard("1-2-5", "1-2-2", TileFace.Right, TileFace.Left);
+            this.TryPlaceOnGameBoard("2-5-5", "1-2-5", TileFace.Left, TileFace.Bottom);
+            this.TryPlaceOnGameBoard("2-3-5", "2-5-5", TileFace.Left, TileFace.Right);
+            this.TryPlaceOnGameBoard("2-2-3", "2-3-5", TileFace.Left, TileFace.Right);
         }
     }
 }

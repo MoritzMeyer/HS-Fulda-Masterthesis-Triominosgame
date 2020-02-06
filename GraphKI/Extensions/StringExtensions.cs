@@ -1,4 +1,5 @@
 ﻿using GraphKI.GameManagement;
+using GraphKI.GraphSuite;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -142,5 +143,66 @@ namespace GraphKI.Extensions
             return tileFaceParts[0].Equals(otherFaceParts[1]) && tileFaceParts[1].Equals(otherFaceParts[0]);
         }
         #endregion
+
+        #region ReverseString
+        /// <summary>
+        /// Returns a string in reverse order.
+        /// </summary>
+        /// <param name="str">string to be reverted</param>
+        /// <returns>reverted string</returns>
+        public static string ReverseString(this string str)
+        {
+            char[] charArray = str.ToCharArray();
+            Array.Reverse(charArray);
+            return new string(charArray);
+        }
+        #endregion
+
+        public static bool IsBlueSide(this string str)
+        {
+            string value = str.GetVertexValue();
+            int i = Convert.ToInt32(value[0]);
+            int j = Convert.ToInt32(value[1]);
+
+            return i == j;
+        }
+
+        public static bool IsGreenSide(this string str)
+        {
+            string value = str.GetVertexValue();
+            int i = Convert.ToInt32(value[0]);
+            int j = Convert.ToInt32(value[1]);
+
+            return i < j;
+        }
+
+        public static bool IsRedSide(this string str)
+        {
+            string value = str.GetVertexValue();
+            int i = Convert.ToInt32(value[0]);
+            int j = Convert.ToInt32(value[1]);
+
+            return i > j;
+        }
+
+        public static VertexColor GetVertexColor(this string str)
+        {
+            if (str.IsGreenSide())
+            {
+                return VertexColor.Green;
+            }
+
+            if (str.IsBlueSide())
+            {
+                return VertexColor.Blue;
+            }
+
+            if (str.IsRedSide())
+            {
+                return VertexColor.Red;
+            }
+
+            throw new ArgumentException("Cannot determin VertexColor");
+        }
     }
 }
